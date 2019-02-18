@@ -1,0 +1,228 @@
+<div class="toolbar uk-margin">
+	<div class="uk-button-group">
+		<a class="uk-button uk-button-small uk-button-success" data-wysihtml-command="undo" title="Deshacer un paso" data-uk-tooltip><i class="uk-icon-undo"></i></a>
+		<a class="uk-button uk-button-small uk-button-success" data-wysihtml-command="redo" title="Adelantar un paso" data-uk-tooltip><i class="uk-icon-repeat"></i></a>
+	</div>
+	
+	<div class="uk-button-group uk-margin-small">
+		<a class="uk-button uk-button-small" data-wysihtml-command="bold" title="Bold CTRL+B" data-uk-tooltip><i class="uk-icon-bold"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="italic" title="Cursiva CTRL+I" data-uk-tooltip><i class="uk-icon-italic"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="underline" title="Subrallado CTRL+U" data-uk-tooltip><i class="uk-icon-underline"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="createLink" title="Link" data-uk-tooltip><i class="uk-icon-link"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="removeLink" title="Quitar link" data-uk-tooltip><i class="uk-icon-unlink"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="insertImage" title="Insertar Imágen" data-uk-tooltip><i class="uk-icon-image"></i></a>
+	</div>
+	
+	<div class="uk-button-group uk-margin-small">
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h1">h1</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h2">h2</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h3">h3</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h4">h4</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h5">h5</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="h6">h6</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="p" title="Bloque Salto de linea" data-uk-tooltip>p</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-blank-value="true">plaintext</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="pre">pre</a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="formatBlock" data-wysihtml-command-value="hr" title="Separador horizontal" data-uk-tooltip><i class="uk-icon-ellipsis-h"></i></a>
+        <!-- BEGIN: hide --><a class="uk-button uk-button-small" data-wysihtml-command="hrTypeStyle" title="Separador horizontal" data-uk-tooltip><i class="uk-icon-ellipsis-h"></i></a><!-- END: hide -->
+	</div>
+	
+	<div class="uk-button-group uk-margin-small">
+		<a class="uk-button uk-button-small" data-wysihtml-command="insertUnorderedList" title="Lista con puntos" data-uk-tooltip><i class="uk-icon-list-ul"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="insertOrderedList" title="Lista numérica" data-uk-tooltip><i class="uk-icon-list-ol"></i></a>
+	</div>
+	
+	<div class="uk-button-group uk-margin-small">
+        <a class="uk-button uk-button-small" data-wysihtml-command="justifyLeft"><i class="uk-icon-align-left"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="justifyRight"><i class="uk-icon-align-right"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="justifyCenter"><i class="uk-icon-align-center"></i></a>
+        <a class="uk-button uk-button-small" data-wysihtml-command="justifyFull"><i class="uk-icon-align-justify"></i></a>
+	</div>
+	
+	<div class="uk-button-group uk-margin-small">
+		<a class="uk-button uk-button-small" data-wysihtml-command="fontSizeStyle" title="Tamaño de la letra" data-uk-tooltip><i class="uk-icon-text-height"></i></a>
+		<a class="uk-button uk-button-small" data-wysihtml-command="fontTypeStyle" title="Fuente" data-uk-tooltip><i class="uk-icon-font"></i></a>
+		<a class="uk-button uk-button-small" data-wysihtml-command="foreColorStyle">Color</a>
+		<a class="uk-button uk-button-small" data-wysihtml-command="bgColorStyle">BG Color</a>
+	</div>
+	
+	<!--//<a class="uk-button" data-wysihtml-command="readmoreSeparator">Leer más separador</a>
+	//-->
+	<a class="uk-button uk-button-small uk-button-primary" data-wysihtml-action="change_view">HTML <i class="uk-icon-code"></i></a>
+	<a href="javascript:void(0);" class="uk-button uk-button-small uk-button-success" data-gallery="manage">Adm. Galería</a>
+	
+	<!-- BEGIN: hide -->
+	<div data-wysihtml-dialog="hrTypeStyle" style="display: none;">
+		<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+			<div class="uk-grid uk-grid-small">
+				<div class="uk-width-1-2">
+					<label>Ancho (width en %):</label>
+					<input data-wysihtml-dialog-field="width" placeholder="100" class="uk-width-1-1 uk-form-small"><br/>
+				</div>
+				
+				<div class="uk-width-1-2">
+					<label>Alto (en px):</label>
+					<input data-wysihtml-dialog-field="size" placeholder="1px" class="uk-width-1-1 uk-form-small"><br/>
+				</div>
+				
+				<div class="uk-width-1-1 uk-margin-top">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- END: hide -->
+	
+	<div data-wysihtml-dialog="fontTypeStyle" style="display: none;">
+		<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+			<div class="uk-grid uk-grid-small">
+				<div class="uk-width-8-10">
+					<select data-wysihtml-dialog-field="class" class="uk-width-1-1 uk-form-small">
+						<option value="mp">Myriad Pro</option>
+						<option value="ct">Crimson Text</option>
+						<option value="ctb">Crimson Text Bold</option>
+						<option value="ctbi">Crimson Text Bold Italic</option>
+						<option value="ctsb">Crimson Text Semibold</option>
+						<option value="ctsi">Crimson Text Semibold Italic</option>
+						<option value="lr">Lato Regular</option>
+					</select>
+				</div>
+				
+				<div class="uk-width-2-10">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>	
+		</div>
+	</div>
+	
+    <div data-wysihtml-dialog="createLink" style="display: none;">
+		<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+			<div class="uk-grid uk-grid-small">
+				<div class="uk-width-8-10">
+					<input data-wysihtml-dialog-field="href" value="http://" class="uk-width-1-1 uk-form-small">	
+				</div>
+				
+				<div class="uk-width-2-10">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+
+	<div data-wysihtml-dialog="insertImage" style="display: none;">
+		<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+			<div class="uk-grid uk-grid-small">
+				<div class="uk-width-1-1">
+					<label>Url de la imágen:</label>
+					<input data-wysihtml-dialog-field="src" value="" class="uk-width-1-1 uk-form-small">
+					<div class="uk-text-small"><span class="uk-badge uk-badge-notification uk-text-small">Nota:</span> despues de ({base}) añadir la ruta hasta la imágen (content/image.jpg)</div>
+				</div>
+				
+				<div class="uk-width-1-2">
+					<label>Width (Ancho):</label>
+					<input data-wysihtml-dialog-field="width" class="uk-width-1-1 uk-form-small"><br/>
+				</div>
+				
+				<div class="uk-width-1-2">
+					<label>Height (Alto):</label>
+					<input data-wysihtml-dialog-field="height" class="uk-width-1-1 uk-form-small"><br/>
+				</div>
+				
+				<div class="uk-width-1-2">
+					<label>Opciones extendidas:</label>
+					<select data-wysihtml-dialog-field="className" class="uk-width-1-1 uk-form-small">
+						<option value="">Por defecto</option>
+						<option value="fl">Aliniar a la Izquierda</option>
+						<option value="fr">Aliniar a la Derecha</option>
+						<option value="mc">Centrar</option>
+						<option value="e">Extender pantalla completa</option>
+					</select>
+				</div>
+				
+				<div class="uk-width-1-2">
+					<label>Alt:</label>
+					<input type="text" data-wysihtml-dialog-field="alt" class="uk-width-1-1 uk-form-small" />
+				</div>
+				
+				<div class="uk-width-1-1 uk-margin-top">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div data-wysihtml-dialog="fontSizeStyle" style="display: none;">
+        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+	        <div class="uk-grid uk-grid-small">
+				<div class="uk-width-2-10">
+					Tamaño:
+				</div>
+				
+				<div class="uk-width-5-10">
+					<input type="text" data-wysihtml-dialog-field="size" class="uk-width-1-1 uk-form-small" value="" placeholder="12px" />
+				</div>
+				
+				<div class="uk-width-3-10">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+    
+    <div data-wysihtml-dialog="foreColorStyle" style="display: none;">
+        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+	        <div class="uk-grid uk-grid-small">
+				<div class="uk-width-2-10">
+					Color:
+				</div>
+				
+				<div class="uk-width-5-10">
+					<input data-colorpicker type="text" data-wysihtml-dialog-field="color" value="rgb(0,0,0)" class="uk-width-1-1 uk-form-small" />
+				</div>
+				
+				<div class="uk-width-3-10">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+   
+    <div data-wysihtml-dialog="bgColorStyle" style="display: none;">
+        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top">
+	        <div class="uk-grid uk-grid-small">
+				<div class="uk-width-2-10">
+					Color Fondo:
+				</div>
+				
+				<div class="uk-width-5-10">
+					<input data-colorpicker type="text" data-wysihtml-dialog-field="color" value="rgb(0,0,0)" class="uk-width-1-1 uk-form-small" />
+				</div>
+				
+				<div class="uk-width-3-10">
+					<div class="uk-button-group uk-float-right">
+						<a class="uk-button uk-button-small uk-button-success" data-wysihtml-dialog-action="save">OK</a>
+						<a class="uk-button uk-button-small uk-button-danger" data-wysihtml-dialog-action="cancel">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>

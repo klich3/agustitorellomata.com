@@ -1,0 +1,20 @@
+Array
+(
+    [RESULT] => 00
+    [AUTHCODE] => 12345
+    [MESSAGE] => [ sistema de prueba ] Mensaje de respuesta de la pasarela [AUTHORISED]
+    [PASREF] => 14599383473212888
+    [AVSPOSTCODERESULT] => M
+    [AVSADDRESSRESULT] => M
+    [CVNRESULT] => M
+    [ACCOUNT] => internet
+    [MERCHANT_ID] => canalsimunne
+    [ORDER_ID] => 20160406122424-862
+    [TIMESTAMP] => 20160406122424
+    [AMOUNT] => 30
+    [MERCHANT_RESPONSE_URL] => http://server.josvila.es/elavon/response.php
+    [COMMENT1] => test compra
+    [pas_uuid] => e5ec2478-6046-4586-af94-0cef63c12856
+    [SHA1HASH] => 6738b86029c0c113775407b8d190dae3fcb5b1d6
+    [BATCHID] => 316532
+)

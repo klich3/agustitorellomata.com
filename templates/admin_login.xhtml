@@ -1,0 +1,33 @@
+<!-- BEGIN: admin_login -->
+	<div class="uk-vertical-align uk-text-center uk-height-1-1">
+        <div class="uk-vertical-align-middle uk-pull-1-1 uk-width-medium-1-3 uk-width-large-1-4">
+			
+			<!-- BEGIN: message -->
+			{FILE "templates/_admin_msg.xhtml"}
+			<!-- END: message -->
+			
+            <form class="uk-panel uk-panel-box uk-form" method="post" autocomplete="off">
+                <div class="uk-form-row">
+		        	<div class="uk-form-icon uk-width-1-1">
+					    <i class="uk-icon-user"></i>
+					    <input type="text" placeholder="Nombre de usuario" name="login_name" id="login_name" class="uk-width-1-1">
+					</div>
+	        	</div>
+	        	
+	        	<div class="uk-form-row">
+	        		<div class="uk-form-icon uk-width-1-1">
+					    <i class="uk-icon-asterisk"></i>
+					    <input type="password" id="login_pass" name="login_pass" placeholder="Contraseña" class="uk-width-1-1">
+					</div>
+	        	</div>
+	        	
+	        	<div class="uk-form-row">
+	        		<input type="hidden" name="form" value="login" />
+	        		<button type="submit" class="uk-button uk-button-primary">Ingresar</button>
+	        	</div>
+
+            </form>
+
+        </div>
+    </div>
+<!-- END: admin_login -->

@@ -1,0 +1,255 @@
+<!-- BEGIN: admin_options -->
+
+<!-- BEGIN: message -->
+{FILE "templates/_admin_msg.xhtml"}
+<!-- END: message -->
+
+<div class="uk-grid uk-grid-small">
+	<div class="uk-width-small-1-1 uk-width-medium-1-3 uk-width-large-1-3 uk-width-xlarge-1-3">
+		
+		<form class="uk-form">
+			
+			<div class="uk-form-row">
+	        	<label for="sitetitle">Título corto de la pagina</label>
+				<input type="text" name="sitetitle" value="{sitetitle}" class="uk-width-1-1" />
+	        </div>
+	        
+			<div class="uk-form-row">
+	        	<label for="sitetitlefull">Título largo o completo de la pagina</label>
+				<input type="text" name="sitetitlefull" value="{sitetitlefull}" class="uk-width-1-1" />
+	        </div>
+			
+			<div class="uk-form-row">
+	        	<label for="sitetitleseo">Título SEO de la pagina (corto)</label>
+				<input type="text" name="sitetitleseo" value="{sitetitleseo}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="description">Descripción (metas)</label>
+	        	<textarea rows="2" name="description" class="uk-width-1-1">{description}</textarea>
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="keywords">Keywords (metas) <span class="uk-text-small">separados por coma</span></label>
+	        	<textarea rows="2" name="keywords" class="uk-width-1-1">{keywords}</textarea>
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="initial_page">Página de inicio por defecto</label>
+	        	<select name="initial_page" class="uk-width-1-1">
+		        	<!-- BEGIN: sel_init_page -->
+		        	<option value="{obj_hash}" {selected}>{obj_title}</option>
+		        	<!-- END: sel_init_page -->
+	        	</select>
+	        </div>
+	        
+	        <hr/>
+	        
+	        <!-- BEGIN: hide -->
+	        <div class="uk-form-row">
+	        	<label for="home_show_testimonios">Mostrar testimonios en la home</label>
+	        	<select name="home_show_testimonios" class="uk-width-1-1">
+		        	<option value="0" {home_show_testimonios_selected_0}>No</option>
+		        	<option value="1" {home_show_testimonios_selected_1}>Sí</option>
+	        	</select>
+	        </div>
+	       
+	        <div class="uk-form-row">
+	        	<label for="home_testimonios_cn">Cantidad de testimonios</label>
+				<input type="number" name="home_testimonios_cn" value="{home_testimonios_cn}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <hr/>
+			<!-- END: hide -->
+			
+	        <div class="uk-form-row">
+	        	<label for="defaultLang">Idioma por defecto</label>
+				<select name="defaultLang" class="uk-width-1-1">
+					<!-- BEGIN: sel_def_lang -->
+					<option value="{lang}" {selected}>{lang}</option>
+					<!-- END: sel_def_lang -->
+				</select>
+	        </div>
+	        
+	        <hr/>
+	        
+	        <div class="uk-form-row">
+	        	<label for="">Idiomas (traducciones de la página web)</label>
+				
+				<div data-lang-container>
+					<!-- BEGIN: lang_row -->
+					<div class="uk-grid uk-grid-small uk-margin uk-margin-small" data-lang-item>
+						<div class="uk-width-2-3">
+							<input type="text" name="langs[]" value="{lang}" class="uk-width-1-1" />
+						</div>
+						<div class="uk-width-1-3">
+							<a href="javascript:void(0);" data-action="delLang" class="uk-button uk-button-danger uk-width-1-1"><i class="uk-icon-trash"></i></a>
+						</div>
+					</div>
+					<!-- END: lang_row -->
+				</div>
+				
+				<div class="uk-grid uk-grid-small uk-margin-top uk-margin-small">
+					<div class="uk-width-2-3">
+						<select name="addlang" class="uk-width-1-1">
+							<option value=""></option>
+							<!-- BEGIN: lang_sel -->
+							<option value="{code}">{locale} - {country_name}</option>
+							<!-- END: lang_sel -->
+						</select>
+					</div>
+					<div class="uk-width-1-3">
+						<a href="javascript:void(0);" data-action="addLang" class="uk-button uk-button-primary uk-width-1-1"><i class="uk-icon-plus"></i></a>
+					</div>
+				</div>
+				
+				<div class="uk-form-row">
+		        	<label for="langSelector">Mostrar lista de idiomas</label>
+		        	<select name="langSelector" class="uk-width-1-1">
+						<option value="0" {langSelector_selected_0}>No mostrar</option>
+						<option value="1" {langSelector_selected_1}>Mostrar</option>
+					</select>
+		        </div>
+	        </div>
+	        
+	        <hr/>
+	        
+	        <div class="uk-form-row">
+	        	<label for="analytics">Google Analytics (ID)</label>
+				<input type="text" name="analytics" value="{analytics}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="addthis">Google AddThis (ID)</label>
+				<input type="text" name="addthis" value="{addthis}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="gmaps_key">Google Api maps (key)</label>
+				<input type="text" name="gmaps_key" value="{gmaps_key}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <hr/>
+	        
+	        <div class="uk-form-row">
+	        	<label for="botmail">Email de robot</label>
+				<input type="text" name="botmail" value="{botmail}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+	        	<label for="mailinfo">Email de información</label>
+				<input type="text" name="mailinfo" value="{mailinfo}" class="uk-width-1-1" />
+	        </div>
+	        
+	        <hr/>
+	        
+	        <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin">
+				<div class="uk-panel-header"><strong>Dirección</strong></div>
+				<div class="uk-panel-body uk-padding-remove">
+					<div class="uk-form-row">
+			        	<label for="dir[0][placeTitle]">Titulo de referencia</label>
+						<input type="text" name="dir[0][placeTitle]" value="{dir.0.placeTitle}" class="uk-width-1-1" />
+			        </div>
+					<div class="uk-form-row">
+			        	<label for="dir[0][dir]">Dirección</label>
+						<textarea name="dir[0][dir]" rows="4" class="uk-width-1-1">{dir.0.dir}</textarea>
+			        </div>
+					<div class="uk-form-row">
+			        	<label for="dir[0][shortDir]">Dirección corta</label>
+						<textarea name="dir[0][shortDir]" rows="4" class="uk-width-1-1">{dir.0.shortDir}</textarea>
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][gmapUrl]">Google maps link</label>
+						<input type="text" name="dir[0][gmapUrl]" value="{dir.0.gmapUrl}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][gps]">Coordeadas gps (41.9452829,3.1690159)</label>
+						<input type="text" name="dir[0][gps]" value="{dir.0.gps}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][post]">Código postal</label>
+						<input type="text" name="dir[0][post]" value="{dir.0.post}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][country]">País</label>
+						<input type="text" name="dir[0][country]" value="{dir.0.country}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][city]">Ciudad</label>
+						<input type="text" name="dir[0][city]" value="{dir.0.city}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][tel]">Teléfono</label>
+						<input type="text" name="dir[0][tel]" value="{dir.0.tel}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][telAlter]">Teléfono secundario</label>
+						<input type="text" name="dir[0][telAlter]" value="{dir.0.telAlter}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="dir[0][cif]">CIF / NIF</label>
+						<input type="text" name="dir[0][cif]" value="{dir.0.cif}" class="uk-width-1-1" />
+			        </div>
+				</div>
+	        </div>
+	        
+	        <hr/>
+			
+			<div class="uk-panel uk-panel-box uk-panel-box-secondary uk-margin">
+				<div class="uk-panel-header"><strong>Redes Sociales</strong></div>
+				<div class="uk-panel-body uk-padding-remove">
+					<div class="uk-form-row">
+			        	<label for="fb">Facebook</label>
+						<input type="text" name="fb" value="{fb}" class="uk-width-1-1" />
+			        </div>
+					<div class="uk-form-row">
+			        	<label for="tw">Twitter</label>
+						<input type="text" name="tw" value="{tw}" class="uk-width-1-1" />
+			        </div>
+			        <div class="uk-form-row">
+			        	<label for="in">Instagram</label>
+						<input type="text" name="in" value="{in}" class="uk-width-1-1" />
+			        </div>
+				</div>
+			</div>
+			
+			<div class="uk-form-row">
+		    	<a href="javascript:void(0);" data-submit="upConfig" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar opciones</a>
+	        </div>
+		</form>
+		
+	</div>
+	
+	<div class="uk-width-small-1-1 uk-width-medium-2-3 uk-width-large-2-3 uk-width-xlarge-2-3">
+		<p><strong>Traducciones de elementos básicos de la web</strong></p>
+		<span class="uk-badge uk-badge-notification">Ejemplo:</span> Botones, elementos que se repiten constantemente.
+		
+		<form class="uk-form uk-margin-top" data-translations>
+			<div class="uk-form-row">
+				<table class="uk-table uk-table-condensed uk-overflow-container">
+					<thead>
+						<tr>
+				        	<th class="uk-text-center" title="Este campo no se ha de modificar" data-uk-tooltip>key</th>
+							<!-- BEGIN: lang_table_row -->
+							<th data-lang="{lang}" class="uk-text-center">{lang}</th>
+							<!-- END: lang_table_row -->
+						</tr>
+					</thead>
+					
+					<tbody>
+						<!-- BEGIN: lang_table_value -->
+						<tr>
+							<td data-disable class="bg-gray"><input type="text" name="translation[{key}]" value="{key}" class="uk-width-1-1" disabled/></td>
+							<!-- BEGIN: lang_table_value_input -->
+							<td data-lang="{lang_k}"><textarea rows="2" name="translation[{key}][{lang_k}]" class="uk-width-1-1">{lang_v}</textarea></td>
+							<!-- END: lang_table_value_input -->
+						</tr>
+						<!-- END: lang_table_value -->
+					</tbody>
+				</table>
+			</div>
+		</form>
+		
+	</div>
+</div>
+<!-- END: admin_options -->

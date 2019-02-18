@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions targetNamespace="http://webservices.apl02.redsys.es">
+	<wsdl:types>
+		<schema targetNamespace="http://webservices.apl02.redsys.es">
+			<element name="consultaOperacionesResponse">
+				<complexType>
+					<sequence>
+						<element name="consultaOperacionesReturn" nillable="true" type="xsd:string"/>
+					</sequence>
+				</complexType>
+			</element>
+			
+			<element name="consultaOperaciones">
+				<complexType>
+					<sequence>
+						<element name="cadenaXML" nillable="true" type="xsd:string"/>
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+	</wsdl:types>
+	
+	<wsdl:message name="consultaOperacionesResponse">
+		<wsdl:part element="intf:consultaOperacionesResponse" name="parameters"/>
+	</wsdl:message>
+	
+	<wsdl:message name="consultaOperacionesRequest">
+		<wsdl:part element="intf:consultaOperaciones" name="parameters"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="SerClsWSConsulta">
+		<wsdl:operation name="consultaOperaciones">
+			<wsdl:input message="intf:consultaOperacionesRequest" name="consultaOperacionesRequest"/>
+			<wsdl:output message="intf:consultaOperacionesResponse" name="consultaOperacionesResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="SerClsWSConsultaSoapBinding" type="intf:SerClsWSCons ulta">
+		<wsaw:UsingAddressingwsdl:required="false"/> 
+		<wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/> 
+
+		<wsdl:operation name="consultaOperaciones">
+			<wsdlsoap:operation soapAction="consultaOperaciones"/>
+			<wsdl:input name="consultaOperacionesRequest">
+				<wsdlsoap:bodyuse="literal"/>
+			</wsdl:input>
+	
+			<wsdl:output name="consultaOperacionesResponse">
+				<wsdlsoap:bodyuse="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<wsdl:service name="SerClsWSConsultaService">
+		<wsdl:port binding="intf:SerClsWSConsultaSoapBinding" name="SerClsWSConsulta">
+			<wsdlsoap:address location="https://glunt.es/class/redsys_soap/InotificacionSIS.php"/>
+        </wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

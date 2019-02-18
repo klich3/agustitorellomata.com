@@ -1,0 +1,235 @@
+<!-- BEGIN: admin_menus -->
+
+<!-- BEGIN: message -->
+{FILE "templates/_admin_msg.xhtml"}
+<!-- END: message -->
+
+<div class="uk-grid uk-grid-small">
+	<!-- BEGIN: list -->
+	<div class="uk-width-1-1 uk-margin-bottom">
+		<a href="#addMenu" data-uk-modal class="uk-button uk-button-small uk-button-primary">Crear Menú</a>
+	</div>
+	
+	<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-small">
+		<thead>
+	        <tr>
+	            <th title="Visible / publicado" data-uk-tooltip>V.</th>
+	            <th class="uk-text-center">Titulo</th>
+	            <th class="uk-text-center">Tipo</th>
+	            <th class="uk-text-center">Idioma</th>
+	            <th class="uk-text-center">Fecha de creación</th>
+	            <th></th>
+	            <th class="uk-text-right">Acciónes</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        <!-- BEGIN: row -->
+	        <tr data-id="{id}">
+	            <td><i class="{active_classes}" title="Visibilidad" data-uk-tooltip></i></td>
+	            <td>{title}</td>
+	            <td>{type}</td>
+		        <td class="uk-text-center">{lang}</td>    
+		        <td class="uk-text-center">{create_date}<br/>{update_date}</td>    
+		        <td></td>    
+		        <td>
+			        <div class="uk-button-group uk-float-right">
+						<a href="{current_hash}?action=editMenus&id={id}" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a>
+						<a href="javascript:void(0);" data-action="delMenus" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
+					</div>
+		        </td>
+	        </tr>
+	        <!-- END: row -->
+	        
+	    </tbody>
+	</table>
+	<!-- END: list -->
+	
+	<!-- BEGIN: editPage -->
+	<div class="uk-width-1-1">
+		<div class="uk-width-1-1 uk-margin-bottom">
+			<a href="{current_hash}" class="uk-button uk-button-small"><i class="uk-icon-angle-left"></i> Volver</a>
+		</div>
+		
+		<div class="uk-grid uk-grid-small">
+			<div class="uk-width-small-1-1 uk-width-medium-1-3 uk-width-large-1-3 uk-width-xlarge-1-3 uk-margin">
+				<!-- BEGIN: hide -->
+				<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin">
+					<div class="uk-panel-header uk-margin"><strong>Opciones extendidas del menú</strong></div>
+					<div class="uk-panel-body uk-padding-remove">
+					
+						<form class="uk-form">
+							<div class="uk-form-row">
+								<div class="uk-grid">
+									<div class="uk-width-1-1">
+										Tipo:
+									</div>
+									
+									<div class="uk-width-1-2">
+										<input type="radio" value="1" name="m_type" checked/> Vertical
+									</div>
+									<div class="uk-width-1-2">
+										<input type="radio" value="0" name="m_type" /> Horizontal
+									</div>
+								</div>
+							</div>
+						</form>
+					
+					</div>
+				</div>
+				<!-- END: hide -->
+				 
+				 <div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin">
+					<div class="uk-panel-header uk-margin"><strong>Añadir elemento</strong></div>
+					<div class="uk-panel-body uk-padding-remove">
+						
+						<form class="uk-form" data-type="edit">
+							<div class="uk-form-row">
+								<label for="m_pid">Página</label>
+								<select name="m_pid" class="uk-width-1-1">
+									<option value="">-- Vacío ---</option>
+									<!-- BEGIN: pag_row -->
+									<option value="{id}">{obj_title} ({lang})</option>
+									<!-- END: pag_row -->
+								</select>
+							</div>
+							
+							<div class="uk-form-row">
+								<label for="m_title">Titulo Personalizado</label>
+								<input type="text" name="m_title" class="uk-width-1-1" />
+							</div>
+							
+							<div class="uk-form-row">
+								<label for="m_url">Url Personalizada</label>
+								<input type="text" name="m_url" class="uk-width-1-1" />
+							</div>
+							
+							<div class="uk-form-row">
+								<input type="checkbox" name="m_active" value="1" class="uk-width-1-1" /> Activo / Visible?
+							</div>
+							
+							<div class="uk-form-row">
+								<input type="hidden" name="id" value="" />
+								<input type="hidden" name="m_id" value="{m_id}" />
+								
+								<div class="uk-button-group uk-float-right">
+									<a href="javascript:void(0);" data-action="cleanForm" class="uk-button">Limpiar</a>
+									<a href="javascript:void(0);" data-submit="addUpMenuItem" class="uk-button uk-button-primary"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar</a>
+								</div>
+							</div>
+						</form>
+						
+					</div>
+				 </div>
+			</div>
+				
+			<div class="uk-width-small-1-1 uk-width-medium-2-3 uk-width-large-2-3 uk-width-xlarge-2-3">
+				<div class="uk-panel uk-panel-box uk-panel-box-secondary uk-width-1-1">
+					<div class="uk-panel-body uk-padding-remove">
+						<div class="uk-width-1-1 uk-text-small uk-hidden uk-text-right" data-status></div>
+						
+						<ul class="uk-nestable uk-placeholder" data-uk-nestable="{handleClass:'uk-nestable-handle', maxDepth:2, group:'com'}" data-type="container">
+							<!-- BEGIN: m_item -->
+							<li data-item-id="{id}" data-page-id="{p_id}" data-item-url="{p_url}" data-item-title="{p_title}" data-item-active="{active}" class="uk-nestable-item {class_parent}">
+								<div class="uk-nestable-panel {active_class}">
+									<div class="uk-nestable-handle uk-float-left">
+										<i class="uk-nestable-handle uk-icon-bars uk-margin-small-right"></i>
+									</div>
+									
+									<div class="uk-grid uk-grid-small">
+										<div class="uk-width-2-3">
+											<div class="noselect">{title}<br/><i class="uk-text-small">{url}</i></div>
+										</div>
+										<div class="uk-width-1-3">
+											<div class="uk-button-group uk-float-right">
+												<a href="javascript:void(0);" class="uk-button uk-button-small uk-button-primary" data-action="editItem"><i class="uk-icon-pencil"></i></a>
+												
+												<a class="uk-button uk-button-danger uk-button-small" href="javascript:void(0);" data-action="delItem"><i class="uk-icon-trash"></i></a>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<!-- BEGIN: parent -->
+								<ul data-item-parent="{parent_id}" class="uk-nestable-list">
+									<!-- BEGIN: row -->
+									<li data-page-id="{p_id}" data-item-id="{id}" data-item-url="{p_url}" data-item-title="{p_title}" data-item-active="{active}" class="uk-nestable-item">
+										<div class="uk-nestable-panel {active_class}">
+											<div class="uk-nestable-handle uk-float-left">
+												<i class="uk-nestable-handle uk-icon-bars uk-margin-small-right"></i>
+											</div>
+											
+											<div class="uk-grid uk-grid-small">
+												<div class="uk-width-2-3">
+													<div class="noselect">{title}<br/><i class="uk-text-small">{url}</i></div>
+												</div>
+												<div class="uk-width-1-3">
+													<div class="uk-button-group uk-float-right">
+														<a href="javascript:void(0);" class="uk-button uk-button-small uk-button-primary" data-action="editItem"><i class="uk-icon-pencil"></i></a>
+														
+														<a class="uk-button uk-button-danger uk-button-small" href="javascript:void(0);" data-action="delItem"><i class="uk-icon-trash"></i></a>
+													</div>
+												</div>
+											</div>
+										</div>
+																
+									</li>
+									<!-- END: row -->
+								</ul>
+								<!-- END: parent -->
+							</li>
+							<!-- END: m_item -->
+						</ul>
+					</div>
+				 </div>
+			</div>
+		</div>
+	</div>
+	<!-- END: editPage -->
+</div>
+
+<!--// MODALS //-->
+<div class="uk-modal" id="addMenu">
+	<div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        
+        <form class="uk-form">
+	        <div class="uk-form-row">
+		        <label for="f_title">Nombre del menú</label>
+		        <input type="text" name="f_title" value="" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <input type="checkbox" name="f_active" value="1" /> Activo / Visible ?
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <label for="f_or">Orden</label>
+		        <input type="number" name="f_or" value="0" class="uk-width-1-1" />
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <label for="f_lang">Idioma</label>
+		        <select name="f_lang" class="uk-width-1-1">
+			        <!-- BEGIN: lang_sel_modal -->
+			        <option value="{key}">{title}</option>
+			        <!-- END: lang_sel_modal -->
+		        </select>
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <label for="f_mtype">Tipo</label>
+		        <select name="f_mtype" class="uk-width-1-1">
+			        <!-- BEGIN: type_sel_modal -->
+			        <option value="{id}">{title}</option>
+			        <!-- END: type_sel_modal -->
+		        </select>
+	        </div>
+	        
+	        <div class="uk-form-row">
+		    	<a href="javascript:void(0);" data-submit="addMenus" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Crear</a>
+	        </div>
+        </form>
+        
+    </div>
+</div>
+<!-- END: admin_menus -->

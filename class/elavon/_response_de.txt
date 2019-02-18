@@ -1,0 +1,26 @@
+Array
+(
+    [RESULT] => 00
+    [AUTHCODE] => 12345
+    [MESSAGE] => [ sistema de prueba ] Mensaje de respuesta de la pasarela [AUTHORISED]
+    [PASREF] => 14599469595601836
+    [AVSPOSTCODERESULT] => M
+    [AVSADDRESSRESULT] => M
+    [CVNRESULT] => M
+    [ACCOUNT] => internet
+    [MERCHANT_ID] => canalsimunne
+    [ORDER_ID] => 20160406144804-984
+    [TIMESTAMP] => 20160406144804
+    [AMOUNT] => 2000
+    [MERCHANT_RESPONSE_URL] => http://server.josvila.es/elavon/response.php
+    [COMMENT1] => test compra
+    [CARD_STORAGE_ENABLE] => 1
+    [pas_uuid] => 0ce900b6-b2b4-4ce7-9105-291de0da15ba
+    [REALWALLET_CHOSEN] => 1
+    [PAYER_SETUP] => 501
+    [PAYER_SETUP_MSG] => Esta referencia de pagador (123) ya se ha usado. Utiliza otra
+    [PMT_SETUP] => 508
+    [PMT_SETUP_MSG] => Error al crear el pagador. El método de pago se ha anulado.
+    [SHA1HASH] => 446a46f662d4eadaade6464624ac2fa25618fa8e
+    [BATCHID] => 316532
+)

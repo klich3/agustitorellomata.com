@@ -1,0 +1,45 @@
+<div id="login_modal" class="uk-modal" data-modal="false">
+	<div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+    	
+    	<div class="uk-width-1-1">
+			
+			<form method="POST" class="uk-form uk-form-horizontal">
+				<fieldset>
+					Su session ha caducado, vuelva a ingresar para continuar.
+				</fieldset>
+				
+				<fieldset>
+					<label for="usuario">Usuario:</label>
+					<div class="uk-form-icon uk-width-1-1">
+					    <i class="uk-icon-user"></i>
+						<input type="text" id="login_name" name="login_name" class="uk-width-1-1">
+					</div>
+				</fieldset>
+				
+				<fieldset>
+					<label for="password">Contraseña:</label>
+					<div class="uk-form-icon uk-width-1-1">
+					    <i class="uk-icon-barcode"></i>
+						<input type="password" id="login_pass" name="login_pass" class="uk-width-1-1">
+					</div>
+					
+				</fieldset>
+				
+				<hr class="uk-article-divider">
+								
+				<fieldset>
+					<a href="javascript:void(0);" data-login-submit="login_modal" class="half boton uk-button"><i class="uk-icon-spinner uk-icon-spin uk-hidden"></i> Entrar</a>
+				</fieldset>
+				
+				<div class="modal_message uk-hidden uk-margin">
+					<div class="uk-alert uk-alert-warning" data-uk-alert>
+						<div class="message"></div>
+					</div>
+				</div>
+			</form>	
+				
+    	</div>
+    	
+    </div>	
+</div>

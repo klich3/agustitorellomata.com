@@ -1,0 +1,145 @@
+<!-- BEGIN: header -->
+<!DOCTYPE html>
+<html class="no-js" lang="{user_lang}" xmlns="http://www.w3.org/1999/xhtml" prefix="og: http://ogp.me/ns# addthis: http://www.addthis.com/help/api-spec" data-hash="{header_stage_hash}" data-type="{stage_hash}">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+	<!-- BEGIN: only_home --><meta name="description" content="{description}">
+	<meta name="keywords" content="{keywords}">
+	<meta name="ROBOTS" content="INDEX, FOLLOW" /><!-- END: only_home -->
+	{FILE {header_seo}}
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	
+	<title>{site_title}</title> 
+	
+	<link type="text/plain" rel="author" href="{base}humans.txt" />
+	<link rel="stylesheet" type="text/css" media="all" href="{base_script}style{production_minimization}.css" />
+	
+	<link rel="shortcut icon" type="image/x-icon" href="{base}images/favicon.ico" />
+	<link rel="apple-touch-icon" type="image/png" href="{base}images/favicon.png" />
+	
+	<script type="text/javascript">
+		var fn_base_script = '{base_script}',
+			s_default = '{default_initial_stage}',
+			debug = '{debug}',
+			fn_addthis = '{addthis}',
+			fn_analytics = '{analytics}',
+			fn_gmapkey = '{gmaps_key}',
+			min = '{production_minimization}',
+			jsToLoad = {
+				items:[fn_base_script+'js/jquery-3.3.1.min.js',
+					   fn_base_script+'js/jquery.imagesloaded.min.js',
+					   fn_base_script+'js/jquery.tmpl.min.js',
+					   fn_base_script+'js/x.211.fn'+min+'.js']
+			};
+	</script>
+	
+</head>
+<body>
+{FILE "templates/_header_svg.xhtml"}
+
+<div class="wrap">
+	<header class="mb-4 cp-1">
+		<div class="hl">
+			<div class="g gc">
+				<div class="menu-container" menu-handler>
+					<div class="menu-box">
+						<div class="menu-inner"></div>
+					</div>
+				</div>
+				
+				<div class="ws-6-10" data-content-from="logo"></div>
+				<div class="ws-6-10" data-content-from="social"></div>
+				
+				<div class="w-1-1 pb-3"></div>
+				
+				<div class="w-1-1">
+					<div class="g">
+						<div class="ws-1-2">
+							<div class="pl-5" data-content-from="tel"></div>
+						</div>
+						<div class="ws-1-2">
+							<div class="pr-5 fr" data-content-from="lang"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="menu-nav l">
+				<div class="w-1-1 pt-5" data-content-from="menu"></div>
+			</div>
+		</div>
+		
+		<div class="hs">
+			<div class="g">
+				<div class="w-1-1 pt-1"></div>
+				<div class="w-2-10">
+					<div class="w-1-1 social">
+						<ul class="ln p-n flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="social">
+							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
+							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
+							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
+							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
+						</ul>
+					</div>
+					<div class="w-1-1">info@agustitorellomata.com</div>
+				</div>
+				
+				<div class="w-6-10 txt@c">
+					<a href="{base_script}{user_lang}" rel="nofollow" data-event="header/logo" class="logo" data-source="logo">
+						<svg class="e" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo"></use></svg>
+					</a>
+				</div>
+				
+				<div class="w-2-10">
+					<div class="g">
+						<div class="w-1-1">
+							<ul class="ln p-n">
+								<li>
+									<img class="cata fr" src="{base_script}images/header-cata.png" alt="Animación cata" />
+								</li>
+								<li>
+									<ul class="fr w-3-10 ln p-n flx@fd-r@fw-n@jc-sb@ai-c@ac-c lang mr-5" data-source="lang">
+										<li><a href="" data-event="header/lang/es">ES</a></li>
+										<li><a href="" data-event="header/lang/ca">CA</a></li>
+										<li><a href="" data-event="header/lang/en">EN</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+						<div class="w-1-1 txt@r">
+							<div data-source="tel">Telf: +34 93 891 11 73</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="w-1-1">
+					<div class="c cc">
+						<nav class="pt-2">
+							<ul class="ln flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="menu">
+								<li><a href="" data-event="menu/">Home</a></li>
+								<li><a href="" data-event="menu/">Filosofía</a></li>
+								<li><a href="" data-event="menu/">Viñedos</a></li>
+								<li><a href="" data-event="menu/">Cava</a></li>
+								<li><a href="" data-event="menu/">Kripta</a></li>
+								<li><a href="" data-event="menu/">Productos</a></li>
+								<li><a href="" data-event="menu/">Premios</a></li>
+								<li><a href="" data-event="menu/">Visitas</a></li>
+								<li><a href="" data-event="menu/">Actividades</a></li>
+								<li><a href="" data-event="menu/">Noticias</a></li>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="clearfix"></div>
+	</header>
+	
+	<div class="w-1-1 hl" data-some-h="header"></div>
+	
+	<main class="pt-5@s">
+		{FILE {pagefreaturedImageTmpl}}
+<!-- END: header -->

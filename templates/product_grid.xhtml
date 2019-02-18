@@ -1,0 +1,46 @@
+<!-- BEGIN: product_grid -->
+{FILE {pagefreaturedImageTmpl}}
+
+<div class="w-1-1">
+	<div class="c cc cp-4@s">
+		{FILE {jsonToTmpl}}
+	</div>
+</div>
+
+<div class="w-1-1 mt-4 mb-4">
+	<div class="g cp-5@s">
+		<div class="w-1-2 txt@c">
+			<div class="prod-cat-selector"><span class="pr-5">{lang_product_type}</span> <svg width="16" height="14" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-arrow-b"></use></svg>
+				<ul class="ln sublist h">
+					<li><a href="javascript:void(0);" rel="nofollow" data-type="category" data-id="all">{lang_selector_all}</a></li>
+					
+					<!-- BEGIN: cat_row -->
+					<li><a href="javascript:void(0);" class="txt@e" rel="nofollow" data-type="category" data-id="{id}">{lang_data}</a></li>
+					<!-- END: cat_row -->
+					
+				</ul>
+			</div>
+		</div>
+		
+		<div class="w-1-2 txt@c">
+			<div class="prod-cat-selector"><span class="pr-5">{lang_product_collections}</span> <svg width="16" height="14" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-arrow-b"></use></svg>
+				<ul class="ln sublist h">
+					<li><a href="javascript:void(0);" rel="nofollow" data-type="collection" data-id="all">{lang_selector_all}</a></li>
+					
+					<li><a href="javascript:void(0);" class="txt@e" rel="nofollow" data-type="collection" data-id="{id}">{lang_data}</a></li>
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<div class="w-1-1 mt-4"></div>
+
+	<div class="w-1-1">
+		<div class="w-1-1 txt@c pb-10@s pt-10@s" data-preloader></div>
+		
+		<ul class="g gc ln gws-1-1 gwm-1-3 gwl-1-3 gwxl-1-3 grid-products" data-grid-container>
+		</ul>
+	</div>
+</div>
+<!-- END: product_grid -->
