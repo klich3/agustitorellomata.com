@@ -1,0 +1,48 @@
+<!-- BEGIN: contactoTmpl -->
+
+<!-- BEGIN: home_header -->
+<div class="contact-stage txt@c pt-5 pb-5 cp-4@s">
+	<h2>{lang_title_contacto}</h2>
+	
+	<div class="ws-1-1 w-6-10 mc txt@l pt-2">
+		<div class="clearfix"></div>
+		<p class="font@ctb pb-2">{lang_contacto_text}</p>
+<!-- END: home_header -->
+
+<!-- BEGIN: rest_header -->
+<div class="contact-stage txt@c cp-4@s">
+	<div class="ws-1-1 w-6-10 mc txt@l">
+<!-- END: rest_header -->	
+	
+	
+	
+		<form data-name="contact">
+			<fieldset>
+				<input type="text" name="c_name" placeholder="{lang_f_name}" class="w-1-1" />
+			</fieldset>
+			
+			<fieldset>
+				<input type="text" name="c_email" placeholder="Email" class="w-1-1" />
+			</fieldset>
+			
+			<fieldset>
+				<input type="text" name="c_subject" placeholder="{lang_f_subject}" class="w-1-1"  />
+			</fieldset>
+			
+			<fieldset>
+				<textarea rows="10" placeholder="{lang_f_message}" class="w-1-1"></textarea>
+			</fieldset>
+			
+			<fieldset data-type="message" class="message h"></fieldset>
+			
+			<fieldset>
+				<a href="javascript:void(0);" class="button fr" data-action="contact" data-event="{stage_hahs}/contact/submit">{lang_send_button}</a>
+			</fieldset>
+		</form>
+	</div>
+</div>
+
+<div class="w-1-1" id="gmap">
+	<noscript id="gmap">{jsonGmap}</noscript>
+</div>
+<!-- END: contactoTmpl -->

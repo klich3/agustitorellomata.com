@@ -1,0 +1,52 @@
+<!-- BEGIN: admin_header -->
+<!DOCTYPE html>
+<html class="no-js uk-height-1-1" lang="{user_lang}" data-hash="{header_stage_hash}">
+<head>
+    <title>{sitetitlefull}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=1">
+    <meta name="robots" content="noarchive, noindex, nofollow, nosnippet">
+    
+    <link rel="shortcut icon" href="{base}images/favicon.ico">
+    <link rel="apple-touch-icon" type="/image/png" href="{base}images/favicon60x60.png" /> 
+    
+	<link rel="stylesheet" type="text/css" href="{base}uikit.almost-flat.min.css" />
+	
+	<!-- BEGIN: logged_js -->
+	<script type="text/javascript">
+	    var fn_base = '{base}',
+		    fn_base_script = '{base_script}',
+		    debug = '{debug}',
+		    session_init = '{cookie_lifeinit}',
+		    session_over = '{cookie_lifeover}',
+		    st_languages = '{languages}',
+		    editors = [],
+		    jsToLoad = {items:[
+			    fn_base_script+'js/jquery-1.12.4.min.js',
+			    fn_base_script+'js/admin/uikit.min.js',
+			    fn_base_script+'js/admin/admin.wysihtml.js',
+			    fn_base_script+'js/admin/jquery.tmpl.min.js',
+			    fn_base_script+'js/admin/admin.x.211.function.manual.js'
+		]};
+	</script> 
+    <script type="text/javascript" src="{base}js/load.min.js"></script>
+	<!-- END: logged_js -->
+</head>
+<body class="uk-height-1-1 admin-side">
+{FILE "templates/_header_svg.xhtml"}
+<!-- BEGIN: logged -->
+	{FILE "templates/admin_navbar.xhtml"}
+	<div class="uk-grid uk-grid-small uk-margin cp">
+		<div class="uk-hidden menu-dummy">
+			{FILE "templates/admin_menu.xhtml"}
+		</div>
+		
+		<div class="uk-pull-1-1 uk-width-medium-2-10 uk-width-large-2-10 uk-margin uk-hidden-small menu-cnt" data-uk-observe></div>
+		
+		<div id="mob-menu" class="uk-offcanvas">
+			<div class="uk-offcanvas-bar mob-menu-cnt" data-uk-observe></div>
+		</div>
+		
+		<div class="uk-pull-1-1 uk-width-medium-8-10 uk-width-large-8-10 uk-width-xlarge-8-10 uk-margin">
+<!-- END: logged -->
+<!-- END: admin_header -->

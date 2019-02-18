@@ -1,0 +1,18 @@
+[17-May-2017 16:06:46 Europe/Madrid] PHP Fatal error:  SOAP-ERROR: Encoding: Violation of encoding rules in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 139
+[17-May-2017 16:08:13 Europe/Madrid] PHP Fatal error:  SOAP-ERROR: Encoding: Violation of encoding rules in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 132
+[17-May-2017 16:10:55 Europe/Madrid] PHP Warning:  Illegal string offset 'Body' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:10:55 Europe/Madrid] PHP Warning:  Illegal string offset 'procesaNotificacionSIS' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:10:55 Europe/Madrid] PHP Warning:  Illegal string offset 'XML' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:10:55 Europe/Madrid] PHP Notice:  Undefined offset: 1 in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 79
+[17-May-2017 16:11:11 Europe/Madrid] PHP Warning:  Illegal string offset 'Body' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:11 Europe/Madrid] PHP Warning:  Illegal string offset 'procesaNotificacionSIS' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:11 Europe/Madrid] PHP Warning:  Illegal string offset 'XML' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:11 Europe/Madrid] PHP Notice:  Undefined offset: 1 in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 79
+[17-May-2017 16:11:24 Europe/Madrid] PHP Warning:  Illegal string offset 'Body' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:24 Europe/Madrid] PHP Warning:  Illegal string offset 'procesaNotificacionSIS' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:24 Europe/Madrid] PHP Warning:  Illegal string offset 'XML' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:24 Europe/Madrid] PHP Notice:  Undefined offset: 1 in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 79
+[17-May-2017 16:11:42 Europe/Madrid] PHP Warning:  Illegal string offset 'Body' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:42 Europe/Madrid] PHP Warning:  Illegal string offset 'procesaNotificacionSIS' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:42 Europe/Madrid] PHP Warning:  Illegal string offset 'XML' in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 56
+[17-May-2017 16:11:42 Europe/Madrid] PHP Notice:  Undefined offset: 1 in /www_211/glunt.com/class/redsys_soap/InotificacionSIS.php on line 79

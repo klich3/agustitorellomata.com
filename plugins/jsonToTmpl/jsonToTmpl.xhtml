@@ -1,0 +1,27 @@
+<!-- BEGIN: grid -->
+<div class="g">
+	<!-- BEGIN: row -->
+	{grid_collapse}
+	<div class="{attributes_options}">
+		{nb}<!-- BEGIN: element_img -->
+		<img src="{base}images/blank.gif" data-image="{value}" data-preloadimages alt="" class="e" />
+		<!-- END: element_img --><!-- BEGIN: element_boxheight_img -->
+		<div class="w-1-1 height-s" data-box-height data-height-fix="height-s" data-bgfrom-img="{value}">&nbsp;</div>
+		<!-- END: element_boxheight_img --><!-- BEGIN: element_embed -->
+		<iframe class="w-1-1" width="100%" height="315" src="{value}" frameborder="0" allowfullscreen></iframe>
+		<!-- END: element_embed --><!-- BEGIN: element_text -->
+		{value}
+		<!-- END: element_text --><!-- BEGIN: element_slider -->
+		<div class="slider-area h" data-slider-id="cnSlider-{sliderid}">
+			<noscript id="sliderData">{jsonSlider}</noscript>
+		</div>
+		<!-- END: element_slider -->
+		
+	</div>
+	<!-- END: row -->
+	
+	<!-- BEGIN: row_boxh_sep -->
+	<div class="hl w-1-1 mt-1 mb-1">&nbsp;</div>
+	<!-- END: row_boxh_sep -->
+</div>
+<!-- END: grid -->

@@ -1,0 +1,9 @@
+User-agent: Googlebot
+Disallow: /xceed/
+Disallow: /images/
+Disallow: /content/
+
+User-agent: *
+Allow: *
+
+Sitemap: https://agustitorellomata.com/sitemap.xml
