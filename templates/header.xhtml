@@ -77,13 +77,10 @@
 				<div class="w-2-10">
 					<div class="w-1-1 social">
 						<ul class="ln p-n flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="social">
-							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
-							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
-							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
-							<li><a href="" rel="nofollow"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#social-fb"></use></svg></a></li>
+							{FILE {socialTmpl}}
 						</ul>
 					</div>
-					<div class="w-1-1">info@agustitorellomata.com</div>
+					<div class="w-1-1"><a href="mailto:{mailinfo}" rel="nofollow" target="_blank">{mailinfo}</a></div>
 				</div>
 				
 				<div class="w-6-10 txt@c">
@@ -101,15 +98,13 @@
 								</li>
 								<li>
 									<ul class="fr w-3-10 ln p-n flx@fd-r@fw-n@jc-sb@ai-c@ac-c lang mr-5" data-source="lang">
-										<li><a href="" data-event="header/lang/es">ES</a></li>
-										<li><a href="" data-event="header/lang/ca">CA</a></li>
-										<li><a href="" data-event="header/lang/en">EN</a></li>
+										{FILE {header_lang}}
 									</ul>
 								</li>
 							</ul>
 						</div>
 						<div class="w-1-1 txt@r">
-							<div data-source="tel">Telf: +34 93 891 11 73</div>
+							<div data-source="tel">Telf: <a href="tel:{dir.tel}" rel="nofollow" target="_blank">{dir.tel}</a></div>
 						</div>
 					</div>
 				</div>
@@ -118,16 +113,7 @@
 					<div class="c cc">
 						<nav class="pt-2">
 							<ul class="ln flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="menu">
-								<li><a href="" data-event="menu/">Home</a></li>
-								<li><a href="" data-event="menu/">Filosofía</a></li>
-								<li><a href="" data-event="menu/">Viñedos</a></li>
-								<li><a href="" data-event="menu/">Cava</a></li>
-								<li><a href="" data-event="menu/">Kripta</a></li>
-								<li><a href="" data-event="menu/">Productos</a></li>
-								<li><a href="" data-event="menu/">Premios</a></li>
-								<li><a href="" data-event="menu/">Visitas</a></li>
-								<li><a href="" data-event="menu/">Actividades</a></li>
-								<li><a href="" data-event="menu/">Noticias</a></li>
+								{FILE {headerMenuTmpl}}
 							</ul>
 						</nav>
 					</div>

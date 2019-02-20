@@ -44,6 +44,8 @@ function get_header($fn_args)
 	
 	$fn_h_hash = (preg_match('/(product_grid|pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 	
+	$fn_dir_prop = (isset($CONFIG['site']['dir']) && isJson($CONFIG['site']['dir'])) ? object_to_array(json_decode($CONFIG['site']['dir'])) : '';
+	
 	$b->assign($CONFIG['site']);
 	$b->assign($fn_page_args);
 	$b->assign($lang_items[$st_lang]);
@@ -65,6 +67,8 @@ function get_header($fn_args)
 		
 		'languages' => (isset($CONFIG['site']['lang']) && isJson($CONFIG['site']['lang'])) ? $CONFIG['site']['lang'] : json_encode(array($CONFIG['site']['defaultLang'])),
 		'header_popup_data' => (isset($CONFIG['site']['initial_page_header_popup_enabled']) && $CONFIG['site']['initial_page_header_popup_enabled'] == 1) ? json_encode(array('gid' => $CONFIG['site']['initial_page_header_popup_id'])) : 'false',
+		
+		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
 	));
 	
 	//widgets load template

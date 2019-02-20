@@ -170,9 +170,7 @@ class WIDGET_headerMenuTmpl {
 			}
 		}
 		
-		self::$fn_xtemplate_parse['assign'][] = array(
-			'count_g' => (!preg_match('/(0|8|9)/', $fn_count_w)) ? "g gw-1-{$fn_count_w}" : "mr-4",
-		);
+		self::$fn_xtemplate_parse['assign'][] = array();
 		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl";
 		
 		return self::$fn_xtemplate_parse;
