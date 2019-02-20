@@ -394,6 +394,11 @@ footer .menu li:not(:last-child)::after {
 	right: 0%;
 }
 
+main .g > .mc {
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
 [class*=flx].hs {
 	display: flex !important;
 }

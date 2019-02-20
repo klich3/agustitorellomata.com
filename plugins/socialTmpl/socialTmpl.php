@@ -54,7 +54,7 @@ class WIDGET_socialTmpl {
 				if(empty($sv->options_value)) continue;
 				
 				self::$fn_xtemplate_parse['assign'][] = array(
-					'val' => $sv->options_value,
+					'val' => ($sv->options_key === 'mailinfo') ? "mailto:{$sv->options_value}" : $sv->options_value,
 					'desc' => $sv->description,
 				);
 				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl.{$sv->options_key}_header";
@@ -108,7 +108,7 @@ class WIDGET_socialTmpl {
 				if(empty($sv->options_value)) continue;
 				
 				self::$fn_xtemplate_parse['assign'][] = array(
-					'val' => $sv->options_value,
+					'val' => ($sv->options_key === 'mailinfo') ? "mailto:{$sv->options_value}" : $sv->options_value,
 					'desc' => $sv->description,
 				);
 				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl.{$sv->options_key}_footer";
@@ -136,7 +136,7 @@ class WIDGET_socialTmpl {
 		$fn_q = $this->db->FetchAll("
 			SELECT *
 			FROM `options`
-			WHERE `options_key` IN ('fb','tw','gp','tr','in')
+			WHERE `options_key` IN ('fb','tw','gp','tr','in','mailinfo')
 		");
 		
 		return $fn_q;

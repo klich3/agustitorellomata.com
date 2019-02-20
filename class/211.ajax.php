@@ -2921,14 +2921,14 @@ if($fn_ajax !== null)
 					'pid' => $fn_insert_id,
 					'szid' => (isset($fn_p['stock']['f_size_id'])) ? $fn_p['stock']['f_size_id'] : null,
 					'cid' => (isset($fn_p['stock']['f_color_id'])) ? $fn_p['stock']['f_color_id'] : null,
-					'pr' => $fn_f_precio_coste,
-					'pv' => $fn_f_precio_venta,
-					'sm' => $fn_f_stock_min,
-					'sb' => $fn_f_stock_base,
-					'sc' => $fn_f_stock_count,
-					'fp' => $fn_f_peso,
-					'sy' => $fn_f_size_y,
-					'sx' => $fn_f_size_x,
+					'pr' => ($fn_f_precio_coste) ? $fn_f_precio_coste : 0,
+					'pv' => ($fn_f_precio_venta) ? $fn_f_precio_venta : 0,
+					'sm' => ($fn_f_stock_min) ? $fn_f_stock_min : 0,
+					'sb' => ($fn_f_stock_base) ? $fn_f_stock_base : 0,
+					'sc' => ($fn_f_stock_count) ? $fn_f_stock_count : 0,
+					'fp' => ($fn_f_peso) ? $fn_f_peso : 0,
+					'sy' => ($fn_f_size_y) ? $fn_f_size_y : 0,
+					'sx' => ($fn_f_size_x) ? $fn_f_size_x : 0,
 				));
 			}
 			

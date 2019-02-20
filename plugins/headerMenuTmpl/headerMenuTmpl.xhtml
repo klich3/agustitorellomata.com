@@ -1,19 +1,17 @@
 <!-- BEGIN: headerMenuTmpl -->
-<ul class="ln {count_g}">
 	<!-- BEGIN: row_item -->
 	<li>
-		<a href="{url}" data-hash="{url}">{title}<!-- BEGIN: arrow --> <svg class="arrow" width="11" height="14" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#menu-arrow"></use><!-- END: arrow --></a>
+		<a href="{url}" data-event="menu/{hash}" data-hash="{url}">{title}</a>
 		
 		<!-- BEGIN: submenu -->
 		<div class="submenu">
 			<ul class="ln p-n">
 				<!-- BEGIN: row -->
-				<li><a href="{url}" data-hash="{url}">{title}</a></li>
+				<li><a href="{url}" data-event="menu/{hash}" data-hash="{url}">{title}</a></li>
 				<!-- END: row -->
 			</ul>
 		</div>
 		<!-- END: submenu -->
 	</li>
 	<!-- END: row_item -->
-</ul>
 <!-- END: headerMenuTmpl -->

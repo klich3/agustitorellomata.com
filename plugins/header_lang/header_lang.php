@@ -37,15 +37,11 @@ class WIDGET_header_lang {
 	public function wHeader($fn_args)
 	{
 		$fn_lng = (isset($this->CONFIG['site']['lang']) && isJson($this->CONFIG['site']['lang'])) ? json_decode($this->CONFIG['site']['lang'], true) : false;
-				
+		
 		if($fn_lng && sizeof($fn_lng) > 1)
 		{
 			$fn_arg_url = (preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 			$fn_blog_url = (isset($fn_args['hash']) && preg_match('/(blog_details|blog)/', $fn_args['url'])) ? "blog/{$fn_args['hash']}" : $fn_arg_url;
-			
-			//default lang flag
-			$fn_get_flag_def_image = (file_exists("images/flags/{$fn_args['st_lang']}.png")) ? $this->CONFIG['site']['base_script']."images/flags/{$fn_args['st_lang']}.png" : false;
-			$fn_user_lang_img = ($fn_get_flag_def_image) ? '<img class="lang-flag" src="'.$fn_get_flag_def_image.'" />' : '';
 			
 			//reorder
 			foreach($fn_lng as $fv)
@@ -63,9 +59,7 @@ class WIDGET_header_lang {
 				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.header_lang.row_lang";
 			}
 			
-			self::$fn_xtemplate_parse['assign'][] = array(
-				'user_lang_img' => $fn_user_lang_img,
-			);
+			self::$fn_xtemplate_parse['assign'][] = array();
 			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.header_lang";
 		}
 		
