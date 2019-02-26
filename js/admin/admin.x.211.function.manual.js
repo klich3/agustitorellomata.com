@@ -22,24 +22,24 @@ $(function()
 	
 	//image item
 	$.template('galleryReloadContent', '{{if data}}{{each(i, v) data.cnt}} {{tmpl(v) "galleryItem"}} {{/each}}{{/if}}')
-	$.template('galleryItem', '<li data-id="${id}"><div class="uk-width-1-1 uk-thumbnail {{if isThumb == "1" || isThumb == 1}}bg-green{{/if}}"><i class="uk-sortable-handle uk-icon uk-icon-bars uk-margin-small-right"></i><img src="{{if thumb}}'+fn_base_script+'${thumb}{{else}}'+fn_base_script+'images/blank.gif{{/if}}" alt="${alt}" title="${title}" class="uk-thumbnail-expand" data-hd-img="${img}" data-th-img="${thumb}" /><div class="uk-thumbnail-caption"><span class="uk-text-small uk-text-center"><div class="uk-button-group">{{if type !== "image"}}<a href="${img}" target="_blank" class="uk-button uk-button-small" data-lightbox-type="iframe" data-video-url="${img}"><i class="uk-icon-video-camera"></i></a>{{/if}}<a href="javascript:void(0);" data-gallery="editImageGallery" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a><a href="javascript:void(0);" data-gallery="delImageGallery" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a></div></span><input type="hidden" name="item[${id}][alt]" value="${alt}" /><input type="hidden" name="item[${id}][title]" value="${title}" /><input type="hidden" name="item[${id}][isThumb]" value="${isThumb}" /></div></div></li>');
+	$.template('galleryItem', '<li data-id="${id}"><div class="uk-width-1-1 uk-thumbnail uk-thumbnail-mini {{if isThumb == "1" || isThumb == 1}}bg-green{{/if}}"><i class="uk-sortable-handle uk-icon uk-icon-bars uk-margin-small-right"></i><img src="{{if thumb}}'+fn_base_script+'${thumb}{{else}}'+fn_base_script+'images/blank.gif{{/if}}" alt="${alt}" title="${title}" class="uk-thumbnail-expand" data-hd-img="${img}" data-th-img="${thumb}" /><div class="uk-thumbnail-caption"><span class="uk-text-small uk-text-center">{{if title}}<div class="uk-width-1-1">${title}</div>{{/if}}<div class="uk-button-group">{{if type == "video"}}<a href="${img}" target="_blank" class="uk-button uk-button-small" data-lightbox-type="iframe" data-video-url="${img}"><i class="uk-icon-video-camera"></i></a>{{/if}}<a href="javascript:void(0);" data-gallery="editImageGallery" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a><a href="javascript:void(0);" data-gallery="delImageGallery" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a></div></span><input type="hidden" name="item[${id}][alt]" value="${alt}" /><input type="hidden" name="item[${id}][title]" value="${title}" /><input type="hidden" name="item[${id}][isThumb]" value="${isThumb}" /></div></div></li>');
 	
 	//sidebar
 	$.template('select', '<option value="${id}">${title}</option>');
 	$.template('galleryModalSidebar', 
 		//seleccion de galeria
-		'<div class="uk-width-1-1"><form class="uk-form" data-id="${pid}" data-gid="${gid}" data-sel-gallery><input type="hidden" name="pid" value="${pid}"/>{{if where == "producto"}}<input type="hidden" name="where" value="producto"/>{{/if}}<div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_gallery_sel">Seleccionar galería</label></div><div class="uk-width-small-1-1 uk-width-2-3"><select name="f_gallery_sel" class="uk-width-1-1 uk-form-small">{{if data && data.lst}} {{each(i, v) data.lst}} <option value="${v.id}" {{if v.id == gid}}selected{{/if}}>${v.title}</option> {{/each}} {{/if}}</select></div><div class="uk-width-small-1-1 uk-width-1-3"><div class="uk-button-group uk-float-right"><a href="javascript:void(0);" data-gallery="assignGalery" class="uk-button uk-button-small uk-text-success" title="Asignar esta galería al producto" data-uk-toolbar>Asign. Gal.</a><a href="javascript:void(0);" data-gallery="delGallery" class="uk-button uk-button-small uk-text-danger" title="Borrar esta galería con todo su contenido." data-uk-toolbar>Borrar</a></div></div></div></form></div>'+
+		'<div class="uk-width-1-1"><form class="uk-form" data-id="${pid}" data-gid="${gid}" data-sel-gallery><input type="hidden" name="pid" value="${pid}"/>{{if where == "producto"}}<input type="hidden" name="where" value="producto"/>{{/if}}<div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_gallery_sel">Seleccionar galería</label></div><div class="uk-width-small-1-1 uk-width-2-3"><select name="f_gallery_sel" class="uk-width-1-1 uk-form-small">{{if data && data.lst}} {{each(i, v) data.lst}} <option value="${v.id}" {{if v.id == gid}}selected{{/if}}>${v.title}</option> {{/each}} {{/if}}</select></div><div class="uk-width-small-1-1 uk-width-1-3"><div class="uk-margin-top uk-margin-small uk-button-group uk-float-right"><a href="javascript:void(0);" data-gallery="assignGalery" class="uk-button uk-button-small uk-text-success" title="Asignar esta galería al producto" data-uk-toolbar>Asign. Gal.</a><a href="javascript:void(0);" data-gallery="delGallery" class="uk-button uk-button-small uk-text-danger" title="Borrar esta galería con todo su contenido." data-uk-toolbar>Borrar</a></div></div></div></form></div>'+
 		
 		//creacion de galeria
-		'<div class="uk-width-1-1 uk-margin uk-margin-small"><hr/></div><div class="uk-width-1-1"><form class="uk-form"><input type="hidden" name="pid" value="${pid}"/><div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_gallery_title">Crear una galería nueva</label></div><div class="uk-width-small-1-1 uk-width-2-3"><input type="text" name="f_gallery_title" class="uk-width-1-1 uk-form-small" /></div><div class="uk-width-small-1-1 uk-width-1-3"><a href="javascript:void(0);" data-gallery="newGallery" class="uk-button uk-button-small uk-button-primary uk-float-right">Crear una galería</a></div><div class="uk-width-1-1 uk-margin uk-margin-small uk-text-small uk-text-right" data-message></div></div></form></div>'+
+		'<div class="uk-width-1-1 uk-margin uk-margin-small"><hr/></div><div class="uk-width-1-1"><form class="uk-form"><input type="hidden" name="pid" value="${pid}"/><div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_gallery_title">Crear una galería nueva</label></div><div class="uk-width-small-1-1 uk-width-2-3"><input type="text" name="f_gallery_title" class="uk-width-1-1 uk-form-small" /></div><div class="uk-width-small-1-1 uk-width-1-3"><a href="javascript:void(0);" data-gallery="newGallery" class="uk-margin-top uk-margin-small uk-button uk-button-small uk-button-primary uk-float-right">Crear una galería</a></div><div class="uk-width-1-1 uk-margin uk-margin-small uk-text-small uk-text-right" data-message></div></div></form></div>'+
 		
 		'<div class="uk-width-1-1 uk-margin uk-margin-small"><hr/></div>'+
 		
 		//video o item
-		'<div class="uk-width-1-1"><p>Crear un item que es un video de Youtube / Vimeo</p><form class="uk-form" data-gallery-viitem><input type="hidden" name="f_gid" value="${gid}" /><div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_url">Url (link del video)</label></div><div class="uk-width-small-1-1 uk-width-2-3"><input type="text" name="f_url" value="" class="uk-width-1-1 uk-form-small" /></div><div class="uk-width-small-1-1 uk-width-1-3"><a href="javascript:void(0);" data-gallery="addUrlGallery" class="uk-button uk-button-small uk-button-primary uk-float-right">Añadir video / url</a></div></div></form></div>'+
+		'<div class="uk-width-1-1"><p>Crear un item que es un video de Youtube / Vimeo</p><form class="uk-form" data-gallery-viitem><input type="hidden" name="f_gid" value="${gid}" /><div class="uk-grid uk-grid-collapse"><div class="uk-width-1-1"><label for="f_url">Url (link del video)</label></div><div class="uk-width-small-1-1 uk-width-2-3"><input type="text" name="f_url" value="" class="uk-width-1-1 uk-form-small" /></div><div class="uk-width-small-1-1 uk-width-1-3"><a href="javascript:void(0);" data-gallery="addUrlGallery" class="uk-margin-top uk-margin-small uk-button uk-button-small uk-button-primary uk-float-right">Añadir video / url</a></div></div></form></div>'+
 		
 		//metas
-		'<div class="uk-width-1-1 uk-margin uk-margin-small"><hr/></div><div class="uk-width-1-1"><form class="uk-form" data-gallery-metaedit><input type="hidden" name="isEdit" value="false" /><input type="hidden" name="f_id" value="" /><div class="uk-form-row"><strong>Detalles de imagen seleccionada</strong></div><div class="uk-form-row"><input type="checkbox" name="f_isThumb" value="1" disabled/> Imágen destacada?</div><div class="uk-form-row"><label for="f_title">Title</label><input type="text" name="f_title" value="" class="uk-width-1-1 uk-form-small" disabled/></div><div class="uk-form-row"><label for="f_alt">Alt. descripción</label><input type="text" name="f_alt" value="" class="uk-width-1-1 uk-form-small" disabled/></div><div class="uk-form-row"><label for="f_url">Url de la imágen</label><input type="text" name="f_url_image" value="" class="uk-width-1-1 uk-form-small" readonly /></div><div class="uk-form-row"><div class="uk-grid"><div class="uk-width-small-1-1 uk-width-1-2"><a href="javascript:void(0);" data-gallery="cpClipboard" class="uk-button uk-button-small uk-button-success uk-float-left">Copiar link</a></div><div class="uk-width-small-1-1 uk-width-1-2"><a href="javascript:void(0);" data-gallery="stImageAltTitle" class="uk-button uk-button-small uk-button-primary uk-float-right">Guardar cambios</a></div></div></div><div class="uk-form-row" data-message></div></form></div>'+
+		'<div class="uk-width-1-1 uk-margin uk-margin-small"></div><div class="uk-width-1-1"><form class="uk-form uk-hidden" data-gallery-metaedit><div class="uk-width-1-1"><hr/></div><input type="hidden" name="isEdit" value="false" /><input type="hidden" name="f_id" value="" /><div class="uk-form-row"><strong>Detalles de imagen seleccionada</strong></div><div class="uk-form-row"><input type="checkbox" name="f_isThumb" value="1" disabled/> Imágen destacada?</div><div class="uk-form-row"><label for="f_title">Title</label><input type="text" name="f_title" value="" class="uk-width-1-1 uk-form-small" disabled/></div><div class="uk-form-row"><label for="f_alt">Alt. descripción</label><input type="text" name="f_alt" value="" class="uk-width-1-1 uk-form-small" disabled/></div><div class="uk-form-row"><label for="f_url">Url de la imágen</label><input type="text" name="f_url_image" value="" class="uk-width-1-1 uk-form-small" readonly /></div><div class="uk-form-row"><div class="uk-grid"><div class="uk-width-small-1-1 uk-width-1-2"><a href="javascript:void(0);" data-gallery="cpClipboard" class="uk-button uk-button-small uk-button-success uk-float-left">Copiar link</a></div><div class="uk-width-small-1-1 uk-width-1-2"><a href="javascript:void(0);" data-gallery="stImageAltTitle" class="uk-button uk-button-small uk-button-primary uk-float-right">Guardar cambios</a></div></div></div><div class="uk-form-row" data-message></div></form></div>'+
 		
 		//upload manual
 		'<div class="uk-width-1-1 uk-margin uk-margin-small"><hr/></div><div class="uk-width-1-1 uk-text-center"><i class="uk-icon-cloud-upload uk-icon-medium uk-text-muted uk-margin-small-right"></i> <a class="uk-form-file">Subir archivos manualmente <input id="gallery-uploadselect" type="file"></a></div>'+
@@ -64,7 +64,6 @@ $(function()
 			
 			switch (hash) 
 			{
-				case "admin-pay":
 				case "admin-options":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.options.fn.js');
 				break;
@@ -79,22 +78,6 @@ $(function()
 				
 				case "admin-productos":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.productos.fn.js');
-				break;
-				
-				case "admin-iva":
-					fn_itmToLoad.push(fn_base_script+'js/admin/admin.iva.fn.js');
-				break;
-				
-				case "admin-shipping":
-					fn_itmToLoad.push(fn_base_script+'js/admin/admin.shipping.fn.js');
-				break;
-				
-				case "admin-pedidos":
-					fn_itmToLoad.push(fn_base_script+'js/admin/admin.pedidos.fn.js');
-				break;
-				
-				case "admin-ofertas":
-					fn_itmToLoad.push(fn_base_script+'js/admin/admin.ofertas.fn.js');
 				break;
 			}
 			
@@ -228,7 +211,7 @@ $(function()
 		            params: {
 			            gid: $('[name="f_gallery_sel"]', o).val()
 		            },
-		            allow: '*.(jpg|jpeg|gif|png|JPG|JPEG|GIF|PNG)', // allow files
+		            allow: '*.(jpg|jpeg|gif|png|JPG|JPEG|GIF|PNG|PDF|pdf|txt|TXT|mp4|MP4|OGG|ogg|webm|WEBM|MOV|mov)', // allow files
 					single: true,
 		            filelimit: false,
 		            
@@ -377,6 +360,8 @@ $(function()
 				get_image_meta_isthumb = (ele.parents('li').find('input[name="item['+get_image_id+'][isThumb]"]').val() == 1) ? true : false,
 				get_image_meta_url = ele.parents('li').find('img').attr('data-hd-img'),
 				get_video_meta_url = ele.parents('li').find('[data-video-url]').attr('data-video-url');
+			
+			$('[data-gallery-metaedit]').removeClass('uk-hidden');
 			
 			$('[data-modal-container] [name="f_isThumb"]').prop(
 			{

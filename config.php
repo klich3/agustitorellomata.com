@@ -27,14 +27,14 @@ $CONFIG = array(
 		"host" => "localhost", //server
 		"port" => "", //server port
 		
-		"username" => ($isLocal) ? "root" : "steciw_blubarcelona", //user
-		"password" => ($isLocal) ? "root" : "&>8AI.LR(~C^pK", //pass
-		"database" => ($isLocal) ? "agustitorellomata" : "agustitorellomata", //table
+		"username" => ($isLocal) ? "root" : "agustitorre", //user
+		"password" => ($isLocal) ? "root" : "I4b31k^d_v", //pass
+		"database" => ($isLocal) ? "agustitorellomata" : "agustitorellomat_web", //table
 	),
 	
 	"site" => array(
 		//site config
-		"sitetitle" => "Agusti Torello Mata",
+		"sitetitle" => "Agustí Torelló Mata",
 		"sitetitlefull" => "Agusti Torello Mata", //S.L
 		"sitecopyz" => "&copy; ".date('Y')." Agusti Torello Mata - Todos los derechos reservados.",
 		"sitetitleseo" => "Blu",

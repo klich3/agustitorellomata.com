@@ -109,12 +109,13 @@ $(function()
 			$('header nav a.active').removeClass('active');
 			$('header nav a[data-hash*="'+_G.HASH+'"]').addClass('active');
 			
-			/*
 			switch(_G.TYPE)
 		    {
+			    /*
 			    case "product_grid":
 			    break;
-		    }*/
+				*/
+		    }
 		});
 		
 		fn_init_fn();
