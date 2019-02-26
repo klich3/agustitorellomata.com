@@ -140,7 +140,7 @@ switch($g_action)
 		//metas
 		if(count($fn_meta_content) !== 0) foreach($fn_meta_content as $mk => $mv)
 		{
-			if(preg_match('/(customimage|keywords|description|resumen|image|freatured|gallery)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value)) ? html_entity_decode($mv->m_value, ENT_QUOTES) : '';
+			if(preg_match('/(link|customimage|keywords|description|resumen|image|freatured|gallery)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value)) ? html_entity_decode($mv->m_value, ENT_QUOTES) : '';
 			
 			if(preg_match('/(noodp|noydir|nofollow|noarchive|check|show_button_addcart)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value) && $mv->m_value == 1) ? 'selected' : '';
 		}

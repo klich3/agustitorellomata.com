@@ -10,7 +10,7 @@
 function get_header($fn_args)
 {
 	global $CONFIG, $fn_page_args, $st_lang, $fn_menu, $db, $too_login, $db, $lang_items;
-
+	
 	//session timer
 	$ses_init_timastamp = '';
 	

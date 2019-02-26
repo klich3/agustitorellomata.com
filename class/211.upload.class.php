@@ -3,7 +3,7 @@
 class tooUpload {
 	
 	public static $tmp_dir = 'content/';
-	public static $ext_allowed = array('jpg', 'jpeg', 'png', 'gif', 'JPG', 'JPEG', 'PNG', 'GIF');
+	public static $ext_allowed = array('jpg', 'jpeg', 'png', 'gif', 'JPG', 'JPEG', 'PNG', 'GIF', 'PDF', 'pdf', 'txt', 'TXT', 'ogg', 'webm', 'mp4', 'mov', 'MP4', 'MOV', 'OGG', 'WEBM', 'zip', '7zp', 'rar');
 	public static $html_input_name = 'files';
 	
 	/**
@@ -39,28 +39,58 @@ class tooUpload {
 			{
 				$fn_prefix_t = microtime();
 				$fn_prefix = str_replace(' ', '-', $fn_prefix_t);
-					
-				$fn_resize = new cacheAndResize_onFly(array(
-					'cacheDir' 			=> 'content/',
-					'defaultQuality' 	=> 85,
-					'cacheTime' 		=> 60*60*120*99999, //min
-					'cropImages' 		=> true,
-					'echoImage' 		=> false,
-					'delOriginalFile' 	=> true,
-					'filename_prefix'	=> $fn_prefix
-				));
 				
-				//tamaños por defecto
-				$fn_w = 450;
-				$fn_h = null;
+				//file type
+				$fn_type = 'image';
 				
-				$fn_resize->processImage("{$fn_tmp_dir}{$fn_new_name}.{$fn_ext}", $fn_w, $fn_h);
+				if(preg_match('/(jpg|jpeg|gif|png|bmp)/', $fn_ext))
+				{
+					$fn_type = 'image';
+				}
 				
-				return self::exit_status(200, 'Imagen subida y procesada!', array(
+				if(preg_match('/(txt|doc|pdf|zip|rar|7zp)/', $fn_ext))
+				{
+					$fn_type = 'file';
+				}
+				
+				if(preg_match('/(mov|mp4|ogf|ogg|webm)/', $fn_ext))
+				{
+					$fn_type = 'video';
+				}
+				//file type
+				
+				$fn_out_array = array(
 					'ext' => $fn_ext,
 					'src' => "{$fn_tmp_dir}{$fn_new_name}.{$fn_ext}",
-					'cachedSrc' => "content/".$fn_resize->echoImageName("{$fn_tmp_dir}{$fn_new_name}.{$fn_ext}"),
-				));
+					'cachedSrc' => '',
+					'title' => $fn_file['name'][0],
+					'type' => $fn_type,
+				);
+				
+				if(!preg_match('/(PDF|pdf|txt|TXT)/', $fn_file['name'][0]))
+				{	
+					$fn_resize = new cacheAndResize_onFly(array(
+						'cacheDir' 			=> 'content/',
+						'defaultQuality' 	=> 85,
+						'cacheTime' 		=> 60*60*120*99999, //min
+						'cropImages' 		=> true,
+						'echoImage' 		=> false,
+						'delOriginalFile' 	=> true,
+						'filename_prefix'	=> $fn_prefix
+					));
+					
+					//tamaños por defecto
+					$fn_w = 450;
+					$fn_h = null;
+					
+					$fn_resize->processImage("{$fn_tmp_dir}{$fn_new_name}.{$fn_ext}", $fn_w, $fn_h);
+					
+					$fn_out_array['cachedSrc'] = "content/".$fn_resize->echoImageName("{$fn_tmp_dir}{$fn_new_name}.{$fn_ext}");
+				}else{
+					$fn_out_array['cachedSrc'] = "images/fileformat/{$fn_ext}.png";
+				}
+				
+				return self::exit_status(200, 'Imagen subida y procesada!', $fn_out_array);
 			}
 		}else{
 			return self::exit_status(400, 'Algo va mal no puedo subir este archivo!');

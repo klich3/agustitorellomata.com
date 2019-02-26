@@ -67,8 +67,8 @@ if($fn_ajax !== null)
 					'img' => $fn_upload['data']['src'],
 					'thumb' => $fn_upload['data']['cachedSrc'],
 					'alt' => '',
-					'title' => '',
-					'type' => 'image',
+					'title' => (isset($fn_upload['data']['title'])) ? $fn_upload['data']['title'] : '',
+					'type' => (isset($fn_upload['data']['type'])) ? $fn_upload['data']['type'] : 'image',
 					'id' => md5(microtime()),
 				);
 				
@@ -440,8 +440,12 @@ if($fn_ajax !== null)
 							$fn_file = (isset($gv['img'])) ? str_replace($CONFIG['site']['base'], '', $gv['img']) : false;
 							$fn_thumb = (isset($gv['thumb'])) ? str_replace($CONFIG['site']['base'], '', $gv['thumb']) : false;
 							
-							if($gv['type'] == 'image' && is_file($fn_file)) unlink($fn_file);
-							if($gv['type'] == 'image' && is_file($fn_thumb)) unlink($fn_thumb);
+							//archivos + videos
+							if(preg_match('/(video|file)/', $gv['type']) && is_file($fn_file)) unlink($fn_file);
+							
+							//imagen
+							if(preg_match('/image/', $gv['type']) && is_file($fn_file)) unlink($fn_file);
+							if(preg_match('/image/', $gv['type']) && is_file($fn_thumb)) unlink($fn_thumb);
 							
 							continue;
 						}
@@ -2748,6 +2752,7 @@ if($fn_ajax !== null)
 					//update stock item
 					if(isset($fn_p['stock']) && count($fn_p['stock']) !== 0)
 					{
+						$fn_f_precio_tachado = (isset($fn_p['stock']['f_precio_tachado'])) ? $fn_p['stock']['f_precio_tachado'] : 0;
 						$fn_f_precio_coste = (isset($fn_p['stock']['f_precio_coste'])) ? $fn_p['stock']['f_precio_coste'] : 0;
 						$fn_f_precio_venta = (isset($fn_p['stock']['f_precio_venta'])) ? $fn_p['stock']['f_precio_venta'] : 0;
 						$fn_f_stock_min = (isset($fn_p['stock']['f_stock_min'])) ? $fn_p['stock']['f_stock_min'] : 0;
@@ -2771,7 +2776,7 @@ if($fn_ajax !== null)
 						//stock table
 						$db->ExecuteSQL("
 							UPDATE `product_stock` 
-							SET `size_id`=:szid, `color_id`=:cid, `precio_coste`=:pc, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc {$fn_args_in}
+							SET `size_id`=:szid, `color_id`=:cid, `precio_coste`=:pc, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc {$fn_args_in}, `precio_tachado`=:ptch
 							WHERE `prid`=:id
 							AND `item_base`='1'
 							LIMIT 1;
@@ -2783,6 +2788,7 @@ if($fn_ajax !== null)
 							'sm' => $fn_f_stock_min,
 							'sb' => $fn_f_stock_base,
 							'sc' => $fn_f_stock_count,
+							'ptch' => $fn_f_precio_tachado,
 							'id' => $fn_p['id'],
 						));
 					}
