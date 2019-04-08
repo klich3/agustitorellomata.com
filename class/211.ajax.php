@@ -1308,7 +1308,7 @@ if($fn_ajax !== null)
 						'u' => $fn_m_url,
 						'pid' => $fn_m_pid,
 						'o' => 0,
-						'a' => (isset($fn_inputs['m_active']) && $fn_inputs['m_active'] == 1) ? $fn_inputs['m_active'] : 0,
+						'a' => (isset($fn_inputs['m_active'])) ? '1' : '0',
 					));
 					
 					if($fn_q)
