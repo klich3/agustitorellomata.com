@@ -148,6 +148,8 @@ switch($g_action)
 		
 		$fn_q_prod['active_checked'] = (isset($fn_q_prod['active']) && $fn_q_prod['active']) ? 'checked' : '';
 		
+		$fn_q_prod['prod_id'] = $fn_g['id'];
+		
 		$fn_xtemplate_parse['assign'][] = $fn_q_prod;
 		$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto";
 	break;

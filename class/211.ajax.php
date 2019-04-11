@@ -3059,10 +3059,8 @@ if($fn_ajax !== null)
 				$fn_q = $db->ExecuteSQL("
 					UPDATE `product`
 					SET `cat_id`=NULL
-					WHERE `id` IN(:id)
-				", array(
-					'id' => $fn_ids,
-				));
+					WHERE `id` IN({$fn_ids})
+				");
 			}else{
 				if(!isset($fn_p['data'])) exit(json_encode(array(
 					'status' => 400,
