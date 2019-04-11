@@ -136,6 +136,9 @@ $(function()
 		}
 		*/
 		
+		//scroll to 
+		$(document).on('click', '[href^="#"]', e_scrolltoid);
+		
 		//mobile click
 		$(document).on('click', '[menu-handler]', fn_menu_handler);
 		
@@ -157,6 +160,22 @@ $(function()
 		
 		if($('[data-some-h]').length !== 0) some_h();
 		if($('[data-source]').length !== 0) fn_content_from_source();
+	}
+	
+	//scrollto element
+	e_scrolltoid = function(e)
+	{
+		var ele = $(e.currentTarget).attr('href') || false;
+		
+		e.preventDefault();
+		e.stopPropagation();
+		
+		if(!ele || ele == undefined) return;
+		
+		$('html,body').animate(
+		{
+			scrollTop: $(ele).offset().top
+		}, 'slow');
 	}
 	
 	//movemos contenido desde source al content form

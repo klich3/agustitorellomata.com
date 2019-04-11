@@ -132,6 +132,13 @@ switch($g_action)
 							
 							$sv['active_class'] = ($sv['active']) ? '' : 'bg-grey';
 							
+							if(isset($sv['p_id']) && $sv['p_id'] !== '0')
+							{
+								$fn_xtemplate_parse['assign'][] = $pv;
+								$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.m_item.parent.row.edit_but";
+							}
+							
+							
 							$fn_xtemplate_parse['assign'][] = $sv;
 							$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.m_item.parent.row";
 							
@@ -169,6 +176,12 @@ switch($g_action)
 					}
 					
 					$mv['active_class'] = ($mv['active']) ? '' : 'bg-grey';
+					
+					if(isset($mv['p_id']) && $mv['p_id'] !== '0')
+					{
+						$fn_xtemplate_parse['assign'][] = $mv;
+						$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.m_item.edit_but";
+					}
 					
 					$fn_xtemplate_parse['assign'][] = $mv;
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.m_item";
