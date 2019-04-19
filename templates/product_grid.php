@@ -70,7 +70,7 @@ if($fn_q_cat_list)
 				
 				//interios del grupos
 				$fn_xtemplate_parse['assign'][] = array(
-					'title' => decodeLangData($vi->lang_data),
+					'title' => html_entity_decode(decodeLangData($vi->lang_data)),
 					'image' => ($fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
 					'alt' => $fn_file['alt'],
 				);
