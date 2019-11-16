@@ -125,6 +125,8 @@ $(function()
 		{
 		    'hide.uk.modal': function()
 		    {
+				$('html').removeClass('uk-modal-page');
+				
 			    $(this).find('.uk-modal-dialog').removeClass('uk-modal-dialog-blank');
 				
 				$('#editModal .uk-close').removeClass('uk-close-alt');

@@ -1,9 +1,9 @@
 User-agent: Googlebot
-Disallow: /xceed/
 Disallow: /images/
 Disallow: /content/
 
 User-agent: *
 Allow: *
+Allow: https://agustitorellomata.com/humans.txt
 
 Sitemap: https://agustitorellomata.com/sitemap.xml
