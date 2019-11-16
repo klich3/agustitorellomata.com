@@ -3,6 +3,8 @@
 date_default_timezone_set('Europe/Madrid');
 ini_set("always_populate_raw_post_data" , "-1");
 
+header("X-Author: Anthony Sychev https://dm211.com | https://twooneone.xyz ");
+
 //cookies & session security config
 ini_set("session.cookie_lifetime", "3600");
 //ini_set("session.cookie_httponly", 1); // Prevents javascript XSS attacks aimed to steal the session ID
