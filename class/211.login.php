@@ -156,6 +156,12 @@ class tooLogin {
 	 */
 	public function login($fn_user, $fn_pass, $fn_redirect = true)
 	{
+		/*
+		//gen new pass
+		var_dump(self::genPass($fn_user, $fn_pass));
+		exit;
+		*/
+
 		$fn_check_ban = self::checkBan($fn_user);
 		
 		if($fn_check_ban)

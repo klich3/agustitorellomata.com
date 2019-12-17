@@ -139,6 +139,8 @@ class WIDGET_headerMenuTmpl {
 					$mv['p_title'] = (isset($mv['title']) && !empty($mv['title'])) ? $mv['title'] : '';
 					$mv['p_url'] = (isset($mv['url']) && !empty($mv['url'])) ? $mv['url'] : '';
 					
+					$mv['submenu'] = (isset($mv['sublevel'])) ? true : false;
+					
 					//saltamos si no esta activo
 					if(!$mv['active']) continue;
 					
