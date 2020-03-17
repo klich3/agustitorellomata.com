@@ -322,11 +322,34 @@ switch($fn_url['url'])
 	case "home":
 	case "inicio":
 		$fn_header_type = (isset($CONFIG['site']['initial_page_header_type'])) ? $CONFIG['site']['initial_page_header_type'] : 'large';
-	
-		page('home', array(
-			'header_type' => $fn_header_type,
-			//'stage_type' => 'page',
+		
+		//aqui hay que buscar tipo de paginas home -> 6
+		$fn_home_page = $db->FetchArray("
+			SELECT p.*
+			FROM `pages_types` t
+			LEFT JOIN `pages` p ON(p.`type`=t.`id`)
+			WHERE t.`tmpl_name`='home'
+			AND p.`lang`=:l
+			LIMIT 1
+		", array(
+			'l' => $st_lang
 		));
+		
+		if(sizeof($fn_home_page) !== 0)
+		{
+			page('home', array(
+				'lang' => $st_lang,
+				'hash' => $fn_home_page['obj_hash'],
+				'stage_title' => $fn_home_page['obj_title'],
+				'stage_type' => 6,
+				'stage_tmpl' => 'home',
+			));
+		}else{
+			page('home', array(
+				'header_type' => $fn_header_type,
+				//'stage_type' => 'page',
+			));
+		}
 	break;
 }
 
