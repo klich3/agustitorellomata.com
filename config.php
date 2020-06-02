@@ -37,7 +37,7 @@ $CONFIG = array(
 		"sitetitle" => "Agustí Torelló Mata",
 		"sitetitlefull" => "Agusti Torello Mata", //S.L
 		"sitecopyz" => "&copy; ".date('Y')." Agusti Torello Mata - Todos los derechos reservados.",
-		"sitetitleseo" => "Blu",
+		"sitetitleseo" => "ATM",
 		
 		//directory
 		"base_prefix" => str_replace('//', '', $http_prefix),
