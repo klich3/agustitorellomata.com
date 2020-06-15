@@ -2,12 +2,10 @@
 
 /*
 	Author: Anthony Sychev
-	date: 20/02/2018
-	ver: 2002181309
+	date: 15/06/2020
+	ver: 20200615-downgrade
 	
-	Implementamos APC cache apache / php module + mysql
-	
-	APC: https://pecl.php.net/package/apcu_bc
+	without apcu 
 	
 	return status:
 	 200 - ok
@@ -62,10 +60,12 @@ class tooLogin {
 		$this->redirRestrictedArea = "{$cfg['site']['base_script']}{$cfg['site']['lang']}/admin/restricted-area";
 		
 		//check if apache get so APC cache
+		/*
 		$fn_php_extensions = get_loaded_extensions();
 		$this->use_apc = (in_array('apcu', $fn_php_extensions)) ? true : false;
 		
 		if(!$this->use_apc) header('Debug: 68');
+		*/
 		
 		if(!class_exists('tooSCrypt'))
 		{
@@ -358,48 +358,6 @@ class tooLogin {
 		$this->fn_banattemp_loging = "{$_SERVER['SERVER_NAME']}~login-blocked:".md5("{$fn_user_ip}{$fn_user}");
 		$this->fn_bantime_loging = "{$_SERVER['SERVER_NAME']}~login-blocked-time:".md5("{$fn_user_ip}{$fn_user}");
 		
-		/*
-		//debug
-		apcu_delete($this->fn_ip_loging);
-		apcu_delete($this->fn_user_loging);
-		apcu_delete($this->fn_bantime_loging);
-		apcu_delete($this->fn_banattemp_loging);
-		*/
-		
-		if($this->use_apc)
-		{
-			//check by APC Cache -----------------
-			$fn_apn_i = (!apcu_exists($this->fn_ip_loging)) ? 0 : (int)apcu_fetch($this->fn_ip_loging);
-			$fn_apn_u = (!apcu_exists($this->fn_user_loging)) ? 0 : (int)apcu_fetch($this->fn_user_loging);
-			
-			$fn_apn_a = (!apcu_exists($this->fn_banattemp_loging)) ? 0 : (int)apcu_fetch($this->fn_banattemp_loging);
-			$fn_apn_b = (!apcu_exists($this->fn_bantime_loging)) ? false : apcu_fetch($this->fn_bantime_loging); //timestamp ban time
-			
-			//print_r("ip:{$fn_apn_i} - user:{$fn_apn_u} - ban timestamp:{$fn_apn_b} - ");
-			
-			//unban check
-			if($fn_apn_b && $fn_apn_a !== 0)
-			{
-				//check time apn
-				if(strtotime($this->fn_now_date) > $fn_apn_b)
-				{
-					//unban
-					self::unBan($fn_user, $fn_user_ip);
-					
-					return false;
-				}
-			}else{
-				$fn_result_acp = true;
-			}
-			
-			//many tries
-			if($fn_apn_i >= 4 || $fn_apn_u >= 4) self::banTime($this->fn_banattemp_loging, $fn_user);
-				
-			//add items to cache
-			apcu_store($this->fn_ip_loging, $fn_apn_i+1, 86400);
-			apcu_store($this->fn_user_loging, $fn_apn_u+1, 86400);
-		}
-		
 		//check by Mysql -----------------
 		$fn_q_check_ip = $this->db->FetchObject("
 			SELECT *
@@ -427,7 +385,7 @@ class tooLogin {
 			$fn_result_sql = true;
 		}
 		
-		return ($fn_result_acp && $fn_result_sql) ? false : true;
+		return ($fn_result_sql) ? false : true;
 	}
 	
 	/**
@@ -443,29 +401,19 @@ class tooLogin {
 	{
 		$fn_user_ip = self::_getClientIP();
 		
-		$fn_apn_b = ($this->use_apc) ? (int)apcu_fetch($fn_hash) : false;
 		
-		if($fn_apn_b == false)
-		{
-			$fn_q_count = $this->db->FetchValue("
-				SELECT `count_attempt`
-				FROM `users_login_ban`
-				WHERE `u_name`=:u
-				OR `u_ip`=:i
-			", array(
-				'u' => $fn_username,
-				'i' => $fn_user_ip,
-			));
-			
-			$fn_apn_b = ($fn_q_count) ? $fn_q_count : 1;
-		}
+		$fn_q_count = $this->db->FetchValue("
+			SELECT `count_attempt`
+			FROM `users_login_ban`
+			WHERE `u_name`=:u
+			OR `u_ip`=:i
+		", array(
+			'u' => $fn_username,
+			'i' => $fn_user_ip,
+		));
 		
-		if($this->use_apc) apcu_store($fn_hash, $fn_apn_b); //add attemps
-		
+		$fn_apn_b = ($fn_q_count) ? $fn_q_count : 1;
 		$fn_ban_time = self::attemsToTime($fn_apn_b);
-		
-		//ban by apc -----------------
-		if($this->use_apc) apcu_store($this->fn_bantime_loging, strtotime($fn_ban_time));
 		
 		//ban by mysql -----------------
 		$fn_get_ban_id = $this->db->FetchValue("
@@ -515,15 +463,6 @@ class tooLogin {
 	 */
 	private function unBan($fn_username = null, $fn_userip = null)
 	{
-		//remove apc -----------------
-		if($this->use_apc)
-		{
-			apcu_delete($this->fn_ip_loging);
-			apcu_delete($this->fn_user_loging);
-			apcu_delete($this->fn_bantime_loging);
-			apcu_delete($this->fn_banattemp_loging);
-		}
-		
 		//remove mysql -----------------
 		if($fn_username && $fn_userip)	$this->db->Fetch("
 			DELETE FROM `users_login_ban`
