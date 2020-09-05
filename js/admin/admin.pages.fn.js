@@ -13,7 +13,13 @@ $(function()
 		'{{tmpl() "pageAddGridOptions"}}'+
 		
 		//content
-		'<div class="uk-width-1-1" data-content>{{if dom}} {{if dom.length !== 0}} {{tmpl(dom) "pageAddElement"}} {{/if}} {{/if}} {{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}</div>'+
+		'<div class="uk-width-1-1" data-content>'+
+			'{{if dom}}'+
+				'{{if dom.length !== 0}} {{tmpl(dom) "pageAddElement"}} {{/if}}'+ 
+			'{{/if}}'+
+			'{{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}'+
+			'{{if type.match(/(videofs)/g)}}<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />{{/if}}'+
+		'</div>'+
 	'</div></div>');
 	
 	//menu inside element
@@ -68,7 +74,8 @@ $(function()
 			'show.uk.modal': function()
 			{
 				//edit elements gallery selector
-				fn_readGallerys_selector();
+				fn_readGallerys_selector("data-slider-opts", "slider");
+				fn_readGallerys_selector("data-videofs-opts","video");
 			},
 			
 			'hide.uk.modal': function()
@@ -272,7 +279,9 @@ $(function()
 				$.data(this, 'modalOpen', setTimeout(function()
 				{
 					//show tab item
-					if(dom_tab_selected == null || dom_tab_selected == undefined || dom_tab_selected == 'text') dom_tab_selected = (/(slider)/.test(dom_element_cnt)) ? 'slider' : 'text';
+					if(dom_tab_selected == null || dom_tab_selected == undefined || dom_tab_selected == 'text') dom_tab_selected = 'text';
+					if(/video/.test(dom_element_cnt)) dom_tab_selected = 'videofs';
+					if(/slider/.test(dom_element_cnt)) dom_tab_selected = 'slider';
 					
 					var dom_tab = $('.uk-modal.uk-open', document),
 						fn_indx = dom_tab.find('.uk-tab #'+dom_tab_selected).parents('li').index();
@@ -300,7 +309,7 @@ $(function()
 					
 					if((/(slider)/.test(dom_element_cnt) ? dom_element_cnt : undefined))
 					{
-						fn_readGallerys_selector(function()
+						fn_readGallerys_selector("data-slider-opts", "slider", function()
 						{
 							var modal_opts = $('.uk-modal.uk-open form[data-slider-opts]'),
 								slider_parser = dom_element_cnt.match(/^slider-(.*?)\-(.*?)\-(.*?)\s/);
@@ -308,6 +317,18 @@ $(function()
 							modal_opts.find('[name="slider[showArrows]"]').val(slider_parser[1]);
 							modal_opts.find('[name="slider[showDots]"]').val(slider_parser[2]);
 							modal_opts.find('[name="slider[g_id]"]').val(slider_parser[3]);
+						});
+					}
+					
+					if((/(videofs)/.test(dom_element_cnt) ? dom_element_cnt : undefined))
+					{
+						fn_readGallerys_selector("data-videofs-opts","video", function()
+						{
+							var modal_opts = $('.uk-modal.uk-open form[data-videofs-opts]'),
+								slider_parser = dom_element_cnt.match(/^videofs-(.*?)\-(.*?)\s/);
+								
+							modal_opts.find('[name="video[showControls]"]').val(slider_parser[1]);
+							modal_opts.find('[name="video[g_id]"]').val(slider_parser[2]);
 						});
 					}
 					
@@ -380,7 +401,7 @@ $(function()
 	}
 	
 	//leer galerias rellenamos en el modal de editor de elementos > slider
-	fn_readGallerys_selector = function(fn_callback)
+	fn_readGallerys_selector = function(fn_dom, fn_dom_selname, fn_callback)
 	{
 		fn_call_ajax('manageGallery', 
 		{
@@ -394,12 +415,12 @@ $(function()
 		{
 			if(d.status == 200)
 			{
-				$('.uk-modal.uk-open [data-slider-opts] select[name="slider[g_id]"]').html($.tmpl("selectOptionTMPL", d));
+				$('.uk-modal.uk-open ['+fn_dom+'] select[name="'+fn_dom_selname+'[g_id]"]').html($.tmpl("selectOptionTMPL", d));
 				
 				//callback
 				if(fn_callback) fn_callback.call(this);
 			}else{
-				$('.uk-modal.uk-open [data-slider-opts] select[name="slider[g_id]"]').addClass('uk-form-danger');
+				$('.uk-modal.uk-open ['+fn_dom+'] select[name="'+fn_dom_selname+'[g_id]"]').addClass('uk-form-danger');
 			}
 		});
 	}
@@ -484,8 +505,8 @@ $(function()
 					domal_opts = modal_opts_container.parents('form').find('input[type="checkbox"]:checked, select option:selected:not([value="0"])'),
 					dom_out_opts = '',
 					dom_el = $('[data-grid-element].edit'),
-					dom_parser_addon_loc = dom_el.attr('data-grid-element').match(/^slider-(.*?)\-(.*?)\-(.*?)\s/),
-					dom_parser_addon = (/(slider)/.test(dom_el.attr('data-grid-element'))) ? dom_parser_addon_loc[0]+' ' : ''; //mantenemos slider y añadimos nuevos cambios en el elemento
+					dom_parser_addon_loc = dom_el.attr('data-grid-element').match(/^(slider|videofs)-(.*?)\-(.*?)\-(.*?)\s/),
+					dom_parser_addon = (/(slider|videofs)/.test(dom_el.attr('data-grid-element'))) ? dom_parser_addon_loc[0]+' ' : ''; //mantenemos slider y añadimos nuevos cambios en el elemento
 				
 				if(domal_opts.length !== 0)
 				{
@@ -554,7 +575,7 @@ $(function()
 					
 					dom_el.find('[data-content]').html('<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />');
 				}
-				//modificamos titulo
+				
 				dom_el.attr('data-grid-element', dom_out_opts).attr(
 				{
 					'class':'uk-margin-bottom uk-margin-small '+dom_out_opts,
@@ -566,6 +587,39 @@ $(function()
 				modal_opts.find('[name="slider[showArrows]"]').val(0);
 				modal_opts.find('[name="slider[showDots]"]').val(0);
 				modal_opts.find('[name="slider[g_id]"]').val(0);
+			break;
+			
+			case "videofs":
+				var modal_opts = $('.uk-modal.uk-open form[data-videofs-opts]'),
+					dom_el = $('[data-grid-element].edit'),
+					dom_showControls = modal_opts.find('[name="video[showControls]"]').val(),
+					dom_gid = modal_opts.find('[name="video[g_id]"]').val(),
+					dom_parser_addon_loc = dom_el.attr('data-grid-element'),
+					dom_parser_addon = (/(videofs)/.test(dom_parser_addon_loc)) ? dom_parser_addon_loc.replace(/videofs-(.*?)\-(.*?)\s/, '') : dom_parser_addon_loc; //mantenemos todo menos slider
+					
+				//clean
+				modal_opts.find('[name="video[g_id]"]').removeClass('uk-form-danger');
+				
+				if(!dom_gid)
+				{
+					dom_out_opts = dom_parser_addon;
+					dom_el.find('[data-content]').html('');
+				}else{
+					dom_out_opts = 'videofs-'+dom_showControls+'-'+dom_gid+' '+dom_parser_addon;
+					dom_el.find('[data-content]').html('<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />');
+				}
+				
+				dom_el.attr('data-grid-element', dom_out_opts).attr(
+				{
+					'class':'uk-margin-bottom uk-margin-small '+dom_out_opts,
+					'title':dom_out_opts
+				});
+				
+				dom_el.find('[data-element-title]').text(dom_out_opts);
+				
+				//clean modal options
+				modal_opts.find('[name="video[showControls]"]').val(0);
+				modal_opts.find('[name="video[g_id]"]').val(0);
 			break;
 		}
 		

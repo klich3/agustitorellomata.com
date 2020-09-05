@@ -9,7 +9,8 @@ $fn_ajax = (isset($fn_g['ajax'])) ? $fn_g['ajax'] : null;
 
 if($fn_ajax !== null)
 {
-	if(isset($fn_ajax) && !preg_match('/(redsys|paypal)+notification$/', $fn_ajax) && !preg_match('/dm211/', $CONFIG['site']['base_script']))
+	
+	if(isset($fn_ajax) && !preg_match('/(redsys|paypal)+notification$/', $fn_ajax) && !preg_match('/too|agustitorellomata/', $CONFIG['site']['base_script']))
 	{
 		$fn_check_ref = $cl_m->parseHeaderReferer($CONFIG['site']['dm_nws']);
 		
@@ -360,6 +361,7 @@ if($fn_ajax !== null)
 					
 					$fn_gal = ($fn_get_gal && isJson($fn_get_gal)) ? object_to_array(json_decode($fn_get_gal)) : array();
 					
+					$fn_count_id = (!$fn_gal) ? 1 : count($fn_gal)+1;
 					$fn_thumb = "{$CONFIG['site']['base']}images/nofoto.png";
 					
 					if(preg_match('/yout|be/', $fn_inputs['f_url']))
@@ -381,7 +383,7 @@ if($fn_ajax !== null)
 						'alt' => '',
 						'title' => '',
 						'type' => 'video',
-						'id' => count($fn_gal)+1,
+						'id' => $fn_count_id,
 					);
 					
 					$fn_gal[] = $fn_out_data;
@@ -408,7 +410,7 @@ if($fn_ajax !== null)
 								'alt' => '',
 								'title' => '',
 								'type' => 'video',
-								'id' => count($fn_gal)+1,
+								'id' => $fn_count_id
 							),
 						);
 					}else{
@@ -921,13 +923,14 @@ if($fn_ajax !== null)
 					
 					try{
 						$fn_q = $db->ExecuteSQL("
-							INSERT INTO `pages` (`obj_title`, `obj_hash`, `type`, `lang`)
-							VALUES (:pn, :hs, :tp, :ln);
+							INSERT INTO `pages` (`obj_title`, `obj_hash`, `type`, `lang`, `create_date`)
+							VALUES (:pn, :hs, :tp, :ln, :cd);
 						", array(
 							'pn' => $fn_p['f_page_name'],
 							'hs' => $fn_p['f_hash'],
 							'tp' => $fn_p['f_type'],
 							'ln' => $fn_p['f_lang'],
+							'cd' => date('Y-m-d'),
 						));
 						
 						$fn_data['id'] = $fn_q;
