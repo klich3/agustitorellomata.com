@@ -1,58 +1,25 @@
 @charset "UTF-8";
 
-/*
-@font-face {
-    font-family: 'Myriad Pro';
-    src: url('fonts/MyriadPro-Regular.eot');
-    src: url('fonts/MyriadPro-Regular.eot?#iefix') format('embedded-opentype'),
-        url('fonts/MyriadPro-Regular.woff2') format('woff2'),
-        url('fonts/MyriadPro-Regular.woff') format('woff'),
-        url('fonts/MyriadPro-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Myriad Pro';
-    src: url('fonts/MyriadPro-It.eot');
-    src: url('fonts/MyriadPro-It.eot?#iefix') format('embedded-opentype'),
-        url('fonts/MyriadPro-It.woff2') format('woff2'),
-        url('fonts/MyriadPro-It.woff') format('woff'),
-        url('fonts/MyriadPro-It.ttf') format('truetype');
-    font-weight: normal;
-    font-style: italic;
-}
-*/
-
 @font-face {
     font-family: 'Gotham';
-    src: url('fonts/Gotham-LightItalic.eot');
-    src: url('fonts/Gotham-LightItalic.eot?#iefix') format('embedded-opentype'),
-        url('fonts/Gotham-LightItalic.woff2') format('woff2'),
-        url('fonts/Gotham-LightItalic.woff') format('woff'),
-        url('fonts/Gotham-LightItalic.ttf') format('truetype');
+    src: local('Gotham'),
+    	 url('fonts/Gotham-LightItalic.woff2') format('woff2');
     font-weight: 300;
     font-style: italic;
 }
 
 @font-face {
     font-family: 'Gotham';
-    src: url('fonts/Gotham-Light.eot');
-    src: url('fonts/Gotham-Light.eot?#iefix') format('embedded-opentype'),
-        url('fonts/Gotham-Light.woff2') format('woff2'),
-        url('fonts/Gotham-Light.woff') format('woff'),
-        url('fonts/Gotham-Light.ttf') format('truetype');
+    src: local('Gotham'),
+    	url('fonts/Gotham-Light.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Gotham';
-    src: url('fonts/Gotham-Bold.eot');
-    src: url('fonts/Gotham-Bold.eot?#iefix') format('embedded-opentype'),
-        url('fonts/Gotham-Bold.woff2') format('woff2'),
-        url('fonts/Gotham-Bold.woff') format('woff'),
-        url('fonts/Gotham-Bold.ttf') format('truetype');
+    src: url('Gotham'),
+    	url('fonts/Gotham-Bold.woff2') format('woff2');
     font-weight: bold;
     font-style: normal;
 }

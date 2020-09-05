@@ -160,10 +160,10 @@
 	<!-- BEGIN: editPage -->
 	<div class="uk-width-1-1">
 		<div class="uk-width-1-1 uk-margin-bottom">
-			<div class="uk-button-group">
+			<div class="uk-button-group" data-gid="{gallery_id}">
 				<a href="{current_hash}" class="uk-button uk-button-small"><i class="uk-icon-angle-left"></i> Volver</a>
 				<a href="{base}{user_lang}/{obj_hash}" class="uk-button uk-button-success uk-button-small"> Prever la página</a>
-				
+				<a href="javascript:void(0);" data-gallery="manage" class="uk-button uk-button-small uk-button-primary uk-float-right uk-margin-bottom">Adm. imágenes</a>
 			</div>
 		</div>
 		
@@ -610,6 +610,7 @@
 			    <li><a href="javascript:void(0);" id="text">Texto</a></li>
 			    <li><a href="javascript:void(0);" id="slider">Slider</a></li>
 			    <li><a href="javascript:void(0);" id="grid">Grid</a></li>
+			    <li><a href="javascript:void(0);" id="videofs">Video full stage</a></li>
 			</ul>
 
 			<ul id="pageelementsswitch" class="uk-switcher uk-margin-top">
@@ -1650,6 +1651,51 @@
 						
 						<div class="uk-width-1-1 uk-clearfix"></div>
 				    </form>
+		    	</li>
+		    	
+		    	<li id="videofs">
+		    		<form data-videofs-opts>
+			    		<div class="uk-grid" data-uk-margin>
+				    		<div class="uk-width-1-1">
+					    		<div class="uk-form-row">
+						    		<label for="video[showControls]">Mostrar controles</label>
+						    		<select name="video[showControls]" class="uk-width-1-1 uk-form-small">
+							    		<option value="0">No</option>
+							    		<option value="1">Si</option>
+						    		</select>
+					    		</div>
+				    		</div>
+				    		
+				    		<div class="uk-width-1-1">
+					    		Seleccionar galería
+				    		</div>
+				    		
+				    		<div class="uk-width-8-10">
+						    	<div class="uk-form-row">
+						    		<select name="video[g_id]" class="uk-width-1-1 uk-form-small">
+								    	<option value=""></option>
+							    	</select>
+					    		</div>
+				    		</div>
+				    		
+				    		<div class="uk-width-2-10">
+						    	<div class="uk-form-row">
+							    	<a href="javascript:void(0);" data-gallery="manage" class="uk-button uk-button-small uk-button-primary uk-float-right uk-margin-bottom uk-margin">Adm. imágenes</a>
+						    	</div>
+				    		</div>
+				    		
+				    		
+				    		<div class="uk-width-1-1 uk-form-row">
+								<hr/>
+							</div>
+						
+							<div class="uk-width-1-1 uk-form-row">
+								<a href="javascript:void(0);" data-page-add-element="videofs" class="uk-button uk-button-small uk-button-success uk-float-right">Aplicar</a>
+							</div>
+							
+							<div class="uk-width-1-1 uk-clearfix"></div>
+			    		</div>
+		    		</form>
 		    	</li>
 			</ul>
 		</div>

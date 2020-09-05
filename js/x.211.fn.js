@@ -87,7 +87,8 @@ $(function()
 		GMAP:false,
 		GMAPSTYLE:[{featureType:"all",stylers:[{saturation:-100},{gamma:0.50}]},{featureType:"water",elementType:"all",stylers:[{hue:"#d8d8d8"},{visibility: "simplified"}]},{featureType:"landscape",elementType:"all",stylers:[{hue:"#0077ff"},{visibility:"simplified"},{invert_lightness:"true"}]} ],
 		GMAP_JSON:{},
-		SLIDER:{}
+		SLIDER:{},
+		VIDEOFS:{}
 	};
 	
 	var init = function()
@@ -187,6 +188,7 @@ $(function()
 		if($('[data-box-height]').length !== 0) fn_page_boxheight();
 		
 		if($('noscript[id*="slider"]').length !== 0) fn_initSlider_handler();
+		if($('noscript[id*="videofs"]').length !== 0) fn_videofs_handler();
 		if($('noscript[id*="gmap"]').length !== 0) fn_gmap_handler();
 		
 		if($('[data-some-h]').length !== 0) some_h();
@@ -291,7 +293,40 @@ $(function()
 		    $.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
 		}
 	}
+	
+	//process videofs
+	
+	fn_videofs_handler = function()
+	{
+		trace("[R:300]");
 		
+		//rellenamos contenidos
+		$('noscript[id*="videofs"]').each(function(i, o)
+		{
+			var ele = $(o),
+				ele_c = ele.contents();
+			
+			if(ele_c.length == 0 && ele_c[0].data == undefined) return;
+			
+			_G.VIDEOFS[i] = $.parseJSON(ele_c[0].data);
+			//if(ele.attr('data-slider-container') && ele.attr('data-slider-container').length !== 0) _G.SLIDER[i].config.dom = ele.attr('data-slider-container');
+		});
+		
+		/*
+		//load script
+		window.loadJS(
+		{
+			items:[
+				fn_base_script+'js/jquery.iosslider.min.js'
+			],
+			callback:fn_initSlider_dom()
+		});
+		*/
+		
+		console.log(_G.VIDEOFS);
+		
+	}
+	
 	//process slider
 	fn_initSlider_handler = function()
 	{

@@ -180,6 +180,44 @@ class WIDGET_jsonToTmpl {
 				continue;
 			}
 			
+			if(preg_match('/videofs/', $gv['type']))
+			{
+				//slider-0-10
+				//slider-<controls 0/1>-<id gallery>
+				
+				preg_match('/^videofs-(.*?)\-(.*?)\s/', $gv['type'], $fn_opts_match);
+				
+				if(sizeof($fn_opts_match) !== 0)
+				{
+					//get gallery content
+					$fn_data_gallery = self::parseGalleryImages($fn_opts_match[2], false);
+					
+					if(!$fn_data_gallery) continue;
+					
+					$fn_slider_id = md5(microtime());
+					
+					self::$fn_xtemplate_parse['assign'][] = array(
+							'videoid' => $fn_slider_id,
+							'jsonVideo' => json_encode(array(
+								'config' => array(
+									'dom' => "cnVideo-{$fn_slider_id}",
+									'type' => 'normal',	
+									'showControls' => (isset($fn_opts_match[1]) && $fn_opts_match[1] == '0') ? false : true,
+								),
+								'data' => $fn_data_gallery,
+							)),
+						);
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_videofs";
+				}
+				
+				//saltamos resto de elementos no mover esta parte
+				
+				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+				
+				continue;
+			}
+			
 			//margin & padding
 			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
 			{
@@ -216,9 +254,10 @@ class WIDGET_jsonToTmpl {
 	 *
 	 * @access private
 	 * @param mixed $fn_gid
+	 * @param boolean $fn_replace_path
 	 * @return void
 	 */
-	private function parseGalleryImages($fn_gid)
+	private function parseGalleryImages($fn_gid, $fn_replace_path = true)
 	{
 		$fn_slider_q = $this->db->FetchValue("
 			SELECT `objects`
@@ -239,9 +278,15 @@ class WIDGET_jsonToTmpl {
 			{
 				if(isset($gv['img']))
 				{
-					$fn_reg = str_replace('/', '\/', $this->CONFIG['site']['base_script']);
-					$fn_reg = (string)"/({$fn_reg})/";
-					$fn_foto = (preg_match($fn_reg, $gv['img'])) ? $gv['img'] : $this->CONFIG['site']['base_script'].$gv['img'];
+					if($fn_replace_path)
+					{
+						$fn_reg = str_replace('/', '\/', $this->CONFIG['site']['base_script']);
+						$fn_reg = (string)"/({$fn_reg})/";
+						$fn_foto = (preg_match($fn_reg, $gv['img'])) ? $gv['img'] : $this->CONFIG['site']['base_script'].$gv['img'];
+					}else{
+						$fn_foto = $gv['img'];
+					}
+					
 					
 					$gv['img'] = $fn_foto;
 				}

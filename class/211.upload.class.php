@@ -3,7 +3,7 @@
 class tooUpload {
 	
 	public static $tmp_dir = 'content/';
-	public static $ext_allowed = array('jpg', 'jpeg', 'png', 'gif', 'JPG', 'JPEG', 'PNG', 'GIF', 'PDF', 'pdf', 'txt', 'TXT', 'ogg', 'webm', 'mp4', 'mov', 'MP4', 'MOV', 'OGG', 'WEBM', 'zip', '7zp', 'rar');
+	public static $ext_allowed = array('jpg', 'jpeg', 'png', 'gif', 'JPG', 'JPEG', 'PNG', 'GIF', 'PDF', 'pdf', 'txt', 'TXT', 'ogg', 'ogv', 'webm', 'mp4', 'mov', 'MP4', 'MOV', 'OGG', 'OGV', 'WEBM', 'zip', '7zp', 'rar');
 	public static $html_input_name = 'files';
 	
 	/**
@@ -53,7 +53,7 @@ class tooUpload {
 					$fn_type = 'file';
 				}
 				
-				if(preg_match('/(mov|mp4|ogf|ogg|webm)/', $fn_ext))
+				if(preg_match('/(mov|mp4|ogf|ogg|ogv|webm)/', $fn_ext))
 				{
 					$fn_type = 'video';
 				}
