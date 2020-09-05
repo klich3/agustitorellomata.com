@@ -77,137 +77,136 @@ class WIDGET_jsonToTmpl {
 		
 		$fn_json = self::parseByPageContent($fn_args, $fn_hash);
 		
+		if(!$fn_json) return;
+		
 		$fn_json = base64_decode($fn_json);
 		$fn_json = html_entity_decode($fn_json, ENT_QUOTES | ENT_HTML5);
 		
-		if(isJson($fn_json))
+		if(!isJson($fn_json)) return;
+		
+		$fn_data = object_to_array(json_decode($fn_json));
+		$fn_hbox_count = 0;
+		
+		foreach($fn_data as $gk => $gv)
 		{
-			$fn_data = object_to_array(json_decode($fn_json));
-			
-			$fn_hbox_count = 0;
-			
-			foreach($fn_data as $gk => $gv)
+			//elements
+			if(isset($gv['dom']) && !empty($gv['dom']))
 			{
-				//elements
-				if(isset($gv['dom']) && !empty($gv['dom']))
+				if(isset($gv['boxheight']) && $gv['boxheight'] && $gv['dom']['type'] == "img")
 				{
-					if(isset($gv['boxheight']) && $gv['boxheight'] && $gv['dom']['type'] == "img")
-					{
-						$fn_for_data = $gv['dom'];
-						
-						$fn_for_data['value'] = (preg_match('/^(http:|https:|\/\/)/m', $fn_for_data['value'])) ? $fn_for_data['value'] : "{$this->CONFIG['site']['base']}{$fn_for_data['value']}";
-						
-						self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_boxheight_img";
-					}else{
-						$fn_for_data = $gv['dom'];
-						
-						if(preg_match('/img/', $fn_for_data['type'])) $fn_for_data['value'] = (preg_match('/^(http:|https:|\/\/)/m', $fn_for_data['value'])) ? $fn_for_data['value'] : "{$this->CONFIG['site']['base']}{$fn_for_data['value']}";
-						
-						self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_{$gv['dom']['type']}";
-					}
-				}
-				
-				//grid type
-				$fn_for_data = $gv;
-				$fn_for_data['type'] = (preg_match('/(mt-|pt-)/', $gv['type'])) ? "w-1-1 {$gv['type']}" : $gv['type'];
-				
-				//responsive type
-				//if(!preg_match('/(mt-|pt-)/', $gv['type'])) $fn_for_data['type_responsive'] = preg_replace('/^w-(.*)/m', 'w-$1 ws-1-1 wm-$1 wl-$1 wxl-$1', $gv['type']);
-				$fn_for_data['attributes_options'] = (preg_match('/\s/', $gv['type'])) ? $gv['type'] : preg_replace('/^w-(.*)/m', 'w-$1 ws-1-1 wm-$1 wl-$1 wxl-$1', $gv['type']);
-				
-				//grid + grid collapse
-				if(preg_match('/(gc)/', $fn_for_data['type']))
-				{
-					$fn_for_data['grid_collapse'] = '</div></div><div class="g gc">';
-					$fn_for_data['attributes_options'] = '';
-				}else if(preg_match('/(g)/', $fn_for_data['type']))
-				{
-					$fn_for_data['grid_collapse'] = '</div><div class="c cc cp-4@s"><div class="g">';
-					$fn_for_data['attributes_options'] = '';
-				}else{
-					$fn_for_data['grid_collapse'] = '';
-				}
-				
-				if(preg_match('/slider/', $gv['type']))
-				{
-					//slider-0-1-10
-					//slider-<arrow 0/1>-<dots 0/1>-<id gallery>
+					$fn_for_data = $gv['dom'];
 					
-					preg_match('/^slider-(.*?)\-(.*?)\-(.*?)\s/', $gv['type'], $fn_opts_match);
-					
-					if(sizeof($fn_opts_match) !== 0)
-					{
-						//get gallery content
-						$fn_data_gallery = self::parseGalleryImages($fn_opts_match[3]);
-						
-						if(!$fn_data_gallery) continue;
-						
-						$fn_slider_id = md5(microtime());
-						
-						/*
-						var_dump($fn_opts_match);
-						array (size=4)
-						  0 => string 'slider-1-0-12 ' (length=14) //class
-						  1 => string '1' (length=1) //arrows
-						  2 => string '0' (length=1) //dots
-						  3 => string '12' (length=2)
-						
-						*/
-						
-						self::$fn_xtemplate_parse['assign'][] = array(
-								'sliderid' => $fn_slider_id,
-								'jsonSlider' => json_encode(array(
-									'config' => array(
-										'dom' => "cnSlider-{$fn_slider_id}",
-										'type' => 'normal',	
-										'showArrows' => (isset($fn_opts_match[1]) && $fn_opts_match[1] == '0') ? false : true, //1
-										'showDots' => (isset($fn_opts_match[2]) && $fn_opts_match[2] == '0') ? false : true, //2
-									),
-									'data' => $fn_data_gallery,
-								)),
-							);
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_slider";
-					}
-					
-					//saltamos resto de elementos no mover esta parte
+					$fn_for_data['value'] = (preg_match('/^(http:|https:|\/\/)/m', $fn_for_data['value'])) ? $fn_for_data['value'] : "{$this->CONFIG['site']['base']}{$fn_for_data['value']}";
 					
 					self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_boxheight_img";
+				}else{
+					$fn_for_data = $gv['dom'];
 					
-					continue;
+					if(preg_match('/img/', $fn_for_data['type'])) $fn_for_data['value'] = (preg_match('/^(http:|https:|\/\/)/m', $fn_for_data['value'])) ? $fn_for_data['value'] : "{$this->CONFIG['site']['base']}{$fn_for_data['value']}";
+					
+					self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_{$gv['dom']['type']}";
+				}
+			}
+			
+			//grid type
+			$fn_for_data = $gv;
+			$fn_for_data['type'] = (preg_match('/(mt-|pt-)/', $gv['type'])) ? "w-1-1 {$gv['type']}" : $gv['type'];
+			
+			//responsive type
+			//if(!preg_match('/(mt-|pt-)/', $gv['type'])) $fn_for_data['type_responsive'] = preg_replace('/^w-(.*)/m', 'w-$1 ws-1-1 wm-$1 wl-$1 wxl-$1', $gv['type']);
+			$fn_for_data['attributes_options'] = (preg_match('/\s/', $gv['type'])) ? $gv['type'] : preg_replace('/^w-(.*)/m', 'w-$1 ws-1-1 wm-$1 wl-$1 wxl-$1', $gv['type']);
+			
+			//grid + grid collapse
+			if(preg_match('/(gc)/', $fn_for_data['type']))
+			{
+				$fn_for_data['grid_collapse'] = '</div></div><div class="g gc">';
+				$fn_for_data['attributes_options'] = '';
+			}else if(preg_match('/(g)/', $fn_for_data['type']))
+			{
+				$fn_for_data['grid_collapse'] = '</div><div class="c cc cp-4@s"><div class="g">';
+				$fn_for_data['attributes_options'] = '';
+			}else{
+				$fn_for_data['grid_collapse'] = '';
+			}
+			
+			if(preg_match('/slider/', $gv['type']))
+			{
+				//slider-0-1-10
+				//slider-<arrow 0/1>-<dots 0/1>-<id gallery>
+				
+				preg_match('/^slider-(.*?)\-(.*?)\-(.*?)\s/', $gv['type'], $fn_opts_match);
+				
+				if(sizeof($fn_opts_match) !== 0)
+				{
+					//get gallery content
+					$fn_data_gallery = self::parseGalleryImages($fn_opts_match[3]);
+					
+					if(!$fn_data_gallery) continue;
+					
+					$fn_slider_id = md5(microtime());
+					
+					/*
+					var_dump($fn_opts_match);
+					array (size=4)
+					  0 => string 'slider-1-0-12 ' (length=14) //class
+					  1 => string '1' (length=1) //arrows
+					  2 => string '0' (length=1) //dots
+					  3 => string '12' (length=2)
+					
+					*/
+					
+					self::$fn_xtemplate_parse['assign'][] = array(
+							'sliderid' => $fn_slider_id,
+							'jsonSlider' => json_encode(array(
+								'config' => array(
+									'dom' => "cnSlider-{$fn_slider_id}",
+									'type' => 'normal',	
+									'showArrows' => (isset($fn_opts_match[1]) && $fn_opts_match[1] == '0') ? false : true, //1
+									'showDots' => (isset($fn_opts_match[2]) && $fn_opts_match[2] == '0') ? false : true, //2
+								),
+								'data' => $fn_data_gallery,
+							)),
+						);
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_slider";
 				}
 				
-				//margin & padding
-				if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
-				{
-					$fn_for_data['mt'] = 'w-1-1';
-					//$fn_for_data['nb'] = '&nbsp;';
-				}
-				
-				//box height
-				if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
-				{
-					//separador entre cuadros
-					if($fn_hbox_count > 0)
-					{
-						self::$fn_xtemplate_parse['assign'][] = '';
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
-					}
-					
-					$fn_hbox_count++;
-				}
+				//saltamos resto de elementos no mover esta parte
 				
 				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
 				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+				
+				continue;
 			}
-		
-			self::$fn_xtemplate_parse['assign'][] = '';
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid";
-		}else{
-			return;
+			
+			//margin & padding
+			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
+			{
+				$fn_for_data['mt'] = 'w-1-1';
+				//$fn_for_data['nb'] = '&nbsp;';
+			}
+			
+			//box height
+			if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
+			{
+				//separador entre cuadros
+				if($fn_hbox_count > 0)
+				{
+					self::$fn_xtemplate_parse['assign'][] = '';
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
+				}
+				
+				$fn_hbox_count++;
+			}
+			
+			self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
 		}
+	
+		self::$fn_xtemplate_parse['assign'][] = '';
+		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid";
+		
 		return self::$fn_xtemplate_parse;
 	}
 	
@@ -264,7 +263,6 @@ class WIDGET_jsonToTmpl {
 	 */
 	private function parseByPageContent($fn_args, $fn_hash)
 	{
-		
 		//idioma por defecto
 		$fn_def_lang = $this->db->FetchArray("
 			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` AS 'pageContent'
@@ -280,6 +278,8 @@ class WIDGET_jsonToTmpl {
 			'l' => $this->CONFIG['site']['defaultLang'],
 		));
 		
+		if(!$fn_def_lang) return false;
+		
 		$fn_translate = $this->db->FetchValue("
 			SELECT m.`meta_value` AS 'pageContent'
 			FROM `pages_lang_rel` pr
@@ -291,9 +291,8 @@ class WIDGET_jsonToTmpl {
 			'lang' => $fn_args['lang'],
 			'pid' => $fn_def_lang['id'],
 		));
-		
+
 		$fn_translate_unbase = base64_decode($fn_translate);
-			
 		$fn_json = (isset($fn_translate) && $fn_translate_unbase !== 'false' && $fn_args['lang'] !== $this->CONFIG['site']['defaultLang']) ? $fn_translate : $fn_def_lang['pageContent'];
 		
 		return $fn_json;
