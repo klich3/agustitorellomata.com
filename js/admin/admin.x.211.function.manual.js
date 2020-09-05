@@ -213,7 +213,7 @@ $(function()
 		            params: {
 			            gid: $('[name="f_gallery_sel"]', o).val()
 		            },
-		            allow: '*.(jpg|jpeg|gif|png|JPG|JPEG|GIF|PNG|PDF|pdf|txt|TXT|mp4|MP4|OGG|ogg|webm|WEBM|MOV|mov)', // allow files
+		            allow: '*.*', // allow files
 					single: true,
 		            filelimit: false,
 		            
@@ -273,6 +273,14 @@ $(function()
 		                var d = $.parseJSON(r);
 		                
 		                if(debug) console.log(d);
+		                
+		                if(d && d.status == 400) UIkit.notify(
+						{
+						    message : d.message,
+						    status  : 'info',
+						    timeout : 5000,
+						    pos     : 'top-center'
+						});
 		                
 		                if(d.status == 200)
 		                {
