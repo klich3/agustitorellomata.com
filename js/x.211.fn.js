@@ -1,5 +1,13 @@
 $(function()
 {
+	//videofs
+	$.template("videofsTMPL", '<video id="videofs" class="video-js" controls preload="auto">'+
+				'<source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4"></source>'+
+				'<source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm"></source>'+
+				'<source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg"></source>'+
+				'<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>'+
+			'</video>');
+	
 	//slider
 	$.template("sliderTMPL", '<div class="slider"><div class="iosSlider"><div class="slider-content">'+
 		
@@ -295,7 +303,12 @@ $(function()
 	}
 	
 	//process videofs
-	
+//------>	
+//------>	
+//------>	
+//------>	
+//------>	
+
 	fn_videofs_handler = function()
 	{
 		trace("[R:300]");
@@ -308,25 +321,43 @@ $(function()
 			
 			if(ele_c.length == 0 && ele_c[0].data == undefined) return;
 			
+			
+			ele.parent().html($.tmpl("videofsTMPL"));
+			
 			_G.VIDEOFS[i] = $.parseJSON(ele_c[0].data);
-			//if(ele.attr('data-slider-container') && ele.attr('data-slider-container').length !== 0) _G.SLIDER[i].config.dom = ele.attr('data-slider-container');
 		});
 		
-		/*
 		//load script
 		window.loadJS(
 		{
 			items:[
-				fn_base_script+'js/jquery.iosslider.min.js'
+				fn_base_script+'js/jquery.jqplayer.min.js'
 			],
-			callback:fn_initSlider_dom()
+			callback:fn_initVideofs_dom()
 		});
-		*/
-		
-		console.log(_G.VIDEOFS);
-		
 	}
 	
+	fn_initVideofs_dom = function()
+	{
+		console.log("as");
+		
+		var player = videojs('videofs', {}, function onPlayerReady()
+		{
+			this.play();
+		
+			/*
+			// How about an event listener?
+			this.on('ended', function() {
+				videojs.log('Awww...over so soon?!');
+			});
+			*/
+		});
+	}
+//------>	
+//------>	
+//------>	
+//------>	
+//------>	
 	//process slider
 	fn_initSlider_handler = function()
 	{
