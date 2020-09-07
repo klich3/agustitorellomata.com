@@ -34,7 +34,7 @@
 	Header set Cache-Control "public, max-age=86400000"
 </FilesMatch>
 
-<FilesMatch "\.(html|htm|php)$">
+<FilesMatch "\.(html|htm|php|js|css)$">
 	Header set Cache-Control "no-cache"
 </FilesMatch>
 
