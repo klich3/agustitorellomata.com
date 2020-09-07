@@ -1,13 +1,5 @@
 $(function()
 {
-	//videofs
-	$.template("videofsTMPL", '<video id="videofs" class="video-js" controls preload="auto">'+
-				'<source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4"></source>'+
-				'<source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm"></source>'+
-				'<source src="//vjs.zencdn.net/v/oceans.ogv" type="video/ogg"></source>'+
-				'<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>'+
-			'</video>');
-	
 	//slider
 	$.template("sliderTMPL", '<div class="slider"><div class="iosSlider"><div class="slider-content">'+
 		
@@ -321,37 +313,114 @@ $(function()
 			
 			if(ele_c.length == 0 && ele_c[0].data == undefined) return;
 			
+			var data = $.parseJSON(ele_c[0].data);
 			
-			ele.parent().html($.tmpl("videofsTMPL"));
+			var items = {};
+				
+			if(data && data.data.length !== 0) for(var i in data.data)
+			{
+				if(/mp4/gim.test(data.data[i].img)) items.mp4 = data.data[i].img;
+				//if(/webmsd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
+				if(/webmhd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
+				if(/ogv|ogg/gim.test(data.data[i].img)) items.ogv = data.data[i].img;
+			}
 			
-			_G.VIDEOFS[i] = $.parseJSON(ele_c[0].data);
+			data.data = items;
+			
+			_G.VIDEOFS[i] = {
+				id: $(ele).parent().attr('data-slider-id'),
+				data: data
+			};
+			
+			var dom_v = $('[data-slider-id="'+_G.VIDEOFS[i].id+'"] video');
+			var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
+			
+			dom_v.attr('src', fn_src);
+			
+			$(dom_v).on('loadedmetadata', function(e)
+			{
+				f_resizeVideo(e.target);
+				
+				$(e.target).animate(
+				{
+					opacity:1
+				}, 2000, 'easeOutExpo');
+			});
+			
+			$(dom_v).on('oncanplay', function(e)
+			{
+				$(e.target)[0].play();
+			});
 		});
 		
+		/*
 		//load script
 		window.loadJS(
 		{
 			items:[
-				fn_base_script+'js/jquery.jqplayer.min.js'
+				fn_base_script+'js/jquery.jplayer.min.js'
 			],
 			callback:fn_initVideofs_dom()
 		});
+		*/
 	}
 	
+	/*
 	fn_initVideofs_dom = function()
 	{
-		console.log("as");
+		trace("[R:334]");
 		
-		var player = videojs('videofs', {}, function onPlayerReady()
+		if(typeof $.fn.jPlayer == 'function')
 		{
-			this.play();
+			if(_G.VIDEOFS && _G.VIDEOFS.length !== 0) for(var v in _G.VIDEOFS)
+			{
+				
+			}
+			
+			clearTimeout($.data(this, 'data-fn_initVideofs_dom'));
+		}else{
+			clearTimeout($.data(this, 'data-fn_initVideofs_dom'));
+		    $.data(this, 'data-fn_initVideofs_dom', setTimeout('fn_initVideofs_dom()', 350));
+		}
 		
+	}
+	*/
+	
+	f_resizeVideo = function(e)
+	{
+		if(e && $(e).length == 0) return;
+		
+		var w = $(window).width(),
+			h = $(window).height();
+		var v_w = 1280,
+			v_h = 720,
+			fn_video_w = w / v_w,
+			fn_video_h = h / v_h,
+			fn_video_s = fn_video_h > fn_video_w ? fn_video_h : fn_video_w,
+			fn_video_f,
+			fn_video_l;
+			if((fn_video_s * v_w) < 320) fn_video_s = 320 / v_w;
+			fn_video_f = fn_video_s * v_w;
+			fn_video_l = fn_video_s * v_h;
+			
+			$(e).css(
+			{
+				width:fn_video_f+'px',
+				height:fn_video_l+'px'
+			});
+			
 			/*
-			// How about an event listener?
-			this.on('ended', function() {
-				videojs.log('Awww...over so soon?!');
+			$('.bg_video').css(
+			{
+				marginLeft:-((fn_video_f - w) / 2)+'px'
+				//marginTop:-((fn_video_l - h) / 2)+'px'
+			});
+			
+			$('.bg_video .pattern').css(
+			{
+				left:(fn_video_f - w) / 2+'px'
 			});
 			*/
-		});
 	}
 //------>	
 //------>	
