@@ -295,12 +295,6 @@ $(function()
 	}
 	
 	//process videofs
-//------>	
-//------>	
-//------>	
-//------>	
-//------>	
-
 	fn_videofs_handler = function()
 	{
 		trace("[R:300]");
@@ -339,7 +333,7 @@ $(function()
 			
 			$(dom_v).on('loadedmetadata', function(e)
 			{
-				f_resizeVideo(e.target);
+				//f_resizeVideo(e.target);
 				
 				$(e.target).animate(
 				{
@@ -352,81 +346,8 @@ $(function()
 				$(e.target)[0].play();
 			});
 		});
-		
-		/*
-		//load script
-		window.loadJS(
-		{
-			items:[
-				fn_base_script+'js/jquery.jplayer.min.js'
-			],
-			callback:fn_initVideofs_dom()
-		});
-		*/
 	}
 	
-	/*
-	fn_initVideofs_dom = function()
-	{
-		trace("[R:334]");
-		
-		if(typeof $.fn.jPlayer == 'function')
-		{
-			if(_G.VIDEOFS && _G.VIDEOFS.length !== 0) for(var v in _G.VIDEOFS)
-			{
-				
-			}
-			
-			clearTimeout($.data(this, 'data-fn_initVideofs_dom'));
-		}else{
-			clearTimeout($.data(this, 'data-fn_initVideofs_dom'));
-		    $.data(this, 'data-fn_initVideofs_dom', setTimeout('fn_initVideofs_dom()', 350));
-		}
-		
-	}
-	*/
-	
-	f_resizeVideo = function(e)
-	{
-		if(e && $(e).length == 0) return;
-		
-		var w = $(window).width(),
-			h = $(window).height();
-		var v_w = 1280,
-			v_h = 720,
-			fn_video_w = w / v_w,
-			fn_video_h = h / v_h,
-			fn_video_s = fn_video_h > fn_video_w ? fn_video_h : fn_video_w,
-			fn_video_f,
-			fn_video_l;
-			if((fn_video_s * v_w) < 320) fn_video_s = 320 / v_w;
-			fn_video_f = fn_video_s * v_w;
-			fn_video_l = fn_video_s * v_h;
-			
-			$(e).css(
-			{
-				width:fn_video_f+'px',
-				height:fn_video_l+'px'
-			});
-			
-			/*
-			$('.bg_video').css(
-			{
-				marginLeft:-((fn_video_f - w) / 2)+'px'
-				//marginTop:-((fn_video_l - h) / 2)+'px'
-			});
-			
-			$('.bg_video .pattern').css(
-			{
-				left:(fn_video_f - w) / 2+'px'
-			});
-			*/
-	}
-//------>	
-//------>	
-//------>	
-//------>	
-//------>	
 	//process slider
 	fn_initSlider_handler = function()
 	{

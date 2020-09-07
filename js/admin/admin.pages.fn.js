@@ -8,7 +8,7 @@ $(function()
 	$.template('parsePageContent', '{{if data}} {{each(i, o) data}} {{tmpl(data[i]) "pageAddGrid"}} {{/each}} {{/if}}');
 	
 	//grid
-	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}"><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
+	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
 		//menu inside element
 		'{{tmpl() "pageAddGridOptions"}}'+
 		
@@ -25,7 +25,10 @@ $(function()
 	//menu inside element
 	$.template('pageAddGridOptions', '{{if type.match(/(w-)/g)}} <a href="javascript:void(0);" data-page-parser="modalpageelements" data-tab="text" class="uk-text-small" title="Añadir/modificar contenido" data-uk-tooltip><i class="uk-icon-plus"></i></a> {{/if}} <a href="javascript:void(0);" data-page-parser="cleanupelement" class="uk-text-small" title="Eliminar elemento con el contenido" data-uk-tooltip><i class="uk-icon-trash uk-text-danger"></i></a>'+
 		//opciones extra sobre el grid
-		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" title="Opciones extendidas de este elemento (grid)" data-uk-tooltip data-page-parser="modalpageelements" data-tab="grid"><i class="uk-icon-puzzle-piece uk-text-"></i></a></span>'+
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" title="Opciones extendidas de este elemento (grid)" data-uk-tooltip data-page-parser="modalpageelements" data-tab="grid"><i class="uk-icon-puzzle-piece"></i></a></span>'+
+		
+		//opciones extra style
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalstyleelement" title="Style Customizado" data-uk-tooltip><i class="uk-icon-paint-brush"></i></a></span>'+
 		
 		//descripcion de lo que esta aplicado al row del grid
 		'<span class="uk-float-right uk-text-small uk-margin-small-right uk-width-3-10 uk-text-truncate" data-uk-tooltip title="${type}" data-element-title>${type}</span>'+
@@ -239,6 +242,24 @@ $(function()
 		
 		switch(dom_type)
 		{
+			//style modal
+			case "modalstyleelement":
+				var modal = UIkit.modal('#pageElementsCustomStyles', {modal: false}),
+				dom_element_style = ele.parents('[data-style]').attr('data-style');
+				
+				if(!modal.isActive()) modal.show();
+				
+				clearTimeout($.data(this, 'modalOpen'));
+				$.data(this, 'modalOpen', setTimeout(function()
+				{
+					//add edit class
+					ele.parents('[data-grid-element]').addClass('edit');
+					
+					$('.uk-modal.uk-open form').find('textarea').val('');
+					$('.uk-modal.uk-open form').find('textarea').val(dom_element_style);
+				}, 250));
+			break;
+			
 			case "cleanupall":
 				//limpia todo el grid
 				var fn_items = dom_container.find('div [data-page-parser="cleanupelement"]');
@@ -438,6 +459,14 @@ $(function()
 		
 		switch(dom_type)
 		{
+			case "setStyle":
+				var dom_el = $('[data-grid-element].edit'),
+				dom_value = $('.uk-modal.uk-open form[data-custom-style] textarea').val();
+				
+				dom_el.attr('data-style', dom_value);
+				dom_el.removeClass('edit');
+			break;
+			
 			//texto contenido interios
 			case "text":
 				var dom_container = $('#pageElements.uk-modal').data('domContainer'),
@@ -545,7 +574,7 @@ $(function()
 					dom_el.attr('data-grid-element', dom_out_opts).attr(
 					{
 						'class':'uk-margin-bottom uk-margin-small '+dom_out_opts,
-						'title':dom_out_opts
+						'title':dom_out_opts,
 					});
 					dom_el.find('[data-element-title]').text(dom_out_opts);
 				}
@@ -657,10 +686,11 @@ $(function()
 			if(!$.isNumeric(i)) continue;
 			
 			var f_type = $(dom_elem[i]).attr('data-grid-element'),
+				dom_style = $(dom_elem[i]).attr('data-style'),
 				dom_attr = $(dom_elem[i]).find('[data-dom]'),
 				dom_attr_array = {},
 				f_boxheight = $(dom_elem[i]).find('[name="boxheight"]').is(':checked');
-				
+			
 			if(dom_attr.length !== 0) for(var o in dom_attr)
 			{
 				if(!$.isNumeric(o)) continue;
@@ -678,15 +708,16 @@ $(function()
 				}
 				
 				dom_attr_array = {
-					type:o_type,
-					value:o_val
+					type: o_type,
+					value: o_val
 				};
 			}
 			
 			data[i] = {
-				type:f_type,
-				boxheight:f_boxheight,
-				dom:dom_attr_array
+				type: f_type,
+				boxheight: f_boxheight,
+				style: dom_style,
+				dom: dom_attr_array
 			}
 		}
 		
