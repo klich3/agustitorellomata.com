@@ -8,7 +8,7 @@ $(function()
 	$.template('parsePageContent', '{{if data}} {{each(i, o) data}} {{tmpl(data[i]) "pageAddGrid"}} {{/each}} {{/if}}');
 	
 	//grid
-	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
+	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}"{{/if}} {{if cclass}}data-cclass="${cclass}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
 		//menu inside element
 		'{{tmpl() "pageAddGridOptions"}}'+
 		
@@ -29,6 +29,9 @@ $(function()
 		
 		//opciones extra style
 		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalstyleelement" title="Style Customizado" data-uk-tooltip><i class="uk-icon-paint-brush"></i></a></span>'+
+		
+		//opciones custom class
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalclasselement" title="Asignar una clase adicional" data-uk-tooltip><i class="uk-icon-tree"></i></a></span>'+
 		
 		//descripcion de lo que esta aplicado al row del grid
 		'<span class="uk-float-right uk-text-small uk-margin-small-right uk-width-3-10 uk-text-truncate" data-uk-tooltip title="${type}" data-element-title>${type}</span>'+
@@ -243,9 +246,11 @@ $(function()
 		switch(dom_type)
 		{
 			//style modal
+			case "modalclasselement":
 			case "modalstyleelement":
-				var modal = UIkit.modal('#pageElementsCustomStyles', {modal: false}),
-				dom_element_style = ele.parents('[data-style]').attr('data-style');
+				var modal = (/modalclasselement/gim.test(dom_type)) ? UIkit.modal('#pageElementsCustomClass', {modal: false}) : UIkit.modal('#pageElementsCustomStyles', {modal: false}),
+				dom_element_style = (/modalclasselement/gim.test(dom_type)) ? ele.parents('[data-cclass]').attr('data-cclass') : ele.parents('[data-style]').attr('data-style'),
+				dom_by_type = (/modalclasselement/gim.test(dom_type)) ? ':input' : 'textarea';
 				
 				if(!modal.isActive()) modal.show();
 				
@@ -255,8 +260,8 @@ $(function()
 					//add edit class
 					ele.parents('[data-grid-element]').addClass('edit');
 					
-					$('.uk-modal.uk-open form').find('textarea').val('');
-					$('.uk-modal.uk-open form').find('textarea').val(dom_element_style);
+					$('.uk-modal.uk-open form').find(dom_by_type).val('');
+					$('.uk-modal.uk-open form').find(dom_by_type).val(dom_element_style);
 				}, 250));
 			break;
 			
@@ -459,11 +464,15 @@ $(function()
 		
 		switch(dom_type)
 		{
+			case "setCClass":
 			case "setStyle":
 				var dom_el = $('[data-grid-element].edit'),
-				dom_value = $('.uk-modal.uk-open form[data-custom-style] textarea').val();
+				dom_by_type = (/setStyle/gim.test(dom_type)) ? 'textarea' : ':input',
+				dom_form_bby_type = (/setStyle/gim.test(dom_type)) ? 'data-custom-style' : 'data-custom-class',
+				dom_value = $('.uk-modal.uk-open form['+dom_form_bby_type+']').find(dom_by_type).val();
 				
-				dom_el.attr('data-style', dom_value);
+				var dom_attr = (/setStyle/gim.test(dom_type)) ? 'data-style' : 'data-cclass';
+				dom_el.attr(dom_attr, dom_value);
 				dom_el.removeClass('edit');
 			break;
 			
@@ -687,6 +696,7 @@ $(function()
 			
 			var f_type = $(dom_elem[i]).attr('data-grid-element'),
 				dom_style = $(dom_elem[i]).attr('data-style'),
+				dom_cclass = $(dom_elem[i]).attr('data-cclass'),
 				dom_attr = $(dom_elem[i]).find('[data-dom]'),
 				dom_attr_array = {},
 				f_boxheight = $(dom_elem[i]).find('[name="boxheight"]').is(':checked');
@@ -717,6 +727,7 @@ $(function()
 				type: f_type,
 				boxheight: f_boxheight,
 				style: dom_style,
+				cclass: dom_cclass,
 				dom: dom_attr_array
 			}
 		}
