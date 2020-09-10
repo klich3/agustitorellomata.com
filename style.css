@@ -379,6 +379,7 @@ header nav li:hover .submenu {
 	-ms-transform: 		translateX(-50%);
 	-o-transform: 		translateX(-50%);
 	-moz-transform: 		translateX(-50%);
+	z-index: 100;
 
 }
 
