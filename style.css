@@ -326,6 +326,7 @@ html.menu-open .menu-nav [data-source="social"] svg {
 header {
 	background-color: #000;
 	color: #fff;
+	z-index: 1;
 }
 
 header .logo svg {
@@ -468,6 +469,11 @@ footer .menu li:not(:last-child)::after {
 	right: 0%;
 }
 
+main {
+	position: relative;
+	z-index: -1;
+}
+
 main .g > .mc {
 	margin-left: auto !important;
 	margin-right: auto !important;
@@ -529,6 +535,17 @@ video {
 	transition: width 167ms, height 167ms;
 
 	opacity: 0;
+}
+
+/* hooks */
+.uk-modal-page body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
 }
 
 @media (max-width: 768px) {
