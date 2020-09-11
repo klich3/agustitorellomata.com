@@ -56,6 +56,10 @@ $(function()
 	//rel page
 	$.template('relItem', '{{if status == 200}}<li data-id="${data.id}"><div class="uk-grid uk-grid-small"><div class="uk-width-2-3"><strong>[${data.lang}]</strong> ${data.obj_title}</div><div class="uk-width-1-3"><a href="javascript:void(0);" data-action="delRelPage" class="uk-button uk-button-small uk-button-danger uk-float-right"><i class="uk-icon-trash"></i></a></div></div></li>{{/if}}');
 	
+	var _G = {
+		POSTOP: 0
+	}
+	
 	var admin_pages = function() 
 	{
 		if (debug) console.log("[plugin] admin-pages");
@@ -74,6 +78,8 @@ $(function()
 		$(document).on('click', '[data-page-parser]', fn_pageParserActions_handler);
 		$(document).on('change.uk.sortable', '[data-uk-sortable]', fn_process_for_save);
 		
+		$(document).on('keydown', fn_keys_handler);
+		
 		//quitamos class edit al cerrar el modal
 		$('#pageElements.uk-modal').on(
 		{
@@ -90,6 +96,14 @@ $(function()
 			}
 		});
 		
+		$('.uk-modal').on(
+		{
+			'hide.uk.modal': function()
+			{
+				$(document).scrollTop(_G.POSTOP);
+			}
+		});
+		
 		//page parser
 		$('[data-pagecontainer]').each(function()
 		{
@@ -97,6 +111,19 @@ $(function()
 			
 			fn_parse_pageContent();
 		});
+	}
+	
+	//key combination
+	fn_keys_handler = function(e)
+	{
+		var evtobj = window.event? event : e;
+		
+		//cmd + s = save
+		if(evtobj.keyCode == 83 && evtobj.ctrlKey)
+		{
+			e.preventDefault();
+			$('[data-submit="upPage"]').trigger('click');
+		}
 	}
 	
 	//change page type show hide content or options
@@ -131,7 +158,7 @@ $(function()
 			dom_type = ele.attr('data-blog-action'),
 			dom_modal = $('#editModalComment', document),
 			modal = UIkit.modal(dom_modal, {modal: false});
-			
+		
 		if(debug) console.log('[>] e_blog_action_handler id['+dom_id+'] action['+dom_type+']');
 		
 		switch(dom_type)
@@ -240,6 +267,8 @@ $(function()
 		var ele = $(this),
 			dom_type = ele.attr('data-page-parser'),
 			dom_container = $('[data-uk-sortable]', document);			
+		
+		_G.POSTOP = ele.position().top;
 		
 		if(debug) console.log('[>] fn_pageParserActions_handler type['+dom_type+']');
 		
@@ -663,14 +692,18 @@ $(function()
 		
 		if(dom_type !== 'gridOpt' || dom_type !== 'text') dom_ele_pos = (dom_addElement == 'down') ? $('[data-grid-tmpl] [data-grid-element]:last-child').position().top : 0;
 		
-		if(dom_ele_pos !== false) $('html, body').animate(
-		{
-			scrollTop: dom_ele_pos+'px'
-		}, 600);
-		
 		$('.uk-modal.uk-open .uk-modal-close.uk-close', document).trigger('click');
-		
+
 		fn_process_for_save();
+	}
+	
+	e_backtoele = function()
+	{
+		$(window).scrollTop(_G.POSTOP, 1);
+		$('html, body').animate(
+		{
+			scrollTop: _G.POSTOP+'px'
+		}, 1);
 	}
 	
 	//pricesamos el contenido para guardar json con elementos
@@ -754,6 +787,8 @@ $(function()
 				message:'No hay nada que guardar'
 			}));
 		}
+		
+		e_backtoele();
 	}
 	
 	//process json
