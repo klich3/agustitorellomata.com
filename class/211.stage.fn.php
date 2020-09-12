@@ -275,6 +275,13 @@ function page($fn_id, $fn_args = null)
 		'dataNow' => date('Y-m-d'),
 	));
 	
+	//activity title
+	if(preg_match('/(product_grid|pages_details)/', $fn_args['url']) && $fn_args['stage_type'] == 8)
+	{
+		$fn_xtemplate_parse['assign'][] = "";
+		$fn_xtemplate_parse['parse'][] = "pages_details.activity_list_title";
+	}
+	
 	//widgets load template
 	if(isset($fn_plugin_template_files) && sizeof($fn_plugin_template_files) !== 0)
 	{
