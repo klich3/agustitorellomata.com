@@ -1,0 +1,37 @@
+<!-- BEGIN: activity_list -->
+{FILE {pagefreaturedImageTmpl}}
+
+<div class="w-1-1">
+	<div class="c cc cp-4@s">
+		{FILE {jsonToTmpl}}
+	</div>
+</div>
+
+<div class="w-1-1 mt-4 mb-4">
+	<div class="c cc">
+		
+		<div class="g gc">
+			<!-- BEGIN: no_items -->
+			<div class="w-1-1 txt@c">{no_post_content}</div>
+			<!-- END: no_items -->
+			
+			
+			<!-- BEGIN: group -->
+			<div class="w-1-1 activity_list pt-4">
+				<div class="title pb-2">{obj_title}</div>
+				<div class="g">
+					<div class="ws-1-1 w-8-10 desc">
+						{seo_resumen}
+					</div>
+					<div class="ws-1-1 w-2-10">
+						<a href="{base}{user_lang}/{obj_hash}" class="button fr ws-1-1 mt-3@s">{button_ver}</a>
+					</div>
+				</div>
+				<hr/>
+			</div>
+			<!-- END: group -->
+		</div>
+		
+	</div>
+</div>
+<!-- END: activity_list -->
