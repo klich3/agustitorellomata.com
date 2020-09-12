@@ -427,6 +427,23 @@ pre {
 	overflow: scroll !important;
 }
 
+.button {
+	display: inline-block;
+	width: auto;
+	padding: 14px 49px;
+	color: #fff !important;
+	background-color: #000;
+	-webkit-transition:all .25s ease-out;
+	-moz-transition:all .25s ease-out;
+	-o-transition:all .25s ease-out;
+	transition:all .25s ease-out;
+}
+
+.button:hover {
+	color: #000 !important;
+	background-color: #B99219;
+}
+
 @media screen and (max-width: 768px) {
 	.cp {
 		padding-left: 3%;

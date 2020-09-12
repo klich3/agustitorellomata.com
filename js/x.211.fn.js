@@ -82,6 +82,7 @@ $(function()
 		FIRSTRUN:false,
 		SCROLL_TOP:$(window).scrollTop(),
 		HASH:'',
+		USERLANG: userLang,
 		REQ:false,
 		COOKIES:false,
 		GMAP:false,
@@ -109,6 +110,10 @@ $(function()
 			//mark menu
 			$('header nav a.active').removeClass('active');
 			$('header nav a[data-hash*="'+_G.HASH+'"]').addClass('active');
+			
+			//lang
+		    $('.lang [data-l="'+_G.USERLANG+'"]').parents('li').addClass('active');
+		    $('.current-lang').html(_G.USERLANG);
 			
 			switch(_G.TYPE)
 		    {

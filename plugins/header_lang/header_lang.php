@@ -46,7 +46,7 @@ class WIDGET_header_lang {
 			//reorder
 			foreach($fn_lng as $fv)
 			{
-				if($fv == $fn_args['st_lang']) continue;
+				//if($fv == $fn_args['st_lang']) continue;
 				
 				$fn_get_flag_image = (file_exists("images/flags/{$fv}.png")) ? $this->CONFIG['site']['base_script']."images/flags/{$fv}.png" : false;
 				
