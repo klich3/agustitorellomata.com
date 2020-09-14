@@ -131,6 +131,26 @@ class WIDGET_jsonToTmpl {
 				$fn_for_data['grid_collapse'] = '';
 			}
 			
+			if(isset($gv['control']))
+			{
+				if($gv['control'] > 0)
+				{
+					
+					
+					self::$fn_xtemplate_parse['assign'][] = array(
+						"gmapUrl" => self::getDir('gmapUrl')
+					);
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
+				}
+				
+				//saltamos resto de elementos no mover esta parte
+				
+				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+				
+				continue;
+			}
+			
 			if(preg_match('/slider/', $gv['type']))
 			{
 				//slider-0-1-10
@@ -246,6 +266,20 @@ class WIDGET_jsonToTmpl {
 		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid";
 		
 		return self::$fn_xtemplate_parse;
+	}
+	
+	/**
+	 * getDir function.
+	 * 
+	 * @access private
+	 * @param mixed $fn_dir_item
+	 * @return void
+	 */
+	private function getDir($fn_dir_item = false)
+	{
+		$fn_dir = (isset($this->CONFIG['site']['dir']) && isJson($this->CONFIG['site']['dir'])) ? json_decode($this->CONFIG['site']['dir'], true) : false;
+		
+		return (!$fn_dir_item) ? $fn_dir[0] : $fn_dir[0][$fn_dir_item];
 	}
 	
 	/**

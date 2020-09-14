@@ -192,6 +192,10 @@ html{font:400 14px/20px "Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-text
 	display: none;
 }
 
+[data-content] {
+	overflow: hidden;
+}
+
 @media (max-width:768px){
 	.hs [data-status-element] .uk-icon-eye,
 	.hs{display:none}

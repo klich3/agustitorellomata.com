@@ -30,7 +30,7 @@
 #	Header set Cache-Control "private, max-age=3153600"
 #</FilesMatch>
 
-<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|swf|svg|ttf|woff|eot)$">
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|swf|svg|ttf|woff|woff2|eot)$">
 	Header set Cache-Control "public, max-age=86400000"
 </FilesMatch>
 

@@ -162,7 +162,7 @@
 		<div class="uk-width-1-1 uk-margin-bottom">
 			<div class="uk-button-group" data-gid="{gallery_id}">
 				<a href="{current_hash}" class="uk-button uk-button-small"><i class="uk-icon-angle-left"></i> Volver</a>
-				<a href="{base}{user_lang}/{obj_hash}" class="uk-button uk-button-success uk-button-small"> Prever la página</a>
+				<a href="{base}{user_lang}/{obj_hash}" class="uk-button uk-button-success uk-button-small"> Ver página</a>
 				<a href="javascript:void(0);" data-gallery="manage" class="uk-button uk-button-small uk-button-primary uk-float-right uk-margin-bottom">Adm. imágenes</a>
 			</div>
 		</div>
@@ -1734,6 +1734,40 @@
 		    		</form>
 		    	</li>
 			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="uk-modal" id="pageControlElements" data-modal="false">
+	<div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        
+        <div class="uk-width-1-1">
+	        <form class="uk-form" data-control-opts>
+	    		<div data-uk-margin>
+		    		<div class="uk-width-1-1">
+			    		Seleccionar elemento de control
+		    		</div>
+		    		
+		    		<div class="uk-width-1-1">
+				    	<div class="uk-form-row">
+				    		<select name="control[id]" class="uk-width-1-1 uk-form-small">
+						    	<option value=""></option>
+						    	<option value="8">Actividades - reserva - como llegar - volver</option>
+					    	</select>
+			    		</div>
+		    		</div>
+		    		
+		    		<div class="uk-width-1-1 uk-form-row">
+					</div>
+				
+					<div class="uk-width-1-1 uk-form-row">
+						<a href="javascript:void(0);" data-page-add-element="controlele" class="uk-button uk-button-small uk-button-success uk-float-right">Añadir</a>
+					</div>
+					
+					<div class="uk-width-1-1 uk-clearfix"></div>
+	    		</div>
+			</form>
 		</div>
 	</div>
 </div>
