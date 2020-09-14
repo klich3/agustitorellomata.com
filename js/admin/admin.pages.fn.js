@@ -8,7 +8,7 @@ $(function()
 	$.template('parsePageContent', '{{if data}} {{each(i, o) data}} {{tmpl(data[i]) "pageAddGrid"}} {{/each}} {{/if}}');
 	
 	//grid
-	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}"{{/if}} {{if cclass}}data-cclass="${cclass}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
+	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}" style="${style}"{{/if}} {{if cclass}}data-cclass="${cclass}"{{/if}} {{if control}}data-control="${control}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
 		//menu inside element
 		'{{tmpl() "pageAddGridOptions"}}'+
 		
@@ -19,6 +19,7 @@ $(function()
 			'{{/if}}'+
 			'{{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}'+
 			'{{if type.match(/(videofs)/g)}}<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />{{/if}}'+
+			'{{if control==8}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
 		'</div>'+
 	'</div></div>');
 	
@@ -28,10 +29,13 @@ $(function()
 		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" title="Opciones extendidas de este elemento (grid)" data-uk-tooltip data-page-parser="modalpageelements" data-tab="grid"><i class="uk-icon-puzzle-piece"></i></a></span>'+
 		
 		//opciones extra style
-		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalstyleelement" title="Style Customizado" data-uk-tooltip><i class="uk-icon-paint-brush"></i></a></span>'+
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalstyleelement" title="Style Customizado" data-uk-tooltip><i class="uk-icon-paint-brush {{if style}}uk-text-success{{/if}}"></i></a></span>'+
 		
 		//opciones custom class
-		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalclasselement" title="Asignar una clase adicional" data-uk-tooltip><i class="uk-icon-tree"></i></a></span>'+
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalclasselement" title="Asignar una clase adicional" data-uk-tooltip><i class="uk-icon-tree {{if cclass}}uk-text-success{{/if}}"></i></a></span>'+
+		
+		//otros elementos
+		'<span class="uk-float-right uk-text-small uk-margin-small-right"><a href="javascript:void(0);" data-page-parser="modalcontrolelements" title="Elementos de control" data-uk-tooltip><i class="uk-icon-asterisk"></i></a></span>'+
 		
 		//descripcion de lo que esta aplicado al row del grid
 		'<span class="uk-float-right uk-text-small uk-margin-small-right uk-width-3-10 uk-text-truncate" data-uk-tooltip title="${type}" data-element-title>${type}</span>'+
@@ -294,6 +298,23 @@ $(function()
 				}, 250));
 			break;
 			
+			case "modalcontrolelements":
+				var modal = UIkit.modal('#pageControlElements', {modal: false}),
+					dom_sel = ele.parents('[data-control]').attr('data-control');
+				
+				if(!modal.isActive()) modal.show();
+				
+				clearTimeout($.data(this, 'modalOpen'));
+				$.data(this, 'modalOpen', setTimeout(function()
+				{
+					//add edit class
+					ele.parents('[data-grid-element]').addClass('edit');
+					
+					$('.uk-modal.uk-open form').find('select[name="control[id]"]').val(0);
+					$('.uk-modal.uk-open form').find('select[name="control[id]"]').val(dom_sel);
+				}, 250));
+			break;
+						
 			case "cleanupall":
 				//limpia todo el grid
 				var fn_items = dom_container.find('div [data-page-parser="cleanupelement"]');
@@ -688,6 +709,25 @@ $(function()
 				modal_opts.find('[name="video[showControls]"]').val(0);
 				modal_opts.find('[name="video[g_id]"]').val(0);
 			break;
+			
+			//control elem actividades
+			case "controlele":
+				var modal_opts = $('.uk-modal.uk-open form[data-control-opts]'),
+					dom_el = $('[data-grid-element].edit'),
+					dom_value = modal_opts.find('select[name="control[id]"]').val();
+				
+				if(!dom_value) 
+				{
+					dom_el.find('[data-content]').html('');
+					dom_el.removeAttr('data-control');
+					dom_el.removeClass('edit');
+					return;
+				}
+				
+				if(dom_value === '8') dom_el.find('[data-content]').html('<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />');
+				dom_el.attr('data-control', dom_value);
+				dom_el.removeClass('edit');
+			break;
 		}
 		
 		if(dom_type !== 'gridOpt' || dom_type !== 'text') dom_ele_pos = (dom_addElement == 'down') ? $('[data-grid-tmpl] [data-grid-element]:last-child').position().top : 0;
@@ -728,6 +768,7 @@ $(function()
 			if(!$.isNumeric(i)) continue;
 			
 			var f_type = $(dom_elem[i]).attr('data-grid-element'),
+				dom_control = $(dom_elem[i]).attr('data-control'),
 				dom_style = $(dom_elem[i]).attr('data-style'),
 				dom_cclass = $(dom_elem[i]).attr('data-cclass'),
 				dom_attr = $(dom_elem[i]).find('[data-dom]'),
@@ -759,8 +800,9 @@ $(function()
 			data[i] = {
 				type: f_type,
 				boxheight: f_boxheight,
-				style: dom_style,
-				cclass: dom_cclass,
+				style: (dom_style) ? dom_style : "",
+				cclass: (dom_cclass) ? dom_cclass : "",
+				control: (dom_control) ? dom_control : "",
 				dom: dom_attr_array
 			}
 		}
