@@ -159,10 +159,10 @@ $(function()
 	//tab open close
 	fn_tab_handler = function(e)
 	{
-		if(window.width > 768) return;
+		if($(window).width() > 768) return;
 		
 		var ele = $(this);
-		
+
 		if(ele.parents('li').find('.submenu').length !== 0)
 		{
 			e.preventDefault();
@@ -175,8 +175,6 @@ $(function()
 				
 		//open
 		var isOpen = ele.parents('li').innerHeight();
-		
-		console.log(ele.parents('li').innerHeight());
 		
 		ele.addClass('open');
 		ele.parents('li').find('.submenu').stop().slideToggle(450, function()

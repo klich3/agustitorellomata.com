@@ -369,13 +369,13 @@ header nav .submenu {
 
 header nav li:hover .submenu {
 	position: absolute;
-	top: 0;
+	top: 17px;
 	left: 50%;
 
 	display: block;
 	width: auto;
 	
-	padding-top: 32px;
+	padding-top: 15px;
 
 	/*Y up/down*/
 	/*X left/right*/
@@ -561,7 +561,7 @@ video {
 	text-align: center;
 	text-transform: uppercase;
 	font-weight: bold;
-	padding: 11px 49px !important;
+	padding: 1em 1em !important;
 	color: #fff !important;
 	background-color: #000;
 	-webkit-transition:all .25s ease-out;
@@ -679,9 +679,12 @@ video {
 	/* nav menu */
 	
 	[data-content-from="menu"] {
-		position: absolute;
-		z-index: 100;
-		background-color: rgba(0, 0, 0, 0.9);
+	    position: absolute;
+	    width: 100vw;
+	    z-index: 100;
+	    background-color: rgba(0, 0, 0, 0.9);
+	    left: -4px;
+	    max-width: inherit;
 	}
 	
 	[data-content-from="menu"] a {
