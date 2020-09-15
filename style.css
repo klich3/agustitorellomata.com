@@ -561,7 +561,7 @@ video {
 	text-align: center;
 	text-transform: uppercase;
 	font-weight: bold;
-	padding: 1em 1em !important;
+	padding: 0.6em 3em !important;
 	color: #fff !important;
 	background-color: #000;
 	-webkit-transition:all .25s ease-out;
