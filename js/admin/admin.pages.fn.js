@@ -8,7 +8,7 @@ $(function()
 	$.template('parsePageContent', '{{if data}} {{each(i, o) data}} {{tmpl(data[i]) "pageAddGrid"}} {{/each}} {{/if}}');
 	
 	//grid
-	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}" style="${style}"{{/if}} {{if cclass}}data-cclass="${cclass}"{{/if}} {{if control}}data-control="${control}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
+	$.template('pageAddGrid', '<div class="{{if type.match(/(mt-|pt-|pb-|mb-)/g)}}uk-width-1-1 ${type}{{else}}${type}{{if boxheight}} height-s {{/if}}{{/if}} uk-margin-bottom uk-margin-small" data-grid-element="${type}" {{if style}}data-style="${style}"{{/if}} {{if cclass}}data-cclass="${cclass}"{{/if}} {{if control}}data-control="${control}"{{/if}}><div class="uk-placeholder uk-padding-remove"><div class="uk-width-1-1">&nbsp;<div class="uk-sortable-handle uk-icon uk-icon-bars uk-text-small"></div>'+
 		//menu inside element
 		'{{tmpl() "pageAddGridOptions"}}'+
 		
@@ -19,7 +19,7 @@ $(function()
 			'{{/if}}'+
 			'{{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}'+
 			'{{if type.match(/(videofs)/g)}}<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />{{/if}}'+
-			'{{if control==8}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
+			'{{if type.match(/(control)/g) && control==8}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
 		'</div>'+
 	'</div></div>');
 	
