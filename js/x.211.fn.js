@@ -89,7 +89,8 @@ $(function()
 		GMAPSTYLE:[{featureType:"all",stylers:[{saturation:-100},{gamma:0.50}]},{featureType:"water",elementType:"all",stylers:[{hue:"#d8d8d8"},{visibility: "simplified"}]},{featureType:"landscape",elementType:"all",stylers:[{hue:"#0077ff"},{visibility:"simplified"},{invert_lightness:"true"}]} ],
 		GMAP_JSON:{},
 		SLIDER:{},
-		VIDEOFS:{}
+		VIDEOFS:{},
+		CLICKED: ""
 	};
 	
 	var init = function()
@@ -161,13 +162,16 @@ $(function()
 	{
 		if($(window).width() > 768) return;
 		
-		var ele = $(this);
-
-		if(ele.parents('li').find('.submenu').length !== 0)
+		var ele = $(this),
+			eleHref = ele.attr('href');
+		
+		if(ele.parents('li').find('.submenu').length !== 0 && _G.CLICKED !== eleHref)
 		{
 			e.preventDefault();
 			e.stopPropagation();
 		}
+		
+		_G.CLICKED = eleHref;		
 		
 		//close all 
 		ele.parents('[data-content-from="menu"]').find('ul .submenu').stop().slideUp(450);
