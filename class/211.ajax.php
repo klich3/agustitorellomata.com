@@ -898,6 +898,7 @@ if($fn_ajax !== null)
 			}
 		break;
 		
+		case "clonePage":
 		case "upPage":
 		case "delPage":
 		case "addPage":
@@ -917,6 +918,67 @@ if($fn_ajax !== null)
 			
 			switch($fn_ajax)
 			{
+				case "clonePage":
+					if(!$fn_p['id']) exit(json_encode(array(
+						'status' => 400,
+						'message' => 'No puedo duplicar la página sin ID!',
+					)));
+					
+					try{
+						$getPageData = $db->FetchAll("
+							SELECT *
+							FROM `pages`
+							WHERE `id`=:id
+						", array(
+							'id' => $fn_p['id']
+						));
+						
+						$getPageMetas = $db->FetchAll("
+							SELECT *
+							FROM `pages_meta`
+							WHERE `p_id`=:id
+						", array(
+							'id' => $fn_p['id']
+						));
+						
+						$fn_new_input = $getPageData[0];
+						$fn_new_input->obj_title = $fn_new_input->obj_hash = "Visita-".date('Ymd-his');
+						
+						$fn_q = $db->ExecuteSQL("
+							INSERT INTO `pages` (`obj_title`, `obj_hash`, `type`, `lang`, `create_date`, `active`, `protected`)
+							VALUES (:pn, :hs, :tp, :ln, :cd, :ac, :pt);
+						", array(
+							'pn' => $fn_new_input->obj_title,
+							'hs' => $fn_new_input->obj_hash,
+							'tp' => $fn_new_input->type,
+							'ln' => $fn_new_input->lang,
+							'cd' => date('Y-m-d'),
+							'ac' => ($fn_new_input->active) ? '1' : '0',
+							'pt' => ($fn_new_input->protected) ? '1' : '0',
+						));
+						
+						$fn_data['id'] = $fn_q;
+						$fn_data['title'] = $fn_data['hash'] = $fn_new_input->obj_title;
+						
+						if(sizeof($getPageMetas) != 0) foreach($getPageMetas as $mk => $mv)
+						{
+							$db->Fetch("
+								INSERT INTO `pages_meta` (`p_id`, `meta_key`, `meta_value`) 
+								VALUES (:pid, :ak, :av) 
+								ON DUPLICATE KEY UPDATE `meta_value`=:av;
+							", array(
+								'pid' => $fn_q,
+								'ak' => $mv->meta_key,
+								'av' => $mv->meta_value,
+							));
+						}
+						
+					}catch (Exception $e) 
+					{
+						$fn_q = false;
+					}
+				break;
+				
 				case "addPage":
 					//f_page_name
 					//f_hash
