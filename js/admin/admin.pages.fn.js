@@ -873,6 +873,8 @@ $(function()
 			
 		if(debug) console.log("[>] e_action_handler");
 		
+		
+		if(dom_type == 'clonePage') dom_data_ser = null;
 		if(dom_type == 'delRelPage') dom_data_ser = null;
 		if(dom_type == 'addRelPage')
 		{
@@ -909,12 +911,17 @@ $(function()
 			
 			if(d.status == 200)
 			{
+				if(dom_type == 'clonePage') {
+					var cloneTableRow = ele.parents('[data-id]').clone();
+					cloneTableRow.attr('data-id', d.data.id);
+					cloneTableRow.find('td:eq(1)').html(d.data.title+'<br/> Url: (<i class="uk-text-small">'+d.data.hash+'</i>)');
+					
+					ele.parents('table').find('tbody').append(cloneTableRow);
+				}
+				
 				if(dom_type == 'delPage') ele.parents('[data-id]').remove();
 				if(dom_type == 'delRelPage') ele.parents('[data-id="'+dom_id+'"]').remove();
-				if(dom_type == 'addRelPage')
-				{
-					$.tmpl('relItem', d).appendTo('[data-rel-container]');
-				}
+				if(dom_type == 'addRelPage') $.tmpl('relItem', d).appendTo('[data-rel-container]');
 			}
 		});
 	}
