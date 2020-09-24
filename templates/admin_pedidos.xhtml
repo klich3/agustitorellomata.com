@@ -1,0 +1,54 @@
+<!-- BEGIN: admin_pedidos -->
+
+<!-- BEGIN: message -->
+{FILE "templates/_admin_msg.xhtml"}
+<!-- END: message -->
+
+<div class="uk-grid uk-grid-small">
+	<!-- BEGIN: hide -->
+	buscar
+	ordenar
+	en el footer hacer paginaciones
+	<!-- END: hide -->
+	
+	
+	<!-- BEGIN: list -->
+	<div class="uk-width-1-1">
+		<table class="uk-table uk-table-condensed uk-table-striped">
+			<thead>
+		        <tr>
+		            <th class="uk-text-center uk-text-small">Num. Pedido</th>
+		            <th class="uk-text-center uk-text-small">Fecha</th>
+		            <th class="uk-text-center uk-text-small">C. Email</th>
+		            <th class="uk-text-center uk-text-small">Idioma</th>
+		            <th class="uk-text-center uk-text-small">Pago</th>
+		            <th class="uk-text-center uk-text-small" title="Estado de entrega y número de seguimiento" data-uk-tooltip>E. / Num.seg</th>
+		            <th class="uk-text-center uk-text-small" title="Respuesta de la transacción del banco" data-uk-tooltip>R. Banco</th>
+		            <th class="uk-text-center uk-text-small"></th>
+		        </tr>
+		    </thead>
+		    
+		    <tbody>
+				<!-- BEGIN: row -->
+		        <tr data-id="{id}" class="{tr_class}">
+		            <td class="uk-text-center uk-text-small">{order_id} (<i class="uk-text-small">{payment_type}</i>)</td>
+		            <td class="uk-text-center uk-text-small">{date}</td>
+		            <td class="uk-text-center uk-text-small"><span class="uk-icon-envelope"> <i><a href="mailto:{user_email}" target="_blank">{user_email}</a></i></span></td>
+		            <td class="uk-text-center uk-text-small">{lang}</td>
+		            <td class="uk-text-center uk-text-small">{payment_status}</td>
+		            <td class="uk-text-center uk-text-small">{entrega_status}<br/>{num_seg}</td>
+		            <td class="uk-text-center uk-text-small">{redsys_response}</td>
+		            <td>
+			            <div class="uk-button-group uk-float-right">
+							<a href="javascript:void(0);" data-modal="addSegNum" class="uk-button uk-button-small uk-button-primary"><i class="uk-icon-truck"></i></a>
+							<a href="javascript:void(0);" data-modal="adminShowOr" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-file-text-o"></i></a>
+						</div>
+		            </td>
+		        </tr>
+				<!-- END: row -->
+		    </tbody>
+		</table>
+	</div>
+	<!-- END: list -->
+</div>
+<!-- END: admin_pedidos -->

@@ -2178,8 +2178,12 @@ if($fn_ajax !== null)
 		case "delDir":
 		case "addDir":
 		case "upPassCliente":
+		case "upPassUsuarios":
+		case "upUsuarios":
 		case "upCliente":
 		case "delCliente":
+		case "delUsuarios":
+		case "addUsuarios":
 		case "addCliente":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
@@ -2197,9 +2201,18 @@ if($fn_ajax !== null)
 			
 			switch($fn_ajax)
 			{
+				case "addUsuarios":
 				case "addCliente":
 					//f_page_name
 					//f_hash
+					
+					/*
+					//slo puede crear y modificar el admins
+					if(preg_match("/addUsuarios/", $fn_ajax) && adminUSER)
+					{
+						
+					}
+					*/
 					
 					if(!isset($fn_p['f_user_name'])) exit(json_encode(array(
 						'status' => 400,
@@ -2219,7 +2232,7 @@ if($fn_ajax !== null)
 					
 					$fn_q = $db->ExecuteSQL("
 						INSERT INTO `users` (`user_name`, `user_pass`, `user_email`, `user_registred`, `user_status`, `user_activation_key`)
-						VALUES (:un, :up, :ue, :rg, '1', SHA2(:nw, 512));
+						VALUES (:un, :up, :ue, :rg, '1', MD5(:nw));
 					", array(
 						'un' => $fn_p['f_user_name'],
 						'up' => $fn_pass,
@@ -2235,7 +2248,7 @@ if($fn_ajax !== null)
 							VALUES (:uid, 'user_level', :lvl);
 						", array(
 							'uid' => $fn_q,
-							'lvl' => '15',
+							'lvl' => (preg_match("/addUsuarios/", $fn_ajax)) ? '100' : '15',
 						));
 						
 						$db->Fetch("
@@ -2271,6 +2284,8 @@ if($fn_ajax !== null)
 						$fn_html_p = $lang_items[$fn_def_lang]['mail_invitacion_html'];
 						$fn_mail_html = $CONFIG['templates']['standartEmail'];
 						
+						$link_admin_or_cliente = (preg_match("/upUsuarios/", $fn_ajax)) ? "admin" : "mi-cuenta";
+						
 						$fn_mail_html = str_replace(array(
 							'%message%',
 							'%regards%', 
@@ -2288,7 +2303,7 @@ if($fn_ajax !== null)
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
 							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_p['f_email']}\" alt=\"logotype\" />",
-							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta\">{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta</a>", //link
+							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}\">{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}</a>", //link
 							$fn_p['f_user_name'],
 							$fn_p['f_user_pass'],
 						), $fn_mail_html);
@@ -2302,6 +2317,7 @@ if($fn_ajax !== null)
 					$fn_data['id'] = $fn_q;
 				break;
 				
+				case "delUsuarios":
 				case "delCliente":
 					if(!isset($fn_p['id'])) exit(json_encode(array(
 						'status' => 400,
@@ -2325,6 +2341,7 @@ if($fn_ajax !== null)
 					));
 				break;
 				
+				case "upUsuarios":
 				case "upCliente":
 					if(!isset($fn_p['data'])) exit(json_encode(array(
 						'status' => 400,
@@ -2364,6 +2381,7 @@ if($fn_ajax !== null)
 					", $fn_q_a);				
 				break;
 				
+				case "upPassUsuarios":
 				case "upPassCliente":
 					if(!isset($fn_p['data'])) exit(json_encode(array(
 						'status' => 400,
