@@ -91,6 +91,9 @@ if($fn_options_q) foreach($fn_options_q as $opk => $opv)
 	if($opv->options_key == 'home_show_testimonios') $fn_options_array["home_show_testimonios_selected_{$opv->options_value}"] = 'selected';
 	if($opv->options_key == 'langSelector') $fn_options_array["langSelector_selected_{$opv->options_value}"] = 'selected';
 	
+	if($opv->options_key == 'showHeaderLangs') $fn_options_array["showHeaderLangs_{$opv->options_value}"] = 'selected';
+	if($opv->options_key == 'showHeaderLangsMob') $fn_options_array["showHeaderLangsMob_{$opv->options_value}"] = 'selected';
+	
 	if($opv->options_key == 'dir') $fn_options_array["dir"] = (isJson($opv->options_value)) ? json_decode($opv->options_value, true) : json_decode('[{"placeTitle":"","dir":"","shortDir":"","gmapUrl":"","gps":"","post":"","country":"","city":"","tel":"​","telAlter":"","cif":""}]', true);
 }
 
