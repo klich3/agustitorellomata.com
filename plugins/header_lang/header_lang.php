@@ -36,6 +36,8 @@ class WIDGET_header_lang {
 	 */
 	public function wHeader($fn_args)
 	{
+		if(!$this->CONFIG['site']['showHeaderLangs']) return;
+		
 		$fn_lng = (isset($this->CONFIG['site']['lang']) && isJson($this->CONFIG['site']['lang'])) ? json_decode($this->CONFIG['site']['lang'], true) : false;
 		
 		if($fn_lng && sizeof($fn_lng) > 1)
