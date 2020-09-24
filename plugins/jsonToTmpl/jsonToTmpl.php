@@ -76,7 +76,7 @@ class WIDGET_jsonToTmpl {
 		if(!isset($fn_args['lang'])) $fn_args['lang'] = $this->CONFIG['site']['defaultLang'];
 		
 		$fn_json = self::parseByPageContent($fn_args, $fn_hash);
-		
+				
 		if(!$fn_json) return;
 		
 		$fn_json = base64_decode($fn_json);
@@ -135,11 +135,22 @@ class WIDGET_jsonToTmpl {
 			{
 				if($gv['control'] > 0)
 				{
+					$fn_page_metas = self::getPageMetas($fn_args['hash']);
 					
+					//button como llegar
+					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = $fn_page_metas;
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_geo_show_button";
+					}
 					
-					self::$fn_xtemplate_parse['assign'][] = array(
-						"gmapUrl" => self::getDir('gmapUrl')
-					);
+					if($fn_page_metas && isset($fn_page_metas['actividades_reservas_show_button']) && $fn_page_metas['actividades_reservas_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = array();
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_reservas_show_button";
+					}
+					
+					self::$fn_xtemplate_parse['assign'][] = array();
 					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
 				}
 				
@@ -330,6 +341,34 @@ class WIDGET_jsonToTmpl {
 		}
 		
 		return (sizeof($fn_array_out) !== 0) ? $fn_array_out : false;
+	}
+	
+	/**
+	 * getPageMetas function.
+	 * 
+	 * @access private
+	 * @param string $fn_page_hash
+	 * @return void
+	 */
+	private function getPageMetas($fn_page_hash)
+	{
+		$fn_q = $this->db->FetchAll("
+			SELECT m.*
+			FROM `pages_meta` m
+			LEFT JOIN `pages` p ON(m.`p_id`=p.`id`)
+			WHERE p.`obj_hash`=:h
+		", array(
+			"h" => $fn_page_hash
+		));
+		
+		$fn_result = false;
+		
+		if($fn_q) foreach($fn_q as $k => $v)
+		{			
+			$fn_result[$v->meta_key] = $v->meta_value;
+		}
+		
+		return $fn_result;
 	}
 	
 	/**
