@@ -1,0 +1,34 @@
+<!-- BEGIN: admin_countries -->
+
+<!-- BEGIN: message -->
+{FILE "templates/_admin_msg.xhtml"}
+<!-- END: message -->
+
+<div class="uk-grid uk-grid-small">
+	<div class="uk-width-1-1">
+		<form class="uk-form">
+			<div class="uk-panel">
+				<div class="uk-panel-box uk-panel-box-secondary">
+					
+					<ul class="uk-grid uk-grid-small uk-grid-width-1-3 uk-margin">
+						<!-- BEGIN: row -->
+						<li><input type="checkbox" name="country[{id}]" value="1" {active} /> {country_name}</li>
+						<!-- END: row -->
+					</ul>
+			
+					<div class="uk-clearfix">&nbsp;</div>
+				
+				</div>
+			</div>
+		
+		<div class="uk-margin-small uk-clearfix">&nbsp;</div>
+			
+		<div class="uk-margin-bottom uk-text-right" data-status-message></div>
+					
+		<a href="javascript:void(0);" data-action="upActivesCountries" class="uk-button uk-button-small uk-button-primary uk-float-right"><i class="uk-icon-save"></i> Guardar cambios</a>
+			
+		</form>
+	</div>
+		
+</div>
+<!-- END: admin_countries -->

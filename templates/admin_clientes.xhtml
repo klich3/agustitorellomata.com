@@ -1,0 +1,263 @@
+<!-- BEGIN: admin_clientes -->
+
+<!-- BEGIN: message -->
+{FILE "templates/_admin_msg.xhtml"}
+<!-- END: message -->
+
+<div class="uk-grid uk-grid-small">
+	<div class="uk-width-small-1-1 uk-width-medium-1-3 uk-width-large-1-3 uk-width-xlarge-1-3">
+		<div class="uk-width-1-1 uk-margin-bottom">
+			<a href="#addCliente" data-uk-modal class="uk-button uk-button-small uk-button-primary">Añadir un cliente nuevo</a>
+		</div>
+
+		<!-- BEGIN: list -->		
+		<ul class="uk-list uk-list-line uk-list-striped">
+			<!-- BEGIN: row -->
+			<li {active} data-id="{ID}">
+				<div class="uk-grid uk-grid-collapse">
+					<div class="uk-width-7-10"><strong class="uk-text-small">{user_name}</strong><br/><i class="uk-text-small">{user_status} - <span title="Fecha de registro" data-uk-tooltip>{user_add_date}</span></i></div>
+					<div class="uk-width-3-10">
+						<div class="uk-button-group uk-float-right">
+							<a href="{current_hash}?action=editCliente&id={ID}" class="uk-button uk-button-small"><i class="uk-icon-pencil"></i></a>
+							<a href="javascript:void(0);" data-action="delCliente" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
+						</div>
+					</div>
+				</div>
+			</li>
+			<!-- END: row -->
+		</ul>
+		<!-- END: list -->	
+	</div>
+	
+	<!-- BEGIN: details -->
+	<div class="uk-width-small-1-1 uk-width-medium-2-3 uk-width-large-2-3 uk-width-xlarge-2-3">
+		<form class="uk-form" data-id="{d_user_id}">
+			<div class="uk-form-row">
+				<label for="f_user_name">Ciente ID</label>
+				<input type="text" name="f_user_name" value="{d_user_name}" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+				<label for="f_user_email">Email</label>
+				<input type="text" name="f_user_email" value="{d_user_email}" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+				<label for="f_user_status">Estado</label>
+				<select name="f_user_status" class="uk-width-1-1">
+					<!-- BEGIN: user_status -->
+					<option value="{d_user_status}" {d_selected}>{status_value}</option>
+					<!-- END: user_status -->
+				</select>
+			</div>
+			
+			<div class="uk-form-row">
+				<a href="javascript:void(0);" data-action="upCliente" class="uk-button uk-button-small uk-button-primary uk-float-right"><i class="uk-icon-save"></i> guardar cambios</a>
+			</div>
+		</form>
+		
+		<hr/>
+		
+		<form class="uk-form" data-id="{d_user_id}">
+			Cambiar contraseña<br/>
+			
+			<div class="uk-form-row">
+				<input type="text" name="f_user_pass" value="" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+				<input type="text" name="f_user_pass_rep" value="" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+			<input type="checkbox" name="send_access_to_email" value="1" class="uk-checkbox" /> Se la enviamos por mail ?
+			</div>
+			
+			<div class="uk-form-row">
+				<input type="hidden" name="f_email" value="{d_user_email}" class="uk-width-1-1" />
+				<a href="javascript:void(0);" data-action="upPassCliente" class="uk-button uk-button-small uk-button-primary uk-float-right"><i class="uk-icon-save"></i> crear nueva contraseña</a>
+			</div>
+		</form>
+		
+		<hr/>
+		
+		<div class="uk-width-1-1">
+			<div class="uk-panel uk-panel-box uk-panel-box-primary">
+				<div class="uk-panel-body uk-padding-remove">
+					<!-- BEGIN: no_client_data_pers -->
+					<p>Cliente no ha rellenado los datos.</p>
+					<!-- END: no_client_data_pers -->
+					
+					<!-- BEGIN: client_data_pers -->
+					<div class="uk-grid">
+						<div class="uk-width-1-2 uk-text-left uk-text-bold">Nombre:</div>
+						<div class="uk-width-1-2 uk-text-right">{u_name}</div>
+						<div class="uk-width-1-2 uk-text-left uk-text-bold">Apellidos:</div>
+						<div class="uk-width-1-2 uk-text-right">{u_surname}</div>
+						<div class="uk-width-1-2 uk-text-left uk-text-bold">CIF / DNI / NIE:</div>
+						<div class="uk-width-1-2 uk-text-right">{u_idd}</div>
+						<div class="uk-width-1-2 uk-text-left uk-text-bold">Teléfono:</div>
+						<div class="uk-width-1-2 uk-text-right">{u_tel}</div>
+					</div>
+					<!-- END: client_data_pers -->
+				</div>
+			</div>
+		</div>	
+		
+		<hr/>
+	
+		<form class="uk-form" data-id="{d_user_id}">
+			<div class="uk-form-row">
+				Direcciones guardadas<br/>
+				
+				<div class="uk-width-1-1 uk-margin-bottom">
+					<a href="#addDir" data-uk-modal class="uk-button uk-button-small uk-button-primary uk-float-right">Añadir una direccion</a>
+				</div>
+				
+				<div class="uk-clearfix">&nbsp;</div>
+				<!-- BEGIN: message -->
+				{FILE "templates/_admin_msg.xhtml"}
+				<!-- END: message -->
+				
+				<ul class="uk-grid uk-grid-small uk-grid-width-1-2 uk-grid-match" data-dir-container data-uk-grid-match="{target:'.uk-panel'}">
+					<!-- BEGIN: dir_row -->
+					<li data-id="{id}" data-user-id="{user_id}" class="uk-margin-small-bottom">
+						<div class="uk-panel uk-panel-box uk-panel-box-secondary">
+							<!-- BEGIN: default -->
+							<div class="uk-panel-badge uk-badge uk-badge-success">Dir. principal</div>
+							<!-- END: default -->
+							<h3 class="uk-panel-title">{dir_name}</h3>
+							<div class="uk-panel-body uk-padding-remove">
+								<div class="uk-grid uk-grid-small">
+									<div class="uk-width-1-1">
+										{dir_primary}
+									</div>
+									
+									<div class="uk-width-1-1">
+										{dir_secundary}
+									</div>
+									
+									<div class="uk-width-1-2">
+										{dir_city}
+									</div>
+									<div class="uk-width-1-2">
+										{dir_region}
+									</div>
+									<div class="uk-width-1-2">
+										{dir_post}
+									</div>
+									<div class="uk-width-1-2">
+										{dir_country}
+									</div>
+									
+									<div class="uk-width-1-1">
+										<a href="javascript:void(0);" data-action="delDir" class="uk-float-right uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</li>
+					<!-- END: dir_row -->				
+				</ul>
+			</div>
+		</form>
+	</div>
+	<!-- END: details -->
+</div>
+	
+<!--// MODALS //-->
+<div class="uk-modal" id="addCliente">
+	<div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        
+        <form class="uk-form">
+	        <div class="uk-form-row">
+		        <label for="f_user_name">Nombre de usuario (<span class="uk-text-small">nick</span>)</label>
+		        <input type="text" name="f_user_name" id="f_user_name" value="" class="uk-width-1-1"/>
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <label for="f_user_pass">Contraseña (<span class="uk-text-small">automatica <strong>{randome_pass}</strong></span>)</label>
+		        
+		        <input type="text" name="f_user_pass" id="f_user_pass" value="{randome_pass}" class="uk-width-1-1"/>
+	        </div>
+	        
+	        <div class="uk-form-row">
+		        <label for="f_email">Correo electronico</label>
+		        <input type="text" name="f_email" value="" class="uk-width-1-1" />
+				<input type="checkbox" name="send_access_to_email" value="1" class="uk-checkbox" /> Enviar accesos y url al mail indicado ?
+	        </div>
+	        
+	        <div class="uk-form-row">
+		    	<a href="javascript:void(0);" data-submit="addCliente" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Crear nuevo cliente</a>
+	        </div>
+        </form>
+        
+    </div>
+</div>
+<div class="uk-modal" id="addDir">
+	<div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        
+		<form class="uk-form">
+			<div class="uk-form-row">
+				<labe name="dir_name">Libreta de direcciones (<span class="uk-text-small">Nombre</span>)</labe>
+				<input type="text" name="dir_name" value="" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+				<input type="checkbox" name="dir_default" value="1" /> Es dirección principal?
+			</div>
+			
+			<div class="uk-form-row">
+				<labe name="dir_primary">Dirección 1</labe>
+				<input type="text" name="dir_primary" value="" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-form-row">
+				<labe name="dir_secundary">Dirección 2</labe>
+				<input type="text" name="dir_secundary" value="" class="uk-width-1-1" />
+			</div>
+			
+			<div class="uk-grid uk-grid-small">
+				<div class="uk-width-1-2">
+					<div class="uk-form-row">
+						<labe name="dir_city">Ciudad</labe>
+						<input type="text" name="dir_city" value="" class="uk-width-1-1" />
+					</div>
+				</div>
+				<div class="uk-width-1-2">
+					<div class="uk-form-row">
+						<labe name="dir_region">Region</labe>
+						<input type="text" name="dir_region" value="" class="uk-width-1-1" />
+					</div>
+				</div>
+				<div class="uk-width-1-2">
+					<div class="uk-form-row">
+						<labe name="dir_post">Código postal / Zip</labe>
+						<input type="text" name="dir_post" value="" class="uk-width-1-1" />
+					</div>
+				</div>
+				<div class="uk-width-1-2">
+					<div class="uk-form-row">
+						<labe name="dir_country">País</labe>
+						<select name="dir_country" class="uk-width-1-1">
+							<!-- BEGIN: country_sel -->
+							<option value="{country_code}">{country_name}</option>
+							<!-- END: country_sel -->
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="uk-clearfix">&nbsp;</div>
+	        
+	        <div class="uk-form-row">
+		        <input type="hidden" name="user_id" value="{d_user_id}" />
+		    	<a href="javascript:void(0);" data-action="addDir" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Añadir una dirección</a>
+	        </div>
+        </form>
+        
+    </div>
+</div>
+<!-- END: admin_clientes -->

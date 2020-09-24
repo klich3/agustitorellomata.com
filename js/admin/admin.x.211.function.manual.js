@@ -79,6 +79,34 @@ $(function()
 				case "admin-productos":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.productos.fn.js');
 				break;
+				
+				case "admin-clientes":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.clientes.fn.js');
+				break;
+				
+				case "admin-usuarios":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.usuarios.fn.js');
+				break;
+				
+				case "admin-shipping":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.shipping.fn.js');
+				break;
+				
+				case "admin-pedidos":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.pedidos.fn.js');
+				break;
+				
+				case "admin-ofertas":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.ofertas.fn.js');
+				break;
+				
+				case "admin-iva":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.iva.fn.js');
+				break;
+				
+				case "admin-countries":
+					fn_itmToLoad.push(fn_base_script+'js/admin/admin.countries.fn.js');
+				break;
 			}
 			
 			if(fn_itmToLoad.length !== 0) window.loadJS(

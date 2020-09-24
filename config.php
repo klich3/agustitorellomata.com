@@ -27,9 +27,9 @@ $CONFIG = array(
 		"host" => "localhost", //server
 		"port" => "", //server port
 		
-		"username" => ($isLocal) ? "root" : "agustitorre", //user
-		"password" => ($isLocal) ? "root" : "I4b31k^d_v", //pass
-		"database" => ($isLocal) ? "agustitorellomata" : "agustitorellomat_web", //table
+		"username" => ($isLocal) ? "root" : "myagustito", //user
+		"password" => ($isLocal) ? "root" : "wogPcj3K", //pass
+		"database" => ($isLocal) ? "agustitorellomata" : "torelloweb", //table
 	),
 	
 	"site" => array(
@@ -55,6 +55,10 @@ $CONFIG = array(
 		"date_today_reservas" => date('d-m-Y'),
 		"date_today" => date('Y-m-d'),
 		"date_max_guestlist" => date('d.m.Y', strtotime('+ 10 days')),
+	),
+	
+	"templates" => array(
+		"standartEmail" => '<!doctype html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width:device-width, initial-scale:1.0"><title>%title%</title><style type="text/css">.ReadMsgBody {width: 100%;background-color: #e9eaed;} .ExternalClass {width: 100%; background-color: #e9eaed; } body {width: 100%;background-color: #ffffff;margin: 0;padding: 0;-webkit-font-smoothing: antialiased;font-family: Georgia, Times, serif;} table {border-collapse: collapse;} .mobile-only {display: none;} @media only screen and (max-width: 640px) {body[yahoo] .deviceWidth {width: 440px!important;padding: 0;} body[yahoo] .paddedblockWidth{width: 400px!important;padding: 0;} body[yahoo] .button {width: 400px!important;padding: 0;} body[yahoo] .center {text-align: center!important;} .paddingleft {padding: 20px 20px 16px 20px!important;}} @media only screen and (max-width: 479px) {body[yahoo] .deviceWidth {width: 280px!important;padding: 0;} body[yahoo] .paddedblockWidth{width: 240px!important;padding: 0;} body[yahoo] .button {width: 240px!important;padding: 0;} body[yahoo] .center {text-align: center!important;}}</style></head><body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" yahoo="fix" style="font-family: Arial, Times, serif"><table width="100%" border="0" cellpadding="0" cellspacing="0" align="center"><tr><td><table width="580" border="0" cellpadding="0" cellspacing="0" align="center" class="deviceWidth"><tr><td width="100%" height="30" padding="" font-family="" font-size="" color="" text-align="" line-height="">&nbsp;</td></tr></table></td></tr></table><table width="100%" border="0" cellpadding="0" cellspacing="0" align="center"><tr><td width="100%" valign="top"><table width="580" align="center" class="deviceWidth" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td style="padding: 0px 20px 20px; text-align: left; color: #6a7480; line-height: 18px; font-family: Arial, sans-serif; font-size: 14px; font-weight: normal; vertical-align: top;" bgcolor="#ebebeb"><br><p style="-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;margin-top:0;margin-bottom:24px;margin-right:0;margin-left:0;">%message%<br/><br><span>%regards%</span><br><span><b>%site_name%</b></span></td></tr></tbody></table><div style="height: 25px">&nbsp;</div><table width="100%" border="0" cellspacing="0" align="center"><tr><td style="padding: 30px"><table width="580" border="0" cellpadding="0" cellspacing="0" align="center" class="deviceWidth"><tr><td><table width="45%" cellpadding="0" cellspacing="0" border="0" align="left" class="deviceWidth"> <tr><td valign="top" style="font-size: 11px; color: #9197a3; font-family: Arial, sans-serif; padding-bottom: 20px; line-height: 16px;" class="center"><br>Copyright &#169; %site_name%.<br> %copyz%<br><br><span style="font-size:11px;color:#9197a3;font-family: Arial, sans-serif;line-height: 14px;">%site_dir%</span><br><br></td></tr></table><table width="40%" cellpadding="0" cellspacing="0" border="0" align="right" class="deviceWidth"><tr><td valign="top" style="font-size: 11px; color:#9197a3; font-weight: normal; font-family: Arial, Times, serif; line-height: 16px; vertical-align: top; text-align: right" class="center">%site_logo%</td></tr></table></td></tr></table></td></tr></table></td></tr></table></body></html>',
 	),
 );
 
