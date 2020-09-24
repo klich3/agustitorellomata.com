@@ -17,9 +17,10 @@ $(function()
 			'{{if dom}}'+
 				'{{if dom.length !== 0}} {{tmpl(dom) "pageAddElement"}} {{/if}}'+ 
 			'{{/if}}'+
+			
 			'{{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}'+
 			'{{if type.match(/(videofs)/g)}}<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />{{/if}}'+
-			'{{if type.match(/(control)/g) && control==8}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
+			'{{if control=="8"}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
 		'</div>'+
 	'</div></div>');
 	

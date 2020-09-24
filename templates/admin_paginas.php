@@ -195,7 +195,7 @@ switch($g_action)
 								
 				if(preg_match('/(customimage|keywords|description|resumen|image|freatured|gallery|actividades_geo_link)/', $mv->meta_key)) $fn_q_page[$mv->meta_key] = (!empty($mv->meta_value)) ? html_entity_decode($mv->meta_value, ENT_QUOTES) : '';
 				
-				if(preg_match('/(noodp|noydir|nofollow|noarchive|check|actividades_geo_show_button)/', $mv->meta_key)) $fn_q_page[$mv->meta_key] = (!empty($mv->meta_value) && $mv->meta_value == 1) ? 'selected' : '';
+				if(preg_match('/(noodp|noydir|nofollow|noarchive|check|actividades_geo_show_button|actividades_reservas_show_button)/', $mv->meta_key)) $fn_q_page[$mv->meta_key] = (!empty($mv->meta_value) && $mv->meta_value == 1) ? 'selected' : '';
 				
 				//tipo de header
 				if($mv->meta_key == 'header_type' && !empty($mv->meta_value))
@@ -221,8 +221,13 @@ switch($g_action)
 						
 			if($fn_q_page['type'] == 8)
 			{
+				//ubicacion
 				$fn_xtemplate_parse['assign'][] = $fn_q_page;
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.actividades_geo";
+				
+				//reservas
+				$fn_xtemplate_parse['assign'][] = $fn_q_page;
+				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editPage.actividades_reservas";
 			}
 				
 			$fn_xtemplate_parse['assign'][] = $fn_q_page;
