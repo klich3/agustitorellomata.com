@@ -71,6 +71,10 @@ function get_header($fn_args)
 		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
 	));
 	
+	//custom settings
+	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.header_lang_list_mob");
+	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.header_lang_list");
+	
 	//widgets load template
 	if(isset($fn_args['plugins_templates']) && sizeof($fn_args['plugins_templates']) !== 0)
 	{
@@ -126,7 +130,7 @@ function get_header($fn_args)
 		}
 	}
 	//end logged header
-	
+		
 	$b->parse($tmpl_header);
 	$b->out($tmpl_header);
 }
