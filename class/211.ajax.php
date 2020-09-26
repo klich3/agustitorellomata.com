@@ -2227,8 +2227,14 @@ if($fn_ajax !== null)
 					$fn_reg = date('Y-m-d H:i:s');
 					$fn_now = microtime();
 					
-					if(class_exists("tooSCrypt")) $fn_pass = tooSCrypt::en($fn_p['f_user_pass'], $CONFIG['site']['tooSHash']);
-					$fn_pass = hash_hmac('sha512', "{$fn_p['f_user_name']}~{$fn_pass}", $CONFIG['site']['tooSHash'], false);
+					
+					//admin pass is more strong than clients one
+					if(preg_match("/Usuarios/", $fn_ajax))
+					{
+						$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_p['f_user_pass'], $CONFIG['site']['tooSHash']) : hash_hmac('sha512', "{$fn_p['f_user_name']}~{$fn_p['f_user_pass']}", $CONFIG['site']['tooSHash'], false);
+					}else{
+						$fn_pass = md5("{$fn_p['f_user_name']}~{$fn_p['f_user_pass']}");
+					}
 					
 					$fn_q = $db->ExecuteSQL("
 						INSERT INTO `users` (`user_name`, `user_pass`, `user_email`, `user_registred`, `user_status`, `user_activation_key`)
@@ -2248,15 +2254,17 @@ if($fn_ajax !== null)
 							VALUES (:uid, 'user_level', :lvl);
 						", array(
 							'uid' => $fn_q,
-							'lvl' => (preg_match("/addUsuarios/", $fn_ajax)) ? '100' : '15',
+							'lvl' => (preg_match("/Usuarios/", $fn_ajax)) ? '100' : '15',
 						));
+						
+						$fn_isAdmin = preg_match("/Usuarios/", $fn_ajax) ? "1" : "0";
 						
 						$db->Fetch("
 							INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`)
 							VALUES (:uid, 'user_access', :val);
 						", array(
 							'uid' => $fn_q,
-							'val' => (isset($fn_p['f_user_access'])) ? $fn_p['f_user_access'] : '0',
+							'val' => (isset($fn_p['f_user_access'])) ? $fn_p['f_user_access'] : $fn_isAdmin,
 						));
 						
 						$db->Fetch("
@@ -2264,7 +2272,7 @@ if($fn_ajax !== null)
 							VALUES (:uid, 'user_or', :val);
 						", array(
 							'uid' => $fn_q,
-							'val' => (isset($fn_p['f_user_or'])) ? $fn_p['f_user_or'] : '0',
+							'val' => (isset($fn_p['f_user_or'])) ? $fn_p['f_user_or'] : $fn_isAdmin,
 						));
 					}
 					
@@ -2363,7 +2371,7 @@ if($fn_ajax !== null)
 					$i = 0;
 					foreach($fn_inputs as $ik => $iv)
 					{
-						if(preg_match('/(pass|activ|key)/', $ik)) continue;
+						if(preg_match('/(pass|activ|key|meta|user_access)/', $ik)) continue;
 						
 						$fn_parse_field_name = str_replace('f_', '', $ik);
 						$fn_update_rows[] = "`{$fn_parse_field_name}`=:iv_{$i}";
@@ -2378,7 +2386,24 @@ if($fn_ajax !== null)
 						UPDATE `users` 
 						SET {$fn_update_rows}
 						WHERE `ID`=:id
-					", $fn_q_a);				
+					", $fn_q_a);
+					
+					//metas
+					if(isset($fn_inputs['meta']))
+					{
+						foreach($fn_inputs['meta'] as $ku => $kv)
+						{
+							$fn_q = $db->Fetch("
+								INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+								VALUES (:uid, :key, :val) 
+								ON DUPLICATE KEY UPDATE `meta_value`=:val;
+							", array(
+								"uid" => $fn_p['id'],
+								"key" => $ku,
+								"val" => $kv
+							));
+						}
+					}
 				break;
 				
 				case "upPassUsuarios":
@@ -2415,8 +2440,12 @@ if($fn_ajax !== null)
 						'id' => $fn_p['id'],
 					));
 					
-					if(class_exists("tooSCrypt")) $fn_pass = tooSCrypt::en($fn_inputs['f_user_pass'], $CONFIG['site']['tooSHash']);
-					$fn_pass = hash_hmac('sha512', "{$fn_user_name}~{$fn_pass}", $CONFIG['site']['tooSHash'], false);
+					if(preg_match("/Usuarios/", $fn_ajax))
+					{
+						$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_inputs['f_user_pass'], $CONFIG['site']['tooSHash']) : hash_hmac('sha512', "{$fn_user_name}~{$fn_inputs['f_user_pass']}", $CONFIG['site']['tooSHash'], false);
+					}else{
+						$fn_pass = md5("{$fn_user_name}~{$fn_inputs['f_user_pass']}");
+					}
 					
 					$fn_q = $db->Fetch("
 						UPDATE `users` 
