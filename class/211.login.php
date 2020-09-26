@@ -156,12 +156,6 @@ class tooLogin {
 	 */
 	public function login($fn_user, $fn_pass, $fn_redirect = true)
 	{
-		/*
-		//gen new pass
-		var_dump(self::genPass($fn_user, $fn_pass));
-		exit;
-		*/
-
 		$fn_check_ban = self::checkBan($fn_user);
 		
 		if($fn_check_ban)
@@ -177,21 +171,8 @@ class tooLogin {
 				return 303;
 			}
 		}else{
-			$fn_admin_or_client = (!preg_match('/\@/', $fn_user)) ? 'user_name':'user_email';
-			
-			//check unser & pass
-			/*
-				SELECT u.*, us.`status_value`, m.`meta_value` AS 'user_level'
-	            FROM `users` u
-				INNER JOIN `users_status` us ON(u.`user_status` = us.`user_status`)
-				INNER JOIN `users_meta` m ON(m.`user_id` = u.`ID`)
-				WHERE `user_name`=:us
-				AND `user_pass`=MD5(:ps)
-				AND m.`meta_key`='user_level'
-	            GROUP BY u.`ID`
-	            LIMIT 1;
-			var_dump(self::genPass($fn_user, $fn_pass));
-			*/
+			$fn_admin_or_client = (!preg_match('/\@/', $fn_user)) ? 'user_name' : 'user_email';
+			$isAdmin = (!preg_match('/\@/', $fn_user)) ? true : false;
 			
 			$fn_q = $this->db->FetchObject("
 				SELECT u.*, us.`status_value`, m.`meta_value` AS 'user_level'
@@ -208,16 +189,8 @@ class tooLogin {
 	            LIMIT 1;
 			", array(
 				'us' => $fn_user,
-				'ps' => self::genPass($fn_user, $fn_pass),
+				'ps' => self::genPass($fn_user, $fn_pass, $isAdmin),
 			));
-			
-			//bject(stdClass)#6 (5) {
-			//	["ID"]=> string(1) "1"
-			//	["user_name"]=> string(3) "211"
-			//	["user_email"]=> string(17) "xx@xx.com"
-			//	["user_registred"]=> string(19) "2013-02-18 19:31:21"
-			//	["user_status"]=> string(1) "1"
-			//}
 			
 			//clean private data
 			unset($fn_q->user_pass);
@@ -483,12 +456,14 @@ class tooLogin {
 	 * @param mixed $fn_pass
 	 * @return void
 	 */
-	private function genPass($fn_user, $fn_pass)
+	private function genPass($fn_user, $fn_pass, $isAdmin = true)
 	{
-		if(class_exists("tooSCrypt")) $fn_pass = tooSCrypt::en($fn_pass, $this->cfg_hash);
-			
-		$fn_pass = hash_hmac('sha512', "{$fn_user}~{$fn_pass}", $this->cfg_hash, false);
-	
+		if($isAdmin)
+		{
+			$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_pass, $this->cfg_hash) : hash_hmac('sha512', "{$fn_user}~{$fn_pass}", $this->cfg_hash, false);
+		}else{
+			$fn_pass = md5("{$fn_user}~{$fn_pass}");
+		}
 		return $fn_pass;
 	}
 	

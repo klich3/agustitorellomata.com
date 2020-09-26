@@ -176,7 +176,7 @@ switch($g_action)
 		{
 			$fn_for_data = object_to_array($sv);
 			
-			$fn_for_data['d_selected'] = ($sv->user_status == $fn_q_datails['d_user_status']) ? 'selected' : '';
+			$fn_for_data['d_selected'] = ($fn_for_data['user_status'] == $fn_q_datails['d_user_status']) ? 'selected' : '';
 			
 			$fn_xtemplate_parse['assign'][] = $fn_for_data;
 			$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_status';
