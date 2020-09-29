@@ -346,9 +346,11 @@ $(function()
 				{
 					opacity:1
 				}, 2000, 'easeOutExpo');
+				
+				$(e.target)[0].play();
 			});
 			
-			$(dom_v).on('oncanplay', function(e)
+			$(dom_v).on('oncanplay, loadedmetadata', function(e)
 			{
 				$(e.target)[0].play();
 			});
