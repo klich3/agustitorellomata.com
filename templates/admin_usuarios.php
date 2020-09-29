@@ -116,12 +116,23 @@ switch($g_action)
 		{
 			$fn_for_data = object_to_array($sv);
 			
-			$fn_for_data['d_selected'] = ($sv->user_status == $fn_q_datails['d_user_status']) ? 'selected' : '';
+			$fn_for_data['d_selected'] = ($fn_for_data['user_status'] == $fn_q_datails['d_user_status']) ? 'selected' : '';
 			
 			$fn_xtemplate_parse['assign'][] = $fn_for_data;
 			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.details.user_status";
 		}
-	
+		
+		$fn_meta_have_access = $db->FetchValue("
+			SELECT `meta_value`
+			FROM `users_meta`
+			WHERE `user_id`=:ui
+			AND `meta_key`='user_access'
+		", array(
+			"ui" => $fn_q_datails['d_user_id']
+		));
+		
+		$fn_q_datails["user_access"] = ($fn_meta_have_access) ? "selected" : "";
+		
 		$fn_xtemplate_parse['assign'][] = $fn_q_datails;
 		$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.details";
 	break;
