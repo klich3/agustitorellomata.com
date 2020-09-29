@@ -96,10 +96,6 @@ $(function()
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.pedidos.fn.js');
 				break;
 				
-				case "admin-ofertas":
-					fn_itmToLoad.push(fn_base_script+'js/admin/admin.ofertas.fn.js');
-				break;
-				
 				case "admin-iva":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.iva.fn.js');
 				break;

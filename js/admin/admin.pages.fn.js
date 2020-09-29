@@ -20,7 +20,9 @@ $(function()
 			
 			'{{if type.match(/(slider)/g)}}<img src="'+fn_base_script+'images/admin-slider-dump.png" class="e" />{{/if}}'+
 			'{{if type.match(/(videofs)/g)}}<img src="'+fn_base_script+'images/admin-videofs-dump.png" class="e" />{{/if}}'+
-			'{{if control=="8"}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
+			'{{if control}}'+
+				'{{if control=="8"}}<img src="'+fn_base_script+'images/admin-actividaes-control.png" class="e" />{{/if}}'+
+			'{{/if}}'+
 		'</div>'+
 	'</div></div>');
 	
