@@ -433,6 +433,7 @@ header .lang li:not(:last-child)::after {
 
 footer {
 	font-size: 0.91rem;
+	white-space: nowrap;
 }
 
 footer .sep {
@@ -450,15 +451,17 @@ footer .sponsors img {
 }
 
 footer .menu {
-	white-space: nowrap;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	flex-wrap: wrap;
 }
 
 footer .menu li {
 	position: relative;
-	display: inline-block;
-	width: auto;
 	padding-right: 5%;
 	margin-right: 4%;
+	white-space: nowrap;
 }
 
 footer .menu li:last-child {
@@ -597,6 +600,10 @@ video {
 	color: #000;
 }
 
+a.secundary {
+	color: #B99219;
+}
+
 @media (max-width: 768px) {
 	
 	[data-hash="home"] main {
@@ -672,8 +679,15 @@ video {
 		border-right: 1px solid rgba(255, 255, 255, 0.72);
 	}
 	
+	footer,
 	footer .sponsors {
 		text-align: center;
+	}
+	
+	footer .flx-sc {
+		justify-content: center !important;
+		align-items: center !important;
+		align-content: center !important;
 	}
 	
 	/* nav menu */
