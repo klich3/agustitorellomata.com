@@ -64,6 +64,7 @@ $(function()
 			
 			switch (hash) 
 			{
+				case "admin-pay":
 				case "admin-options":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.options.fn.js');
 				break;
