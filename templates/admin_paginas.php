@@ -374,13 +374,6 @@ switch($g_action)
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list_page.{$fn_type_page}.delAllow";
 				}
 				
-				//pagins protegidas
-				if($pv->type == 8)
-				{
-					$fn_xtemplate_parse['assign'][] = '';
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list_page.{$fn_type_page}.cloneActividades";
-				}
-				
 				$fn_xtemplate_parse['assign'][] = $fn_for_data;
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list_page.{$fn_type_page}";
 			}
