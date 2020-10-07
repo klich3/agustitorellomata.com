@@ -131,35 +131,24 @@ class WIDGET_jsonToTmpl {
 				$fn_for_data['grid_collapse'] = '';
 			}
 			
-			if(isset($gv['control']))
+			//margin & padding
+			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
 			{
-				if($gv['control'] > 0)
+				$fn_for_data['mt'] = 'w-1-1';
+				//$fn_for_data['nb'] = '&nbsp;';
+			}
+			
+			//box height
+			if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
+			{
+				//separador entre cuadros
+				if($fn_hbox_count > 0)
 				{
-					$fn_page_metas = self::getPageMetas($fn_args['hash']);
-					
-					//button como llegar
-					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
-					{	
-						self::$fn_xtemplate_parse['assign'][] = $fn_page_metas;
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_geo_show_button";
-					}
-					
-					if($fn_page_metas && isset($fn_page_metas['actividades_reservas_show_button']) && $fn_page_metas['actividades_reservas_show_button'])
-					{	
-						self::$fn_xtemplate_parse['assign'][] = array();
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_reservas_show_button";
-					}
-					
-					self::$fn_xtemplate_parse['assign'][] = array();
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
+					self::$fn_xtemplate_parse['assign'][] = '';
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
 				}
 				
-				//saltamos resto de elementos no mover esta parte
-				
-				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
-				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
-				
-				continue;
+				$fn_hbox_count++;
 			}
 			
 			if(preg_match('/slider/', $gv['type']))
@@ -215,7 +204,6 @@ class WIDGET_jsonToTmpl {
 			{
 				//slider-0-10
 				//slider-<controls 0/1>-<id gallery>
-				
 				preg_match('/^videofs-(.*?)\-(.*?)\s/', $gv['type'], $fn_opts_match);
 				
 				if(sizeof($fn_opts_match) !== 0)
@@ -249,24 +237,35 @@ class WIDGET_jsonToTmpl {
 				continue;
 			}
 			
-			//margin & padding
-			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
+			if(isset($gv['control']))
 			{
-				$fn_for_data['mt'] = 'w-1-1';
-				//$fn_for_data['nb'] = '&nbsp;';
-			}
-			
-			//box height
-			if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
-			{
-				//separador entre cuadros
-				if($fn_hbox_count > 0)
+				if($gv['control'] > 0)
 				{
-					self::$fn_xtemplate_parse['assign'][] = '';
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
+					$fn_page_metas = self::getPageMetas($fn_args['hash']);
+					
+					//button como llegar
+					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = $fn_page_metas;
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_geo_show_button";
+					}
+					
+					if($fn_page_metas && isset($fn_page_metas['actividades_reservas_show_button']) && $fn_page_metas['actividades_reservas_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = array();
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_reservas_show_button";
+					}
+					
+					self::$fn_xtemplate_parse['assign'][] = array();
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
 				}
 				
-				$fn_hbox_count++;
+				//saltamos resto de elementos no mover esta parte
+				
+				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+				
+				continue;
 			}
 			
 			self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
