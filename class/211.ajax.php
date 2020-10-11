@@ -22,6 +22,896 @@ if($fn_ajax !== null)
 	
 	switch($fn_ajax)
 	{
+
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->	
+		
+		//client get product variety
+		case "getProdVariety":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(isset($fn_p['p']) && !is_numeric($fn_p['p'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => '[PR:137]',
+			)));
+			
+			if(isset($fn_p['s']) && !is_numeric($fn_p['s'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => '[PR:138]',
+			)));
+			
+			$fn_q_array = array(
+				'p' => $fn_p['p'],
+			);
+			
+			$fn_s = "";
+			
+			if(isset($fn_p['s']))
+			{
+				$fn_s = "AND `size_id`=:s";
+				$fn_q_array['s'] = $fn_p['s'];
+			}
+			
+			$fn_q = $db->FetchAll("
+				SELECT `precio_venta`, `size_id`, `color_id`, `item_base`
+				FROM `product_stock`
+				WHERE `prid`=:p
+				{$fn_s}
+				AND `stock_count`!='0'
+			", $fn_q_array);
+			
+			//--colores
+			$fn_color_q = $db->FetchAll("
+				SELECT *
+				FROM `product_color`
+			");
+			
+			$fn_color = array();
+			
+			if($fn_color_q) foreach($fn_color_q as $ck => $cv)
+			{
+				$fn_d = object_to_array($cv);
+				
+				$fn_title = (isset($fn_d['lang_data']) && isJson($fn_d['lang_data'])) ? object_to_array(json_decode($fn_d['lang_data'])) : '';
+				$fn_color[$fn_d['id']] = (isset($fn_title[$st_lang])) ? $fn_title[$st_lang] : $fn_title[$CONFIG['site']['defaultLang']];
+			}
+						
+			//out global
+			if($fn_q && sizeof($fn_q) != 0)
+			{
+				$fn_out = array();
+				$fn_colors_inlist = array();
+				
+				foreach($fn_q as $k => $v)
+				{
+					$fn_for_data = object_to_array($v);
+					
+					//if(in_array($fn_for_data['color_id'], $fn_colors_inlist)) continue;
+					
+					$fn_colors_inlist[] = $fn_for_data['color_id'];
+
+					$fn_for_data['color_title'] = $fn_color[$fn_for_data['color_id']];
+					$fn_out[] = $fn_for_data;
+				}
+				
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => '[PR:165]',
+					'data' => $fn_out,
+				)));
+			}
+			
+			exit(json_encode(array(
+				'status' => 400,
+				'message' => '[PR:155]',
+			)));
+		break;
+		
+		//client reclamacion submit
+		case "reclamacionSend":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			
+			if(empty($fn_inputs['f_or_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => array('f_or_id'),
+			)));
+			
+			$fn_order_id = $db->FetchValue("
+				SELECT `id`
+				FROM `orders`
+				WHERE `order_id`=:oid
+				LIMIT 1;
+			", array(
+				'oid' => $fn_inputs['f_or_id'],
+			));
+			
+			if($fn_order_id)
+			{
+				$fn_rec_data = base64_encode(json_encode($fn_inputs));
+				$fn_date = date('Y-m-d H:i:s');
+				
+				$db->Fetch("
+					INSERT INTO `orders_reclamacion` (`o_id`, `data`, `date`)
+					VALUES (:oid, :rdt, :dt);
+				", array(
+					'oid' => $fn_order_id,
+					'rdt' => $fn_rec_data,
+					'dt' => $fn_date,
+				));
+			}
+			
+			$getUserData = $too_login->getUserData();
+			/*
+				var_dump($getUserData);
+				object(stdClass)[1]
+			  public 'ID' => string '1' (length=1)
+			  public 'user_name' => string '211' (length=3)
+			  public 'user_email' => string 'admin@211.com' (length=13)
+			  public 'user_status' => string '1' (length=1)
+			  public 'user_add_date' => string '2017-02-25 17:22:14' (length=19)
+			  public 'status_value' => string 'Activo' (length=6)
+			  public 'user_level' => string '100' (length=3)
+			  public 'time_stamp' => int 1488910705
+
+			*/
+			
+			$fn_message = getLangItem('mail_message_reclamacion');
+			$fn_message = str_replace(array(
+				'%ID%',
+				'%MOTIVO%'
+			), array(
+				$getUserData->ID,
+				$fn_inputs['f_subject']
+			), $fn_message);
+			
+			$fn_message .= htmlspecialchars($fn_inputs['f_message'], ENT_COMPAT, 'UTF-8');
+			
+			$fn_to = $CONFIG['site']['mailinfo'];
+			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
+			
+			//html y content del mail
+			$fn_mail_html = $CONFIG['templates']['standartEmail'];
+			
+			$fn_mail_html = str_replace(array(
+				'%message%',
+				'%regards%', 
+				'%site_name%', 
+				'%copyz%',
+				'%site_dir%', 
+				'%site_logo%', 
+			), array(
+				$fn_message,
+				getLangItem('regards'),
+				$CONFIG['site']['sitetitlefull'],
+				$CONFIG['site']['sitecopyz'],
+				'',
+				'<img src="'.$CONFIG['site']['base'].'m/logo.png?" alt="logotype" />',
+			), $fn_mail_html);
+			
+			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
+			
+			//envio del mail
+			if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => getLangItem('contact_form_confirm'),
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('contact_form_error'),
+				)));
+			}
+		break;
+		
+		case "checkoutPayment":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			
+			if(!isset($fn_inputs['u_email']) || emailValidation($fn_inputs['u_email'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_email_not_valid'),
+			)));
+			
+			//check cart
+			if(!isset($_SESSION) && !isset($_SESSION['cart_checkout']) || !isset($_SESSION['cart'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('cart_empty'),
+				'data' => array(
+					'redirect' => "{$CONFIG['site']['base']}{$st_lang}/tienda",
+				)
+			)));
+			
+			//check user level
+			$u_level = $too_login->isAuth(15, false);
+			
+			$fn_isPayProcess = false;
+			$fn_order_data = array();
+			$fn_oferta_product = 0;
+			
+			if($u_level !== 200)
+			{
+				//check exist user
+				$fn_get_user_by_mail = $db->FetchValue("
+					SELECT `ID`
+					FROM `users`
+					WHERE `user_email`=:em
+					AND `ID` NOT IN('9999, 9998')
+					AND `user_status`!='3'
+				", array(
+					'em' => $fn_inputs['u_email'],
+				));
+				
+				if(count($fn_get_user_by_mail) !== 0)
+				{
+					//existe user
+					//obtener datos del usuario
+					
+					$fn_get_user = $db->FetchArray("
+						SELECT `ID`, `user_name`, `user_email`, `user_status`
+						FROM `users`
+						WHERE `ID`=:id
+						AND `ID` NOT IN('9999', '9998')
+						LIMIT 1;
+					", array(
+						'id' => $fn_get_user_by_mail,
+					));
+					
+					if($fn_get_user)
+					{
+						$fn_u_data = array(
+							'ID' => $fn_get_user['ID'],
+							'user_name' => $fn_get_user['user_name'],
+							'user_email' => $fn_get_user['user_email'],
+							'user_status' => $fn_get_user['user_status'],
+							'user_level' => 15,
+						);
+						
+						$fn_user_dir = array(
+							'dir_name' => getLangItem('pordefecto'),
+							'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
+							'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
+							'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
+							'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
+							'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
+							'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
+							'dir_default' => 1,
+							'dir_id' => 0,
+						);
+						
+						$fn_user_dir_json = json_encode($fn_user_dir);
+						
+						// check si existe la direccion si no añadir y poner como principal
+						//get user_dirs
+						$fn_q_meta_dirs = $db->FetchValue("
+							SELECT `meta_value`
+							FROM `users_meta`
+							WHERE `user_id`=:uid
+							AND `meta_key`='user_dirs'
+							LIMIT 1;
+						", array(
+							'uid' => $fn_get_user['ID'],
+						));
+
+						$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs, true) : array();
+						
+						$fn_dir_in_db = false;
+						
+						if(count($fn_dir_data) !== 0 && isset($fn_dir_data['dir_id']))
+						{
+							if($fn_dir_data['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
+						}else{
+							foreach($fn_dir_data as $dkm => $dkv)
+							{
+								if($dkv['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
+							}
+						}
+						
+						if($fn_dir_in_db)
+						{
+							//desmarcamos otros defaults y dejamos este como principal
+							foreach($fn_dir_data as $dk => $dv)
+							{
+								if(isset($dv['dir_default'])) unset($fn_dir_data[$dk]['dir_default']);
+							}
+							
+							$fn_user_dir['dir_id'] = count($fn_dir_data); //añadimos nuevo id
+							$fn_dir_data[] = $fn_user_dir;
+							$fn_dir_data = json_encode($fn_dir_data, JSON_UNESCAPED_UNICODE);
+							
+							//save
+							$fn_q = $db->Fetch("
+								INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+								VALUES (:uid, 'user_dirs', :dt) 
+								ON DUPLICATE KEY UPDATE `meta_value`=:dtr;
+							", array(
+								'uid' => $fn_get_user['ID'],
+								'dt' => $fn_dir_data,
+								'dtr' => $fn_dir_data,
+							));
+						}
+						// check si existe la direccion si no añadir y poner como principal
+						
+						$fn_order_data['user'] = $fn_u_data;
+						$fn_order_data['user_dir'] = $fn_user_dir;
+						$fn_isPayProcess = true;
+					}else{
+						exit(json_encode(array(
+							'status' => 400,
+							'message' => getLangItem('payment_no_redirect'),
+						)));
+					}
+				}else{
+					//no existe creamos registramos
+					$fn_set_new_password = substr(md5(rand()), 8);
+					$fn_new_act_key = md5(microtime());
+					$fn_set_new_name_user = substr(str_replace(array('.', ' '), '', microtime()), 8);
+					$fn_today_date = date('Y-m-d H:i:s');
+					
+					$fn_q = $db->ExecuteSQL("
+						INSERT INTO `users` (`user_name`, `user_email`, `user_pass`, `user_registred`, `user_status`, `user_activation_key`)
+						VALUES (:un, :em, MD5(:ps), :td, '0', :ac);
+					", array(
+						'un' => $fn_set_new_name_user,
+						'em' => $fn_inputs['u_email'],
+						'ps' => $fn_set_new_password,
+						'td' => $fn_today_date,
+						'ac' => $fn_new_act_key,
+					));
+					
+					//mail al cliente con contraseña y activación
+					if($fn_q)
+					{
+						$fn_user_dir = array(
+							'dir_name' => getLangItem('pordefecto'),
+							'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
+							'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
+							'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
+							'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
+							'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
+							'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
+							'dir_default' => 1,
+							'dir_id' => 0,
+						);
+						$fn_user_dir_json = json_encode(array($fn_user_dir), JSON_UNESCAPED_UNICODE);
+						
+						$fn_per_data = json_encode(array(
+							'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
+							'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
+							'u_idd' => (isset($fn_inputs['u_idd'])) ? $fn_inputs['u_idd'] : '',
+							'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
+						), JSON_UNESCAPED_UNICODE);
+						
+						//add metas
+						$db->Fetch("
+							INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`)
+							VALUES (:uid, 'user_level', '15'), (:uid, 'user_dirs', :m), (:uid, 'user_pers_data', :v);
+						", array(
+							'uid' => $fn_q,
+							'm' => $fn_user_dir_json,
+							'v' => $fn_per_data,
+						));
+						
+						//preparamos mail
+						$fn_to = $fn_inputs['u_email'];
+						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_new_client');
+						
+						$fn_html_p = getLangItem('mail_new_client_html');
+						$fn_mail_html = $CONFIG['templates']['standartEmail'];
+						
+						$fn_mail_html = str_replace(array(
+							'%message%',
+							'%regards%', 
+							'%site_name%', 
+							'%copyz%',
+							'%site_dir%', 
+							'%site_logo%',
+							'%site_link%',
+							'%user_name%',
+							'%user_pass%',
+						), array(
+							$fn_html_p,
+							getLangItem('mail_regards'),
+							$CONFIG['site']['sitetitlefull'],
+							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
+							"Client ID: <strong>{$fn_set_new_name_user}</strong>",
+							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['u_email']}\" alt=\"logotype\" />",
+							"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
+							$fn_inputs['u_email'],
+							$fn_set_new_password,
+						), $fn_mail_html);
+						
+						$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
+						
+						//envio del mail
+						@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
+					
+						//add user to session
+						$fn_u_data = array(
+							'ID' => $fn_q,
+							'user_name' => $fn_set_new_name_user,
+							'user_email' => $fn_inputs['u_email'],
+							'user_status' => 0,
+							'user_level' => 15,
+						);
+						
+						$fn_order_data['user'] = $fn_u_data;
+						$fn_order_data['user_dir'] = $fn_user_dir;
+						$fn_isPayProcess = true;
+					}else{
+						exit(json_encode(array(
+							'status' => 400,
+							'message' => getLangItem('payment_no_redirect'),
+						)));
+					}
+				}
+			}else{
+				//logueado
+				$getUserData = $too_login->getUserData();
+				
+				$fn_order_data['user'] = object_to_array($getUserData);
+				
+				$fn_user_dir = array(
+					'dir_name' => getLangItem('pordefecto'),
+					'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
+					'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
+					'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
+					'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
+					'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
+					'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
+					'dir_default' => 1,
+					'dir_id' => 0,
+				);
+				
+				$fn_user_dir_json = json_encode($fn_user_dir, JSON_UNESCAPED_UNICODE);
+				
+				// check si existe la direccion si no añadir y poner como principal
+				//get user_dirs
+				$fn_q_meta_dirs = $db->FetchValue("
+					SELECT `meta_value`
+					FROM `users_meta`
+					WHERE `user_id`=:uid
+					AND `meta_key`='user_dirs'
+					LIMIT 1;
+				", array(
+					'uid' => $getUserData->ID,
+				));
+
+				$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs, true) : array();
+				
+				$fn_dir_in_db = false;
+				
+				if(count($fn_dir_data) !== 0 && isset($fn_dir_data['dir_id']))
+				{
+					if($fn_dir_data['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
+				}else{
+					foreach($fn_dir_data as $dkm => $dkv)
+					{
+						if($dkv['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
+					}
+				}
+				
+				if($fn_dir_in_db)
+				{
+					//desmarcamos otros defaults y dejamos este como principal
+					foreach($fn_dir_data as $dk => $dv)
+					{
+						if(isset($dv['dir_default'])) unset($fn_dir_data[$dk]['dir_default']);
+					}
+					
+					$fn_user_dir['dir_id'] = count($fn_dir_data); //añadimos nuevo id
+					$fn_dir_data[] = $fn_user_dir;
+					$fn_dir_data = json_encode($fn_dir_data, JSON_UNESCAPED_UNICODE);
+					
+					//save
+					$fn_q = $db->Fetch("
+						INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+						VALUES (:uid, 'user_dirs', :d) 
+						ON DUPLICATE KEY UPDATE `meta_value`=:d;
+					", array(
+						'uid' => $getUserData->ID,
+						'd' => $fn_dir_data,
+					));
+				}
+				// check si existe la direccion si no añadir y poner como principal
+				
+				$fn_order_data['user_dir'] = $fn_user_dir;
+				$fn_isPayProcess = true;
+			}
+		
+			//datos personales del usuario
+			$fn_order_data['user_dir'] = $fn_user_dir; 
+			
+			//ofertas
+			if(isset($fn_inputs['p_promote']) && !empty($fn_inputs['p_promote']))
+			{
+				//check si esta disponible
+				$fn_q_promote = $db->FetchArray("
+					SELECT *
+					FROM `ofertas`
+					WHERE `code`=:code
+					AND `active`='1'
+					LIMIT 1;
+				", array(
+					'code' => $fn_inputs['p_promote'],
+				));
+				
+				//incluimos oferta entera
+				if($fn_q_promote['used'] <= $fn_q_promote['max']) $fn_order_data['promote'] = $fn_q_promote;
+			}
+			
+			$fn_cart_out_final = array();
+			$fn_cart_calcs_subtotal = 0;
+			
+			//empezamos proceso de pago
+			if($fn_isPayProcess)
+			{
+				$fn_order_num = assignCheckoutId(); //cada compra es unico
+				
+				//recuperamos el id anterior de order anterior
+				$fn_checkout_id_loc = (isset($_SESSION) && isset($_SESSION['cart_checkout']) && isset($_SESSION['cart_checkout']['checkout_id'])) ? $_SESSION['cart_checkout']['checkout_id'] : $fn_order_num;
+				
+				//añadimos oferta a la session
+				if(isset($_SESSION) && isset($fn_order_data['promote']))
+				{
+					$_SESSION['promote'] = $fn_order_data['promote'];
+
+					//quitamos el global oferta
+					if(isset($_SESSION['promote']['global_userd']) && $fn_order_data['promote']['p_id'] !== 0) unset($_SESSION['promote']['global_userd']);
+				}
+				
+				//recalculamos todo el cart
+				if(!isset($_SESSION['cart_checkout']['cart_total']) && (empty($_SESSION['cart_checkout']['cart_total']) || $_SESSION['cart_checkout']['cart_total'] == 0)) cartProcessAndCalc($_SESSION);
+				
+				//cart calc
+				if(count($_SESSION['cart']) !== 0) foreach($_SESSION['cart'] as $ck => $cv)
+				{
+					$fn_for_data = $cv;
+					
+					$fn_q_p_title = $db->FetchValue("
+						SELECT `menu_title`
+						FROM `product`
+						WHERE `id`=:id
+						LIMIT 1;
+					", array(
+						'id' => $fn_for_data['p_id'],
+					));
+					
+					$fn_q_prod = $db->FetchArray("
+						SELECT `precio_venta`, `peso`, `size_x`, `size_y`
+						FROM `product_stock`
+						WHERE `prid`=:pid
+						LIMIT 1;
+					", array(
+						'pid' => $fn_for_data['p_id'],
+					));
+					
+					$fn_for_data['title'] = ($fn_q_p_title) ? $fn_q_p_title : '';
+					
+					//oferta sobre un producto
+					if(isset($fn_order_data['promote']) && $fn_order_data['promote']['p_id'] == $fn_for_data['p_id'] && $fn_oferta_product == 0)
+					{
+						//off
+						if(isset($fn_for_data['pax']) && $fn_for_data['pax'] !== 0)
+						{
+							if($fn_order_data['promote']['used'] <= $fn_order_data['promote']['max'])
+							{
+								//oferta sobre 1 producto
+								$fn_loc_of = round(($fn_q_prod['precio_venta'] * $fn_order_data['promote']['oferta_value'] / 100), 2);
+								$fn_loc_calc_total_price_per_pax = round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2);
+								
+								//restamos descuento de un solo producto del total
+								$fn_for_data['price'] = round(($fn_loc_calc_total_price_per_pax - $fn_loc_of), 2);
+								
+								$fn_oferta_product++;
+							}else{
+								$fn_price_loc = round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2);
+							}
+						}else{
+							$fn_for_data['price'] = $fn_q_prod['precio_venta'];
+						}
+					}else{
+						//sin oferta
+						$fn_for_data['price'] = ($fn_q_prod) ? round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2) : $fn_q_prod['precio_venta'];
+					}
+					
+					$fn_for_data['peso'] = ($fn_q_prod) ? ($fn_q_prod['peso'] * $fn_for_data['pax']) : 0;
+					$fn_for_data['size_x'] = ($fn_q_prod) ? $fn_q_prod['size_x'] : 0;
+					$fn_for_data['size_y'] = ($fn_q_prod) ? $fn_q_prod['size_y'] : 0;
+					
+					//html
+					$fn_get_p = $db->FetchValue("
+						SELECT `lang_data`
+						FROM `product`
+						WHERE `id`=:pid
+						LIMIT 1;
+					", array(
+						'pid' => $cv['p_id'],
+					));
+					
+					$fn_title = (isset($fn_get_p) && isJson($fn_get_p)) ? object_to_array(json_decode($fn_get_p)) : '';
+					$fn_cart_out_final[] = $fn_for_data;
+					
+					//calculo de subtotal
+					$fn_cart_calcs_subtotal += $fn_for_data['price'];
+				}
+				
+				
+				$fn_order_data['user_order'] = array(
+					'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
+					'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
+					'u_idd' => (isset($fn_inputs['u_idd'])) ? $fn_inputs['u_idd'] : '',
+					'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
+				);
+				
+				$fn_order_data['cart'] = $fn_cart_out_final;
+				$fn_order_data['cart_checkout'] = $_SESSION['cart_checkout'];
+				$fn_order_data['cart_checkout']['cart_checkout_date'] = date('Y-m-d H:i:s');
+				//$fn_order_data['cart_wiva_checkout'] = $_SESSION['cart_wiva_checkout'];
+				
+				$fn_cart_calcs_iva = round(($fn_cart_calcs_subtotal * $fn_order_data['cart_checkout']['cart_iva_percent'] / 100), 2);
+				$fn_importe = $fn_cart_calcs_subtotal;
+				
+				$fn_order_data['cart_wiva_checkout'] = array(
+					'cart_subtotal' => $fn_cart_calcs_subtotal,
+					'cart_iva' => $fn_cart_calcs_iva,
+				);
+				
+				//oferta global
+				if(isset($fn_order_data['promote']) && !isset($_SESSION['promote']['global_userd']))
+				{
+					if($fn_order_data['promote']['used'] <= $fn_order_data['promote']['max'] && $fn_order_data['promote']['p_id'] == 0)
+					{
+						$fn_sub_of = round(($fn_cart_calcs_subtotal * $fn_order_data['promote']['oferta_value'] / 100), 2);
+						
+						//redsys / paypal
+						$fn_order_data['cart_wiva_checkout']['cart_subtotal'] = $fn_importe = round(($fn_cart_calcs_subtotal - $fn_sub_of), 2);
+						$fn_order_data['cart_wiva_checkout']['cart_iva'] = round(($fn_importe * $fn_order_data['cart_checkout']['cart_iva_percent'] / 100), 2);
+						
+						//dejamos una marca de que ya esta aplicada la oferta general
+						$_SESSION['promote']['global_userd'] = $fn_order_data['promote']['global_userd'] = 1;
+					}
+				}
+				
+				$fn_order_data['user']['user_payment_method'] = ($fn_inputs['p_pay_type'] == 'rd') ? 'redsys' : 'paypal';
+				
+				//gen order html
+				$fn_calc_total = $fn_order_data['cart_wiva_checkout']['cart_subtotal'];
+				$fn_calc_subtotal = round(($fn_calc_total - $fn_order_data['cart_wiva_checkout']['cart_iva']) , 2);
+				
+				//guardamos todo en db
+				$fn_order_data_based = base64_encode(json_encode($fn_order_data, JSON_UNESCAPED_UNICODE));
+				$fn_now_date = date('Y-m-d H:i:s');
+				
+				//insert order
+				//si $fn_checkout_id_loc es el mismo del order anterior se reescribe por uno nuevo
+				//asi no hay fallos en redsys
+				
+				$fn_insert = $db->Fetch("
+					INSERT INTO `orders` (`user_id`, `order_id`, `date`, `lang`, `data_cart`, `payment_type`)
+					VALUES (:uid, :ck, :dt, :ln, :dc, :pt) 
+					ON DUPLICATE KEY UPDATE `order_id`=:oid, `data_cart`=:dc, `date`=:dt;
+				", array(
+					'uid' => $fn_order_data['user']['ID'],
+					'ck' => $fn_checkout_id_loc,
+					'dt' => $fn_now_date,
+					'ln' => $st_lang,
+					'dc' => $fn_order_data_based,
+					'pt' => $fn_order_data['user']['user_payment_method'],
+					'oid' => $fn_order_num,
+				));
+				
+				if($fn_insert)
+				{
+					//creamos peticion de pago
+					$_SESSION['cart_checkout']['checkout_id'] = $fn_order_num;
+
+					switch($fn_order_data['user']['user_payment_method'])
+					{
+						case "redsys":
+							require_once('redsys_soap/Messages.php');
+							require_once('redsys_soap/Redsys.php');
+							
+							$fn_merchant = $CONFIG['site']['redsys_user'];
+							$fn_redsys_mode = ($CONFIG['site']['redsys_mode']) ? 'live' : 'test';
+							
+							if($fn_redsys_mode == 'live')
+							{
+								//real
+								$fn_sha = $CONFIG['site']['redsys_sha256_real'];
+								$fn_pass = $CONFIG['site']['redsys_pass_real'];
+							}else{
+								//sandbox
+								$fn_sha = $CONFIG['site']['redsys_sha256'];
+								$fn_pass = $CONFIG['site']['redsys_pass'];
+							}
+							
+							$fn_terminal = '001';
+							$fn_moneda = '978';
+							
+							try {
+								
+								$redsys = new \Buuum\Redsys($fn_sha);
+								$redsys->setMerchantcode($fn_merchant);
+								$redsys->setAmount($fn_importe);
+								$redsys->setOrder($fn_order_num);
+								$redsys->setTerminal($fn_terminal);
+								$redsys->setCurrency($fn_moneda);
+								$redsys->setLang($st_lang);
+								 
+								if($CONFIG['site']['redsys_service'] == 'soap')
+								{
+									//web service
+									$fn_card_num = str_replace(array(' ', '  '), '', $fn_inputs['p_vnum']);
+									$fn_card_expire = "{$fn_inputs['p_year']}{$fn_inputs['p_month']}";
+									$fn_card_ccv = $fn_inputs['p_ccv'];
+									
+									$redsys->setPan($fn_card_num);
+									$redsys->setExpiryDate($fn_card_expire);
+									$redsys->setCVV($fn_card_ccv);
+								  
+									/*
+									* A – Pago tradicional
+									* 1 – Preautorización
+									* O – Autorización en diferido
+									*/
+									$redsys->setTransactiontype('A');
+									
+									$redsys->setIdentifier('REQUIRED');
+									//$redsys->setNotification('<URL>');
+								
+									$result = $redsys->firePayment($fn_redsys_mode); //live | test
+									
+									if(isset($result['Ds_Merchant_Identifier']))
+									{
+										//ok
+										
+										//update response data
+										$fn_response_data = base64_encode(json_encode($result));
+										$fn_mid = (isset($result['Ds_Merchant_Identifier'])) ? $result['Ds_Merchant_Identifier'] : '';
+										
+										//asignamos el pago y respuesta
+										$db->Fetch("
+											UPDATE `orders`
+											SET `data_response`=:dr, `payment_status`='1', `m_id`=:mid
+											WHERE `order_id`=:oid
+										", array(
+											'dr' => $fn_response_data,
+											'mid' => $fn_mid,
+											'oid' => $fn_checkout_id_loc,
+										));
+										
+										//restamos oferta
+										$db->Fetch("
+											UPDATE `ofertas`
+											SET `used`=`used`+1
+											WHERE `id`=:s
+										", array(
+											's' => $_SESSION['promote']['id'],
+										));
+										
+										sendInvioce($getUserData->user_email, $fn_checkout_id_loc, $fn_order_data);
+										sendAdminNotice($fn_checkout_id_loc);
+										
+										//todo correcto borramos el cart y detalles
+										//----------------> 
+										//----------------> 
+										unset($_SESSION['cart_wiva_checkout']);
+										unset($_SESSION['cart_checkout']);
+										unset($_SESSION['cart']);
+										unset($_SESSION['promote']);
+										//----------------> 
+										//----------------> 
+													
+										exit(json_encode(array(
+											'status' => 200,
+											'message' => getLangItem('checkout_success'),
+											'data' => array(
+												'redirect' => "{$CONFIG['site']['base']}{$st_lang}/mis-pedidos",
+											),
+										)));
+									}
+								}else{
+									//redirect
+									$redsys->setTransactiontype('0');
+									$redsys->setMethod('C'); //c solo tarjeta || t visa+yupay
+									
+									$fn_wsd_debug = ($CONFIG['status']['debug']) ? 'local' : '';
+									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? "{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}response/response.php" : "{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
+									
+									$redsys->setNotification($fn_not_path); //Url de notificacion
+									$redsys->setUrlOk("{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}{$st_lang}/pago-completado");
+									$redsys->setUrlKo("{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}{$st_lang}/pago-error");
+									
+									$result = $redsys->createForm($fn_redsys_mode, array(
+										'form_name' => 'glunt_pay_redsys',
+										//'submit_value' => 'Pay',
+									));
+									
+									exit(json_encode(array(
+										'status' => 200,
+										'message' => getLangItem('redirection'),
+										'data' => array(
+											//'redirect' => "{$CONFIG['site']['base']}{$st_lang}/mis-pedidos",
+											'pay_html' => $result,
+										),
+									)));
+								}
+							} catch (Exception $e) 
+							{
+								$fn_data = array();
+								$fn_data['error'] = $e;
+								$fn_data['session'] = $_SESSION;
+								
+								//añadimos al log
+								$fn_data = base64_encode(json_encode($fn_data));
+								$fn_now = date('Y-m-d H:i:s');
+								
+								$db->Fetch("
+									INSERT INTO `log_orders` (`id`, `log`, `date`)
+									VALUES ('null', :dt, :nw);
+								", array(
+									'dt' => $fn_data,
+									'nw' => $fn_now,
+								));
+								
+								exit(json_encode(array(
+									'status' => 400,
+									'message' => getLangItem('error_db')." [511]",
+								)));
+							}
+							
+						break;
+					}
+				}
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('payment_no_redirect'),
+				)));
+			}
+			
+			exit;
+		break;
+		
+		//------------------------------------------------------------------------------------------------
+		
 		case "upObjects":
 			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
 			
@@ -589,183 +1479,7 @@ if($fn_ajax !== null)
 			
 			exit(json_encode($fn_result));
 		break;
-		
-		/* ------------------------------------------------------------------------------------------------ */
-		
-		//--- ofertas
-		case "ofertasManage":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
 			
-			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
-			
-			if($u_level !== 200) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No puede hacer esto, no tiene autorización!.',
-			)));
-		
-			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
-			
-			switch($fn_p['type'])
-			{
-				//add
-				case "upOferta":
-				case "addOferta":
-					$fn_active = (isset($fn_inputs['f_active']) && $fn_inputs['f_active'] == 1) ? 1 : 0;
-					$fn_active = ($fn_inputs['f_type'] == 'prd' && $fn_inputs['f_product'] == 0) ? 0 : $fn_active;
-					
-					$fn_tab_active = (isset($fn_inputs['f_tab_active']) && $fn_inputs['f_tab_active'] == 1) ? 1 : 0;
-					$fn_tab_sendmail = (isset($fn_inputs['f_tab_sendemail']) && $fn_inputs['f_tab_sendemail'] == 1) ? 1 : 0;
-					
-					$fn_pid = (isset($fn_inputs['f_type']) && $fn_inputs['f_type'] == 'prd') ? $fn_inputs['f_product'] : 0; //producto o 0 querra decir todos los productos
-					
-					//desactivamos los tabs anteriores
-					if($fn_tab_active)
-					{
-						$db->Fetch("
-							UPDATE `ofertas`
-							SET `tab_active`='0'
-						");
-					}
-					
-					if($fn_p['type'] == 'addOferta')
-					{
-						//add
-						$fn_q = $db->ExecuteSQL("
-							INSERT INTO `ofertas` (`active`, `p_id`, `title`, `oferta_value`, `desc`, `code`, `max`, `tab_active`, `tab_sendemail`)
-							VALUES (:ac, :pid, :tl, :pr, :dsc, :fc, :fmax, :tba, :tbs);
-						", array(
-							'ac' => $fn_active,
-							'pid' => $fn_pid,
-							'tl' => $fn_inputs['f_title'],
-							'pr' => $fn_inputs['f_percent'],
-							'dsc' => $fn_inputs['f_desc'],
-							'fc' => $fn_inputs['f_code'],
-							'fmax' => $fn_inputs['f_max'],
-							'tba' => $fn_tab_active,
-							'tbs' => $fn_tab_sendmail,
-						));
-					}else{
-						if(!isset($fn_inputs['id'])) exit(json_encode(array(
-							'status' => 400,
-							'message' => 'Faltan id',
-						)));
-						
-						//update
-						$fn_q = $db->Fetch("
-							UPDATE `ofertas`
-							SET `active`=:ac, `p_id`=:pid, `title`=:tl, `oferta_value`=:ov, `desc`=:dsc, `code`=:code, `max`=:max, `tab_active`=:tac, `tab_sendemail`=:tsdm
-							WHERE `id`='{$fn_inputs['id']}';
-						", array(
-							'ac' => $fn_active,
-							'pid' => $fn_pid,
-							'tl' => $fn_inputs['f_title'],
-							'ov' => $fn_inputs['f_percent'],
-							'dsc' => $fn_inputs['f_desc'],
-							'code' => $fn_inputs['f_code'],
-							'max' => $fn_inputs['f_max'],
-							'tac' => $fn_tab_active,
-							'tsdm' => $fn_tab_sendmail,
-						));
-					}
-					
-					if($fn_q)
-					{
-						exit(json_encode(array(
-							'status' => 200,
-							'message' => 'Okey',
-						)));
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => 'Error en base de datos',
-						)));
-					}
-				break;
-				
-				case "delOferta":
-					if(!isset($fn_p['id'])) exit(json_encode(array(
-						'status' => 400,
-						'message' => 'Faltan id',
-					)));
-					
-					$fn_q = $db->Fetch("
-						DELETE FROM `ofertas`
-						WHERE `id`=:id
-						LIMIT 1;
-					", array(
-						'id' => $fn_p['id'],
-					));
-					
-					if($fn_q)
-					{
-						exit(json_encode(array(
-							'status' => 200,
-							'message' => 'Oferta eliminada',
-						)));
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => 'Error en base de datos',
-						)));
-					}
-				break;
-				
-				case "getOfertaEdit":
-					if(!isset($fn_p['id'])) exit(json_encode(array(
-						'status' => 400,
-						'message' => 'Faltan id',
-					)));
-					
-					$fn_q = $db->FetchArray("
-						SELECT *
-						FROM `ofertas`
-						WHERE `id`=:id
-						LIMIT 1;
-					", array(
-						'id' => $fn_p['id'],
-					));
-					
-					if($fn_q)
-					{
-						//select productos data
-						$fn_modal_q = $db->FetchAll("
-							SELECT *
-							FROM `product`
-							ORDER BY `order` ASC
-						");
-						
-						$fn_sel_array = array();
-						
-						if($fn_modal_q) foreach($fn_modal_q as $mk => $mv)
-						{
-							$fn_foritem_data = object_to_array($mv);
-							$fn_foritem_data['item_title'] = langTitleJsonToStringJointer($mv->lang_data);
-							$fn_sel_array[] = $fn_foritem_data;
-						}
-						
-						$fn_q['select_products'] = $fn_sel_array;
-						
-						exit(json_encode(array(
-							'status' => 200,
-							'message' => 'Ofera',
-							'data' => $fn_q,
-						)));
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => 'Error en base de datos',
-						)));
-					}				
-				break;
-			}
-			
-			exit;
-		break;
-
-		
 		/* ------------------------------------------------------------------------------------------------ */
 		
 		//PAGE MANAGE AJAX CALLS ADMIN SIDE
@@ -1463,7 +2177,6 @@ if($fn_ajax !== null)
 				break;
 			}
 		break;
-				
 		
 		/* ------------------------------------------------------------------------------------------------ */
 		
@@ -3208,6 +3921,920 @@ if($fn_ajax !== null)
 				)));
 			}
 		break;
+		
+		/* ------------------------------------------------------------------------------------------------ */
+		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->	
+		//creamos actualizamos variedad de producto
+		case "upVarProducto":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(100, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No puede hacer esto, no tiene autorización!.',
+			)));
+			
+			if(!isset($fn_p['prid'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Me falta el ID del producto.',
+			)));
+			
+			if(!isset($fn_p['id']))
+			{
+				try{
+					$fn_q_atr = array(
+						'prid' => $fn_p['prid'],
+						's' =>  (isset($fn_p['var_size'])) ? $fn_p['var_size'] : null,
+						'c' =>  (isset($fn_p['var_color'])) ? $fn_p['var_color'] : null,
+						'pc' => (isset($fn_p['var_precio_coste'])) ? $fn_p['var_precio_coste'] : 0,
+						'pt' => (isset($fn_p['var_precio_oferta'])) ? $fn_p['var_precio_oferta'] : 0,
+						'pv' => (isset($fn_p['var_precio_venta'])) ? $fn_p['var_precio_venta'] : 0,
+						'sm' => (isset($fn_p['var_stock_min'])) ? $fn_p['var_stock_min'] : 0,
+						'sb' => (isset($fn_p['var_stock_base'])) ? $fn_p['var_stock_base'] : 0,
+						'sc' => (isset($fn_p['var_stock_actual'])) ? $fn_p['var_stock_actual'] : 0,
+						'p' =>  (isset($fn_p['var_peso']) && !empty($fn_p['var_peso'])) ? $fn_p['var_peso'] : "0.1",
+						'sy' => (isset($fn_p['var_size_y'])) ? $fn_p['var_size_y'] : 0,
+						'sx' => (isset($fn_p['var_size_x'])) ? $fn_p['var_size_x'] : 0,
+					);
+					
+					$fn_q_c = $db->ExecuteSQL("
+						INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_tachado`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`) 
+						VALUES (:prid, :s, :c, :pc, :pt, :pv, :sm, :sb, :sc, :p, :sy, :sx);
+					", $fn_q_atr);
+				}catch (Exception $e) 
+				{
+					$fn_result = array(
+						'status' => 400,
+						'message' => 'Todos los campos son obligatorios, asegurese de que no exista un dublicado.',
+					);
+					
+					exit(json_encode($fn_result));
+				}
+			}
+			
+			if(isset($fn_p['id']) && isset($fn_p['prid']))
+			{
+				//update
+				$fn_q_c = $db->Fetch("
+					UPDATE `product_stock`
+					SET `prid`=:prid, `size_id`=:s, `color_id`=:c, `precio_coste`=:pc, `precio_tachado`=:pt, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc, `peso`=:p, `size_y`=:sy, `size_x`=:sx
+					WHERE `id`=:id
+				", array(
+					'id' => $fn_p['id'],
+					'prid' => $fn_p['prid'],
+					's' =>  (isset($fn_p['var_size'])) ? $fn_p['var_size'] : null,
+					'c' =>  (isset($fn_p['var_color'])) ? $fn_p['var_color'] : null,
+					'pc' => (isset($fn_p['var_precio_coste'])) ? $fn_p['var_precio_coste'] : 0,
+					'pt' => (isset($fn_p['var_precio_oferta'])) ? $fn_p['var_precio_oferta'] : 0,
+					'pv' => (isset($fn_p['var_precio_venta'])) ? $fn_p['var_precio_venta'] : 0,
+					'sm' => (isset($fn_p['var_stock_min'])) ? $fn_p['var_stock_min'] : 0,
+					'sb' => (isset($fn_p['var_stock_base'])) ? $fn_p['var_stock_base'] : 0,
+					'sc' => (isset($fn_p['var_stock_actual'])) ? $fn_p['var_stock_actual'] : 0,
+					'p' => (isset($fn_p['var_peso'])) ? $fn_p['var_peso'] : "0.1",
+					'sy' => (isset($fn_p['var_size_y'])) ? $fn_p['var_size_y'] : 0,
+					'sx' => (isset($fn_p['var_size_x'])) ? $fn_p['var_size_x'] : 0,
+				));
+			}
+			
+			if($fn_q_c)
+			{
+				$fn_size_title = '';
+				$fn_color_title = '';
+				
+				if(isset($fn_p['var_size']))
+				{
+					$fn_q_size = $db->FetchValue("
+						SELECT `lang_data`
+						FROM `product_size`
+						WHERE `id`=:id
+					", array(
+						'id' => $fn_p['var_size'],
+					));
+				
+					$fn_size_title = langTitleJsonToStringJointer($fn_q_size);
+				}
+				
+				if(isset($fn_p['var_color']))
+				{
+					$fn_q_color = $db->FetchValue("
+						SELECT `lang_data`
+						FROM `product_color`
+						WHERE `id`=:id
+					", array(
+						'id' => $fn_p['var_color'],
+					));
+				
+					$fn_color_title = langTitleJsonToStringJointer($fn_q_color);
+				}
+				
+				$fn_result = array(
+					'status' => 200,
+					'message' => 'Hura! Item creado con éxito. :)',
+					'data' => array(
+						'id' => (isset($fn_p['id'])) ? $fn_p['id'] : $fn_q_c,
+						'size' => $fn_size_title,
+						'color' => $fn_color_title,
+						'stock_count' => (isset($fn_p['var_stock_actual'])) ? $fn_p['var_stock_actual'] : 0,
+						'precio_venta' => (isset($fn_p['var_precio_venta'])) ? $fn_p['var_precio_venta'] : 0,
+						'precio_tachado' => (isset($fn_p['var_precio_oferta'])) ? $fn_p['var_precio_oferta'] : 0,
+					),
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Por alguna causa no puedo crear este item.',
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+		
+		//crear usuario recuperar contraseña
+		case "recoveryPass":
+		case "newClient":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			parse_str($fn_p['data'], $fn_inputs);
+			
+			if(!isset($fn_inputs['n_email']) || empty($fn_inputs['n_email'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(emailValidation($fn_inputs['n_email'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_email_not_valid'),
+			)));
+			
+			$fn_f_check_email = $cl_m->parseSTMP($fn_inputs['n_email'], false);
+				
+			if(!$fn_f_check_email) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_error_param'),
+			)));
+			
+			$fn_check_exist_mail = $db->FetchArray("
+				SELECT COUNT(*) AS 'count', `user_email`
+				FROM `users`
+				WHERE `user_email`=:em
+				AND `ID` > '9999'
+				LIMIT 1;
+			", array(
+				'em' => $fn_inputs['n_email'],
+			));
+			
+			$fn_set_new_password = substr(md5(rand()), 8);
+			$fn_new_act_key = md5(microtime());
+			
+			if($fn_check_exist_mail && $fn_check_exist_mail['count'] !== "0")
+			{
+				if($fn_ajax == 'newClient') exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('msg_new_mail_exist'),
+				)));
+				
+				//recuperamos pass
+				$fn_q = $db->Fetch("
+					UPDATE `users`
+					SET `user_status`='0', `user_pass`=MD5(:np), `user_activation_key`=:ac
+					WHERE `user_email`=:en
+					LIMIT 1;
+				", array(
+					'np' => $fn_set_new_password,
+					'ac' => $fn_new_act_key,
+					'en' => $fn_check_exist_mail['user_email'],
+				));
+				
+				if($fn_q)
+				{
+					$fn_client = $db->FetchArray("
+						SELECT `user_name`, `user_email`
+						FROM `users`
+						WHERE `user_email`=:en
+						LIMIT 1;
+					", array(
+						'en' => $fn_check_exist_mail['user_email'],
+					));
+					
+					$fn_to = $fn_check_exist_mail['user_email'];
+					$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_recover_pass');
+					
+					$fn_html_p = getLangItem('mail_recover_pass_html');
+					$fn_mail_html = $CONFIG['templates']['standartEmail'];
+					
+					$fn_mail_html = str_replace(array(
+						'%message%',
+						'%regards%', 
+						'%site_name%', 
+						'%copyz%',
+						'%site_dir%', 
+						'%site_logo%',
+						'%site_link%',
+						'%user_name%',
+						'%user_pass%',
+					), array(
+						$fn_html_p,
+						getLangItem('mail_regards'),
+						$CONFIG['site']['sitetitlefull'],
+						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
+						"Client ID: <strong>{$fn_client['user_name']}</strong>",
+						"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['n_email']}\" alt=\"logotype\" />",
+						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
+						$fn_client['user_email'],
+						$fn_set_new_password,
+					), $fn_mail_html);
+					
+					$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
+					
+					//envio del mail
+					@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
+					
+					exit(json_encode(array(
+						'status' => 200,
+						'message' => getLangItem('msg_new_client_mail_sended'),
+					)));
+				}else{
+					exit(json_encode(array(
+						'status' => 400,
+						'message' => getLangItem('msg_recovery_pass_send_error'),
+					)));
+				}
+			}else{
+				if($fn_ajax == 'recoveryPass' && !$fn_check_exist_mail['user_email']) exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('msg_rec_mail_noexist'),
+				)));
+
+				//enviamos mail de activacion y contraseña nueva
+				
+				$fn_set_new_name_user = substr(str_replace(array('.', ' '), '', microtime()), 8);
+				$fn_today_date = date('Y-m-d H:i:s');
+				
+				$fn_f_check_email = $cl_m->parseSTMP($fn_inputs['n_email']);
+				
+				$fn_q = $db->ExecuteSQL("
+					INSERT INTO `users` (`user_name`, `user_email`, `user_pass`, `user_registred`, `user_status`, `user_activation_key`)
+					VALUES (:un, :en, MD5(:np), :td, '0', :ac);
+				", array(
+					'un' => $fn_set_new_name_user,
+					'en' => $fn_f_check_email,
+					'np' => $fn_set_new_password,
+					'td' => $fn_today_date,
+					'ac' => $fn_new_act_key,
+				));
+				
+				//mail al cliente con contraseña y activación
+				if($fn_q)
+				{
+					//metas
+					$db->Fetch("
+						INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`)
+						VALUES (:uid, 'user_level', '15');
+					", array(
+						'uid' => $fn_q
+					));
+					
+					$fn_to = $fn_f_check_email;
+					$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_new_client');
+					
+					$fn_html_p = getLangItem('mail_new_client_html');
+					$fn_mail_html = $CONFIG['templates']['standartEmail'];
+					
+					$fn_mail_html = str_replace(array(
+						'%message%',
+						'%regards%', 
+						'%site_name%', 
+						'%copyz%',
+						'%site_dir%', 
+						'%site_logo%',
+						'%site_link%',
+						'%user_name%',
+						'%user_pass%',
+					), array(
+						$fn_html_p,
+						getLangItem('mail_regards'),
+						$CONFIG['site']['sitetitlefull'],
+						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
+						"Client ID: <strong>{$fn_set_new_name_user}</strong>",
+						"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['n_email']}\" alt=\"logotype\" />",
+						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
+						$fn_inputs['n_email'],
+						$fn_set_new_password,
+					), $fn_mail_html);
+					
+					$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
+					
+					//envio del mail
+					@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
+					
+					exit(json_encode(array(
+						'status' => 200,
+						'message' => getLangItem('msg_new_client_mail_sended'),
+					)));
+				}else{
+					exit(json_encode(array(
+						'status' => 400,
+						'message' => getLangItem('msg_new_client_create_error'),
+					)));
+				}
+				
+			}
+		break;
+		
+		//modificacion de datos personales del usuario
+		case "clientPersonalData":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			//array(1) { ["data"]=> string(44) "u_name=test&u_surname=123&u_idd=123&u_tel=13" }
+			parse_str($fn_p['data'], $fn_inputs);
+			
+			$fn_login_user_data = $too_login->getUserData();
+			$fn_user_id = ($fn_login_user_data->ID !== '1') ? $fn_login_user_data->ID : exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_client_persdata_no_updated'),
+			)));
+			
+			$fn_json_data = json_encode($fn_inputs);
+			
+			dm_nsw($CONFIG['site']['dm_nws'], $fn_login_user_data->user_email, "{$fn_inputs['u_name']} {$fn_inputs['u_surname']}", $fn_inputs['u_tel']);
+			
+			//save
+			$fn_q = $db->Fetch("
+				INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+				VALUES (:uid, 'user_pers_data', :jd) 
+				ON DUPLICATE KEY UPDATE `meta_value`=:jdd;
+			", array(
+				'uid' => $fn_user_id,
+				'jd' => $fn_json_data,
+				'jdd' => $fn_json_data,
+			));
+			
+			if($fn_q)
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => getLangItem('msg_client_persdata_updated'),
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('msg_client_persdata_no_updated'),
+				)));
+			}
+		break;
+		
+		//cliente manage directions
+		case "submitNewDirection":
+		case "getDirection":
+		case "addDirection":
+		case "delDirection":
+		case "stDirectionDefault":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			if(!preg_match('/(getDirection|submitNewDirection)/', $fn_ajax) && !isset($fn_p['dir_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			$fn_login_user_data = $too_login->getUserData();
+			
+			//get user_dirs
+			$fn_q_meta_dirs = $db->FetchValue("
+				SELECT `meta_value`
+				FROM `users_meta`
+				WHERE `user_id`=:uid
+				AND `meta_key`='user_dirs'
+				LIMIT 1;
+			", array(
+				'uid' => $fn_login_user_data->ID,
+			));
+			
+			$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs) : array();
+			
+			$fn_data_out = array();
+			$fn_data_out['lang'] = array(
+				'lang_label_dir' => getLangItem('lang_label_dir'),
+				'lang_label_region' => getLangItem('lang_label_region'),
+				'lang_label_city' => getLangItem('lang_label_city'),
+				'lang_label_region' => getLangItem('lang_label_region'),
+				'lang_label_post' => getLangItem('lang_label_post'),
+				'lang_label_country' => getLangItem('lang_label_country'),
+				'form_update_but' => getLangItem('form_update_but'),
+				'form_del_but' => getLangItem('form_del_but'),
+				'form_set_default_but' => getLangItem('form_set_default_but'),
+				'form_save_but' => getLangItem('form_save_but'),
+				'form_misdirecciones_name' => getLangItem('form_misdirecciones_name'),
+			);
+			
+			$ifSave = false;
+			
+			switch($fn_ajax)
+			{
+				case "submitNewDirection":
+					//array(1) { ["data"]=> string(96) "dir_name=test&dir_primary=&dir_secundary=&dir_city=&dir_region=&dir_post=&dir_country=am&dir_id=" }
+					parse_str($fn_p['data'], $fn_inputs);
+					
+					if(isset($fn_inputs['dir_up']) && $fn_inputs['dir_up'])
+					{
+						//modif
+						$fn_edit_id = $fn_inputs['dir_id'];
+						if(!isset($fn_inputs['dir_id'])) unset($fn_inputs['dir_id']);
+						
+						foreach($fn_dir_data as $dk => $dv)
+						{
+							$fn_id = ($dv->dir_id == 0) ? '0' : $dv->dir_id;
+							
+							if($fn_id == $fn_edit_id)
+							{
+								$fn_inp_con = array();
+								
+								foreach($fn_inputs as $ik => $iv)
+								{
+									$fn_inp_con[$ik] = htmlentities($iv);
+								}
+								
+								$fn_inputs['dir_id'] = $fn_edit_id;
+								$fn_dir_data[$dk] = $fn_inp_con;
+							}
+						}
+					}else{
+						//add new
+						//unset($fn_inputs['dir_id']);
+						$fn_inputs['dir_id'] = count($fn_dir_data);
+						
+						$fn_inp_con = array();
+						
+						foreach($fn_inputs as $ik => $iv)
+						{
+							$fn_inp_con[$ik] = htmlentities($iv);
+						}
+						
+						//ponemos el primer item como default
+						if(count($fn_dir_data) == 0) $fn_inp_con['dir_default'] = 1;
+						
+						$fn_dir_data[] = $fn_inp_con;
+					}
+					
+					$fn_data_out['dir'] = $fn_inputs;
+					$ifSave = true;
+				break;
+				
+				case "getDirection":
+					$fn_q_contries = $db->FetchAll("
+						SELECT `country_code` AS 'c', `country_name` AS 'n'
+						FROM `apps_countries`
+						WHERE `active`='1';
+					");
+					
+					if($fn_q_contries) foreach($fn_q_contries as $ck => $cv)
+					{
+						$fn_data_out['countries'][] = array(
+							'c' => strtolower($cv->c),
+							'n' => $cv->n,
+						);
+					}
+					
+					if(isset($fn_p['dir_id'])) foreach($fn_dir_data as $dk => $dv)
+					{
+						if($dv->dir_id == $fn_p['dir_id']) $fn_data_out['dir'] = object_to_array($dv);
+					}
+					
+					$fn_q = true;
+				break;
+				
+				case "delDirection":
+					$fn_data_mod = array();
+				
+					//borramos direccion
+					foreach($fn_dir_data as $dk => $dv)
+					{
+						if($dv->dir_id == $fn_p['dir_id']) continue;
+						$fn_data_mod[] = $dv;
+					}
+					
+					$fn_dir_data = $fn_data_mod;
+					$ifSave = true;
+				break;
+				
+				case "stDirectionDefault":
+				case "addDirection":
+					//desmarcamos otros defaults y dejamos este como principal
+					if(count($fn_dir_data) !== 0) foreach($fn_dir_data as $dk => $dv)
+					{
+						if($dv->dir_id == $fn_p['dir_id'])
+						{
+							$fn_dir_data[$dk]->dir_default = 1;
+						}else{
+							if(isset($fn_dir_data[$dk]->dir_default)) unset($fn_dir_data[$dk]->dir_default);
+						}
+					}
+					
+					$ifSave = true;
+				break;
+			}
+			
+			if($ifSave)
+			{
+				$fn_dir_data = json_encode($fn_dir_data);
+				
+				//save
+				$fn_q = $db->Fetch("
+					INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+					VALUES (:uid, 'user_dirs', :iv) 
+					ON DUPLICATE KEY UPDATE `meta_value`=:ivv;
+				", array(
+					'uid' => $fn_login_user_data->ID,
+					'iv' => $fn_dir_data,
+					'ivv' => $fn_dir_data,
+				));
+			}
+			
+			if($fn_q)
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => 'Dirección establecida',
+					'data' => $fn_data_out,
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => 'No he podido actualizar nada :(',
+				)));
+			}
+		break;
+		
+		case "openCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+				
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('cart_generado'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('cart_error_generar'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+
+		case "addCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			//'data' => string 'product_id=2&category_id=1' (length=26)
+			parse_str($fn_p['data'], $fn_inputs);
+			
+			//si no esta la session iniciada la iniciamos
+			if(!isset($_SESSION)) session_start();
+			
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+			}
+			
+			if(!is_numeric($fn_inputs['product_id']) || !is_numeric($fn_inputs['category_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_error_param'),
+			)));
+			
+			$fn_var = '';
+			$fn_isVars = false;
+			
+			$fn_q_check_stock_array = array(
+				'pid' => $fn_inputs['product_id'],
+			);
+			
+			$fn_p_c = (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : 12;
+			$fn_p_s = (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : 8;
+			
+			
+			if((isset($fn_inputs['product_var_size']) && is_numeric($fn_inputs['product_var_size'])) && (isset($fn_inputs['product_var_color']) && is_numeric($fn_inputs['product_var_color'])))
+			{
+				$fn_var = "AND `size_id`=:s AND `color_id`=:c";
+				
+				$fn_q_check_stock_array['s'] = $fn_p_s;
+				$fn_q_check_stock_array['c'] = $fn_p_c;
+				
+				$fn_isVars = true;
+			}
+			
+			//id del producto en el carrito
+			$fn_pr_cart_id = md5("{$fn_inputs['product_id']}{$fn_p_s}{$fn_p_c}");
+			
+			//añadimos al carrito
+			$fn_q_check_stock = $db->FetchArray("
+				SELECT `stock_count`, `size_id`, `color_id`
+				FROM `product_stock` 
+				WHERE `prid`=:pid
+				{$fn_var}
+				LIMIT 1;
+			", $fn_q_check_stock_array);
+			
+			$fn_updated = false;
+
+			//vacio añadimos uno nuevo
+			if(!isset($_SESSION['cart']) && $fn_q_check_stock >= 1)
+			{
+				$fn_updated = true;
+				
+				$_SESSION['cart'][$fn_pr_cart_id] = array(
+					'cat_id' => $fn_inputs['category_id'],
+					'p_id' => $fn_inputs['product_id'],
+					's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
+					'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+					'pax' => '1',
+				);
+			}
+			
+			//añadimos a la lista
+			if(isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0 && !$fn_updated)
+			{
+				//existe sumamos un pax
+				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
+				{
+					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
+					
+					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
+				}else{
+					$_SESSION['cart'][$fn_pr_cart_id] = array(
+						'cat_id' => $fn_inputs['category_id'],
+						'p_id' => $fn_inputs['product_id'],
+						's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
+						'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+						'pax' => '1',
+					);
+				}
+			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('add_item_cart'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('add_item_cart_error'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+
+		case "delCart":
+		case "reloadItemsCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			//'p_id':dom_pid,'cat_id':dom_cat_id,'pax':dom_pax_value
+			
+			if(!isset($fn_p['p_id']) || !isset($fn_p['cat_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!is_numeric($fn_p['p_id']) || !is_numeric($fn_p['cat_id']) || !is_numeric($fn_p['c_id']) || !is_numeric($fn_p['s_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_error_param'),
+			)));
+			
+			if($fn_ajax == 'reloadItemsCart' && !isset($fn_p['pax'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']))
+			{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			if(sizeof($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+				
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			//del cart
+			if($fn_ajax == 'delCart')
+			{
+				//id del item en el cart
+				$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
+				
+				if(sizeof($_SESSION['cart']) !== 0 && array_key_exists($fn_pr_cart_id, $_SESSION['cart'])) unset($_SESSION['cart'][$fn_pr_cart_id]);
+				if(sizeof($_SESSION['cart']) == 0)
+				{
+					unset($_SESSION['cart']);
+					
+					exit(json_encode(array(
+						'status' => 400,
+						'message' => getLangItem('cart_empty'),
+					)));
+				}
+			}
+			
+			//reloadcart
+			if($fn_ajax == 'reloadItemsCart') foreach($_SESSION['cart'] as $ck => $cv)
+			{
+				if($cv['cat_id'] == $fn_p['cat_id'] && $cv['p_id'] == $fn_p['p_id'])
+				{
+					$fn_q_check_stock = $db->FetchValue("
+						SELECT `stock_count`
+						FROM `product_stock` 
+						WHERE `prid`=:prid
+						AND `color_id`=:cid
+						AND `size_id`=:sid
+						LIMIT 1;
+					", array(
+						'prid' => $cv['p_id'],
+						'cid' => $cv['c_id'],
+						'sid' => $cv['s_id'],
+					));
+					
+					$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
+					
+					$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_p['pax'] < $fn_q_check_stock) ? $fn_p['pax'] : $fn_q_check_stock;
+				}
+			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+						
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('add_item_cart'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('add_item_cart_error'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+
+		case "stShippingReloadCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['t_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']))
+			{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			if(sizeof($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+				
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			
+			/*
+				array (size=1)
+			  't_id' => string '9' (length=1)
+			*/
+			
+			$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_p['t_id'];
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => 'Recalculado',
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Hay algún error al calcular la tarifa',
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+			
+		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
+//------->		
 		
 		/* ------------------------------------------------------------------------------------------------ */
 		

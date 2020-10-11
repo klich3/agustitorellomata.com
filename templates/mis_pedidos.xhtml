@@ -1,0 +1,54 @@
+<!-- BEGIN: mis_pedidos -->
+<div class="center-container mt-1 mb-1">
+	<div class="cp-5 pb-3">
+		
+		<div class="w-1-1 mt-2">&nbsp;</div>
+		
+		<div class="g">
+			
+			<!-- BEGIN: no_pedidos -->
+			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+				<div class="w-1-1">
+					{msg_no_hay_pedidos}
+				</div>
+				
+				<div class="w-1-1 mt-1">
+					<a href="{base}{user_lang}/tienda" class="button" data-event="order/tienda">{but_ir_a_la_tienda}</a>
+				</div>
+			</div>
+			<!-- END: no_pedidos -->
+			
+			<!-- BEGIN: pedidos -->
+			<div class="w-1-1">
+				<div class="hs">
+					<ul class="g gw-1-6 ln w-1-1">
+						<li class="tc tu">{checkout_pedido_title}</li>
+						<li class="tc tu">{order_date}</li>
+						<li class="tc tu">{order_pago}</li>
+						<li class="tc tu">{order_estado}</li>
+						<li class="tc tu">{order_tracking_num}</li>
+						<li class="tc tu">{order_actions}</li>
+					</ul>
+				</div>
+				<div class="w-1-1 mb-1 hs">&nbsp;</div>
+				
+				<ul class="g gw-1-3 gwm-1-6 gwl-1-6 gwxl-1-6 ln w-1-1 gp">
+					<!-- BEGIN: row -->
+					<li class="tc">{order_id}</li>	
+					<li class="tc">{date}</li>	
+					<li class="tc">{payment_status}</li>	
+					<li class="tc">{entrega_status}</li>	
+					<li class="tc">{num_seg}</li>	
+					<li class="tc">
+						<a href="{base}{user_lang}/mis-pedidos/{order_id}" rel="nofollow" data-event="order/details">{order_show_details}</a>
+						<div class="w-1-1 pb-5 hl clearfix">&nbsp;</div>
+					</li>
+					<!-- END: row -->
+				</ul>			
+				<!-- END: pedidos -->
+			</div>
+		</div>
+		
+	</div>
+</div>
+<!-- END: mis_pedidos -->

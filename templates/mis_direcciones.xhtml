@@ -1,0 +1,59 @@
+<!-- BEGIN: mis_direcciones -->
+<div class="center-container mt-3 mb-3">
+	<div class="cp-5 pb-3">
+		
+		<div class="w-1-1 mt-2">&nbsp;</div>
+		
+		<div class="g">
+			
+			<div class="w-1-1">
+				<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3 sub-divider pb-1">
+					<span class="label tu vb">{misdirecciones_title}</span>
+				</div>
+				
+				<div class="w-1-1">
+					<!-- BEGIN: no_dirs -->
+					<div class="mt-1">&nbsp;</div>
+					<p>{micuenta_no_direcciones_msg}</p>
+					<!-- END: no_dirs -->
+					<div class="mb-1">&nbsp;</div>
+				</div>
+			</div>
+			
+			<div class="w-1-1">
+				<p>{misdirecciones_asegurate_mod}</p>
+				<a href="javascript:void(0);" rel="nofollow" data-action="addDirection" class="button">{add_one_but}</a>
+				<div class="pb-4">&nbsp;</div>
+				
+				<ul class="ln g gws-1-1 gwm-1-3 gwl-1-3 gwxl-1-3" data-list-container>
+					<!-- BEGIN: dirs_row -->
+					<li class="{selected}" data-id="{dir_id}">
+						<div class="box w-1-1 mb-4">
+							<strong>{dir_name}</strong><br/>
+					
+							<strong>{lang_label_dir}:</strong> {dir_primary}<br/>
+							<strong>{lang_label_region} 2:</strong> {dir_secundary}<br/>
+							<strong>{lang_label_city}:</strong> {dir_city}<br/>
+							<strong>{lang_label_region}:</strong> {dir_region}<br/>
+							<strong>{lang_label_post}:</strong> {dir_post}<br/>
+							<strong>{lang_label_country}:</strong> ({dir_country}) {dir_country_name}<br/>
+						</div>
+						<div class="w-1-1">
+							<a href="javascript:void(0);" data-action="editDirection" class="button">{form_update_but} <svg class="ml-2" width="15" height="15" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#update-icon"></use></svg></a>
+							<a href="javascript:void(0);" data-action="delDirection" class="button">{form_del_but} <svg class="ml-2" width="15" height="15" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#del-icon"></use></svg></a>
+							<a href="javascript:void(0);" data-action="stDirectionDefault" class="button">{form_set_default_but}</a>
+						</div>
+						
+						<div class="clearfix">&nbsp;</div>
+						<div class="w-1-1 mb-4 hl">&nbsp;</div>
+					</li>
+					<!-- END: dirs_row -->
+				</ul>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+<!-- END: mis_direcciones -->

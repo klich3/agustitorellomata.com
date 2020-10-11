@@ -1,75 +1,81 @@
 <!-- BEGIN: login -->
-{FILE {pagefreaturedImageTmpl}}
-
-<div class="w-1-1" data-cc-container>
-	<div class="c cc cp-4@s">
+<div class="center-container mt-1 mb-1">
+	<div class="cp-5 pb-3">
+		
 		<div class="g">
 			
-			<div class="w-1-1 mt-4">&nbsp;</div>
+			<div class="hl w-1-1 mt-2">&nbsp;</div>
 			
-			<div class="w-1-2">
-				<form data-type="user">
-					<div class="w-1-1 pb-2 border@b">
-						<svg class="mr-3" width="45" height="32" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-user-plus"></use></svg> <span class="header-title">{lang_new_user}</span>
-					</div>
-					
-					<div class="w-1-1 mt-6">
-						<span class="font@ctsi">{lang_new_user_email}</span>
-					</div>
-					
-					<div class="w-1-1 mt-3">
-						<input type="text" name="" class="w-6-10" />
-					</div>					
-					
-					<div class="w-1-1 pt-3"></div>
-					
-					<div class="w-1-1 mt-3">
-						<a href="javascript:void(0);" class="button" data-action="regUser">{lang_new_user_createbutton}</a>
-					</div>
-					
-					<div class="mt-3 message h" data-message></div>
-				</form>
+			<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2">
+				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 sub-divider pb-2">
+					<svg width="46" height="41" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user-add"></use></svg> <span class="label tu vb">{login_new_user_title}</span>
+				</div>
+				
+				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 mt-4 sub-divider">
+					<form autocomplete="off">
+						<fieldset>
+							<label for="n_email">{label_new_user_email}</label>
+						</fieldset>
+						
+						<fieldset>
+							<input type="text" name="n_email" value="" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10"/>
+						</fieldset>
+						
+						<fieldset>
+							<a href="javascript:void(0);" data-action="newClient" class="button" data-event="login/registrar"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {new_user_but}</a>
+						</fieldset>
+						
+						<fieldset data-message>
+						</fieldset>
+					</form>
+				</div>
 			</div>
 			
-			<div class="w-1-1 hl mt-3">&nbsp;</div>
+			<div class="hl w-1-1 pt-1 mb-2">&nbsp;</div>
 			
-			<div class="w-1-2">
-				<form data-type="user" autocomplete="off">
-					<div class="w-1-1 pb-2 border@b">
-						<svg class="mr-3" width="45" height="32" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-user"></use></svg> <span class="header-title">{lang_registred_user_title}</span>
-					</div>
-					
-					<div class="w-1-1 mt-6">
-						<span class="font@ctsi">{lang_form_email}</span><br/>
-					</div>
-					
-					<div class="w-1-1 mt-3">
-						<input type="text" name="" class="w-6-10" />
-					</div>
-					
-					<div class="w-1-1 mt-3">
-						<span class="font@ctsi">{lang_form_pass}</span><br/>
-					</div>
-					<div class="w-1-1 mt-3">
-						<input type="text" name="" class="w-6-10" />
-					</div>
-					
-					<div class="w-1-1 mt-6">
-						<a href="{base_script}{user_lang}/recuperacion-de-contrasena" class="font@ctsi">{lang_recover_pass}</span>
-					</div>
-					
-					<div class="w-1-1 pt-3"></div>
-					
-					<div class="w-1-1 mt-3">
-						<a href="javascript:void(0);" class="button" data-action="login">{lang_login}</a>
-					</div>
-					
-					<div class="mt-3 message h" data-message></div>
-				</form>
+			<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2">
+				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 sub-divider fr pb-2">
+					<svg width="28" height="34" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use></svg> <span class="label tu vb ml-1">{login_registred_title}</span>
+				</div>
+				
+				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 mt-4 sub-divider fr">
+					<form method="post" autocomplete="off">
+						<fieldset>
+							<label for="login_email">{label_email}</label>
+						</fieldset>
+						
+						<fieldset>
+							<input type="text" name="login_email" value="" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10" required/>
+						</fieldset>
+						
+						<fieldset>
+							<label for="login_pass">{label_pass}</label>
+						</fieldset>
+						
+						<fieldset>
+							<input type="password" name="login_pass" value="" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10" required/>
+						</fieldset>
+						
+						<fieldset>
+							<a href="{base}recover-password" class="tul tu">{login_lost_pass_link}</a>
+						</fieldset>
+						
+						<fieldset>
+							<input type="hidden" name="form" value="login" />
+				    		<button type="submit" class="button" data-event="login/submit">{login_init_session_but}</button>
+						</fieldset>
+						
+						<fieldset data-message>
+							<!-- BEGIN: message -->
+							<div class="{type} w-1-1">{message}</div>
+							<!-- END: message -->
+						</fieldset>
+					</form>
+				</div>
 			</div>
 			
-			<div class="w-1-1 mb-10">&nbsp;</div>
 		</div>
+		
 	</div>
 </div>
 <!-- END: login -->

@@ -1,0 +1,272 @@
+<!-- BEGIN: checkout -->
+<div class="center-container mt-1 mb-1">
+	<div class="cp-5 pb-3">
+		
+		<div class="w-1-1 mt-3 hl">&nbsp;</div>
+		
+		<div class="g">
+			
+			<!-- BEGIN: no_cart -->
+			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+				<div class="w-1-1">
+					{message}
+				</div>
+				
+				<div class="w-1-1 mt-2">
+					<a href="{base}{user_lang}/tienda" class="button" data-event="checkout/tienda">{but_ir_a_la_tienda}</a>
+				</div>
+			</div>
+			<!-- END: no_cart -->
+			
+			<!-- BEGIN: cart -->
+			<div class="w-1-1">
+				<form>
+					<div class="g">
+						<!-- BEGIN: nologged -->
+						<div class="w-1-1 pb-1">
+							<p>{msg_no_logged}</p>
+							
+							<div class="w-1-1 pt-1">&nbsp;</div>
+							
+							<a href="{base}{user_lang}/login" class="button tu" data-event="checkout/login">{menu_but_login}</a>
+							<!-- BEGIN: hide -->
+							<a href="{base}{user_lang}/login" class="button tu" data-event="checkout/registro">{menu_but_register}</a>
+							<!-- END: hide -->
+						</div>
+						
+						<div class="mt-2 w-1-1">&nbsp;</div>
+						<!-- END: nologged -->
+						
+						<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3 side">
+							<div class="tu sub-divider mb-3">{checkout_title_adress_book}</div>
+							
+							<!-- BEGIN: hide -->
+							<p>{msg_checkout_nodir}</p>
+							<a href="{base}{user_lang}/mis-direcciones" class="button tu" data-event="checkout/mis-direcciones">{menu_but_misdirecciones}</a>
+							<!-- END: hide -->
+							
+							<div class="box w-1-1 mb-4">
+								
+								<div class="w-1-1 mt-4">
+									<label for="u_email">Email *</label>
+									<input type="text" name="u_email" value="{u_email}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<label for="u_name">{form_name} *</label>
+									<input type="text" name="u_name" value="{u_name}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<label for="u_surname">{form_surname} *</label>
+									<input type="text" name="u_surname" value="{u_surname}" class="w-1-1" required/>
+								</div>
+						
+								<div class="w-1-1 mt-4">
+									<label for="u_idd">{form_cif}</label>
+									<input type="text" name="u_idd" value="{u_idd}" class="w-1-1"/>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<label for="u_tel">{form_tel}</label>
+									<input type="text" name="u_tel" value="{u_tel}" class="w-1-1"/>
+								</div>
+								
+								<hr/>
+								
+								<div class="w-1-1 mt-4">
+									<label for="dir_primary">{lang_label_dir} *</label>
+									<input type="text" name="dir_primary" value="{dir_primary}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">								
+									<label for="dir_secundary">{lang_label_dir} 2</label>
+									<input type="text" name="dir_secundary" value="{dir_secundary}" class="w-1-1"/>
+								</div>
+								
+								<div class="w-1-1 mt-4">								
+									<label for="dir_city">{lang_label_city} *</label>
+									<input type="text" name="dir_city" value="{dir_city}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">								
+									<label for="dir_region">{lang_label_region} *</label>
+									<input type="text" name="dir_region" value="{dir_region}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">								
+									<label for="dir_post">{lang_label_post} *</label>
+									<input type="text" name="dir_post" value="{dir_post}" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">							
+									<label for="dir_country">{lang_label_country} *</label>
+									<select name="dir_country" class="w-1-1" required>
+										<!-- BEGIN: contry_list_row -->
+										<option value="{c}" {selected}>{n}</option>
+										<!-- END: contry_list_row -->
+									</select>
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="w-1-1 mt-3 hl">&nbsp;</div>
+						
+						<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+							<div class="tu sub-divider mb-3">{checkout_pago_title}</div>
+							
+							<div class="w-1-1">
+								<div class="w-1-1 mt-4">
+									<!-- BEGIN: no_payment_actived -->
+									{no_payment_actived_message}
+									<!-- END: no_payment_actived -->
+									
+									<ul class="ln g gw-1-1">
+										<!-- BEGIN: pay_rd --><li><input type="radio" name="p_pay_type" value="rd" required/> <span class="ml-2">{creditcard}</span></li><!-- END: pay_rd -->
+										<!-- BEGIN: pay_pp --><li><input type="radio" name="p_pay_type" value="pp" required/> <span class="ml-2">PayPal</span></li><!-- END: pay_pp -->
+									</ul>
+								</div>
+								
+								<!-- BEGIN: hide -->
+								<div class="w-1-1 mt-4">
+									<label for="p_name"> {form_name}</label>
+									<input type="text" name="p_name" value="" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<label for="p_vnum"> {form_num_visa}</label>
+									<input type="text" name="p_vnum" value="" class="w-1-1" required/>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<span class="tu">{form_card_expire}</span><br/>
+									<div class="g">
+										<div class="w-1-2 ws-1-2 wm-1-3 wl-1-3 wxl-1-3">
+											<select name="p_month" class="w-1-1" required>
+												<option value="">{form_month}</option>
+												<option value="01">1</option>
+												<option value="02">2</option>
+												<option value="03">3</option>
+												<option value="04">4</option>
+												<option value="05">5</option>
+												<option value="06">6</option>
+												<option value="07">7</option>
+												<option value="08">8</option>
+												<option value="09">9</option>
+												<option value="10">10</option>
+												<option value="11">11</option>
+												<option value="12">12</option>
+											</select>
+										</div>
+										<div class="w-1-2 ws-1-2 wm-1-3 wl-1-3 wxl-1-3">
+											<select name="p_year" class="w-1-1" required>
+												<option value="">{form_year}</option>
+												<!-- BEGIN: year_row -->
+												<option value="{val}">{val}</option>
+												<!-- END: year_row -->
+											</select>
+										</div>
+										<div class="w-1-3">&nbsp;</div>
+									</div>
+								</div>
+								
+								<div class="w-1-1 mt-4">
+									<label for="p_ccv">{form_card_ccv}</label><br/>
+									<input type="number" min="0" name="p_ccv" value="" class="w-1-2" required/>
+								</div>
+								<!-- END: hide -->
+							</div>
+						</div>
+						
+						<div class="w-1-1 mt-3 hl">&nbsp;</div>
+						
+						<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+							<div class="tu sub-divider mb-3">{checkout_pedido_title}</div>
+							<!-- BEGIN: no_cart -->
+							<p>{msg_cart_no_hay_compras}</p>
+							<div class="w-1-1 pt-3">&nbsp;</div>
+							<a href="{base}{user_lang}/tienda" class="button" data-event="checkout/tienda">{but_ir_a_la_tienda}</a>
+							<!-- END: no_cart -->
+							
+							<!-- BEGIN: cart -->
+							<div class="g gc">
+								<div class="w-1-3 tu tl">{lang_cart_producto_title}</div>
+								<div class="w-1-3 tu tc">{lang_cart_cantidad_title}</div>
+								<div class="w-1-3 tu tr">total</div>
+							</div>
+							
+							<div class="w-1-1 mt-1">&nbsp;</div>
+							
+								<!-- BEGIN: cart_row -->
+								<div class="g gc">
+									<div class="w-1-3 tu tl">
+										<img src="{base}images/blank.gif" data-image="{thumb}" data-preloadimages class="e" title="product {title} image preview" />
+									</div>
+									<div class="w-1-3 tu tc">{pax}</div>
+									<div class="w-1-3 tu tr">{price}&euro;</div>
+								</div>
+								<!-- END: cart_row -->
+							
+							<div class="w-1-1 mt-2 sub-divider">&nbsp;</div>
+							
+							<div class="w-1-1 mt-1">
+								<div class="g gc">
+								
+									<div class="w-1-2 tu tr">{lang_iva} ({cart_iva_percent}%)</div>
+									<div class="w-1-2 tu tr">{cart_iva}&euro;</div>
+									
+									<div class="w-1-2 tu tr">subtotal</div>
+									<div class="w-1-2 tu tr">{cart_subtotal}&euro;</div>
+									
+									<div class="w-1-2 tu tr">{lang_envio}</div>
+									<div class="w-1-2 tu tr">{cart_shipping_included}<!-- BEGIN: hide -->{cart_shipping_cost}&euro;<!-- END: hide --></div>
+									
+									<div class="w-1-2 tu tr">total</div>
+									<div class="w-1-2 tu tr">{cart_total}&euro;</div>
+								
+								</div>
+							</div>
+							
+							<div class="w-1-1">
+								<div class="tu sub-divider mb-3 mt-8">{lang_cart_promote_code}</div>
+								<input type="text" name="p_promote" value="" class="w-1-1"/>							
+							</div>
+							
+							<div class="w-1-1" data-promote-msg>
+							</div>
+							
+							<div class="w-1-1">
+								<!-- BEGIN: pay_button -->
+								<div class="w-1-1 mt-2">&nbsp;</div>
+								
+								<input type="checkbox" name="p_agree" value="1" required/> <a href="{base}{user_lang}/terminos-y-condiciones" class="tu" data-event="checkout/terminos">{checkout_agree_checkbox}</a>
+								
+								<div class="w-1-1 mt-4">&nbsp;</div>
+								
+								<button data-pay disabled class="fr" data-event="checkout/pay"><span class="h pr-4"><img src="{base}images/preloader-gray-small.gif" /></span> {checkout_finalizar_but}</button>
+								<!-- END: pay_button -->
+							</div>
+							
+							<div class="clearfix">&nbsp;</div>
+							
+							<div class="w-1-1 pt-5" data-message></div>
+							<!-- END: cart -->
+						</div>
+						
+					</div>
+				</form>
+			</div>
+			<!-- END: cart -->
+		</div>
+		
+		<div class="w-1-1 mt-3 hl">&nbsp;</div>
+		
+	</div>
+</div>
+<!-- BEGIN: h -->
+<div class="mb-2">
+	{FILE {productos_destacados_footer}}
+</div>
+<!-- END: h -->
+<!-- END: checkout -->
