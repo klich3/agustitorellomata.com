@@ -558,6 +558,12 @@ video {
     width: 100%;
 }
 
+button.button {
+	-webkit-appearance: none;
+	border: none;
+	line-height: 20px;
+}
+
 .button {
 	display: inline-block;
 	width: auto;
