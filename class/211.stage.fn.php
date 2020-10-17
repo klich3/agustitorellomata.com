@@ -75,6 +75,14 @@ function get_header($fn_args)
 	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.header_lang_list_mob");
 	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.header_lang_list");
 	
+	//header logged / not
+	if(class_exists('tooLogin') && $too_login->isLogged() == 200)
+	{
+		$b->parse("{$tmpl_header}.header_logged");
+	}else{
+		$b->parse("{$tmpl_header}.login_but_not_logged");
+	}
+	
 	//widgets load template
 	if(isset($fn_args['plugins_templates']) && sizeof($fn_args['plugins_templates']) !== 0)
 	{
@@ -89,9 +97,8 @@ function get_header($fn_args)
 			if(isset($fn_header_parser) && $fn_header_parser['assign'] && $fn_header_parser['parse']) pageBParser($b, $fn_header_parser);
 		}
 	}
-	//widgets
-	
-	//logged header
+		
+	//logged header (admin side)
 	if($tmpl_header == 'admin_header')
 	{
 		if(class_exists('tooLogin'))
@@ -236,7 +243,7 @@ function page($fn_id, $fn_args = null)
 	{
 		foreach($fn_plugins_folders as $pk => $pv)
 		{
-			if(!preg_match('/admin/', $pv) && file_exists("{$CONFIG['site']['pluginspath']}{$pv}/{$pv}.xhtml")) $fn_plugin_template_files[$pv] = "{$CONFIG['site']['pluginspath']}{$pv}/{$pv}";
+			if(file_exists("{$CONFIG['site']['pluginspath']}{$pv}/{$pv}.xhtml")) $fn_plugin_template_files[$pv] = "{$CONFIG['site']['pluginspath']}{$pv}/{$pv}";
 		}
 	}
 	
@@ -290,7 +297,7 @@ function page($fn_id, $fn_args = null)
 	if(isset($fn_plugin_template_files) && sizeof($fn_plugin_template_files) !== 0)
 	{
 		$fn_page_args['stage_id'] = $fn_id;
-		
+			
 		foreach($fn_plugin_template_files as $tpk => $tpv)
 		{
 			$fn_page_parser = false;

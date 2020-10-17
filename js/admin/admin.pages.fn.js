@@ -876,7 +876,6 @@ $(function()
 			
 		if(debug) console.log("[>] e_action_handler");
 		
-		
 		if(dom_type == 'clonePage') dom_data_ser = null;
 		if(dom_type == 'delRelPage') dom_data_ser = null;
 		if(dom_type == 'addRelPage')
@@ -918,10 +917,13 @@ $(function()
 					var cloneTableRow = ele.parents('[data-id]').clone();
 					cloneTableRow.attr('data-id', d.data.id);
 					cloneTableRow.find('td:eq(1)').html(d.data.title+'<br/> Url: (<i class="uk-text-small">'+d.data.hash+'</i>)');
+					cloneTableRow.find('a[href^="editPage"]').attr('href', '/admin-paginas?action=editPage&id='+d.data.id);
+					cloneTableRow.find('a[href*="action=editPage"]').attr('href', '/admin-paginas?action=editPage&id='+d.data.id);
 					
 					ele.parents('table').find('tbody').append(cloneTableRow);
 				}
 				
+				if(dom_type == 'delPage' && /action\=editPage/gim.test(window.location.href)) window.location.href = window.location.pathname;
 				if(dom_type == 'delPage') ele.parents('[data-id]').remove();
 				if(dom_type == 'delRelPage') ele.parents('[data-id="'+dom_id+'"]').remove();
 				if(dom_type == 'addRelPage') $.tmpl('relItem', d).appendTo('[data-rel-container]');

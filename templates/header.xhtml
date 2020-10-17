@@ -4,9 +4,17 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-	<!-- BEGIN: only_home --><meta name="description" content="{description}">
+	<!-- BEGIN: only_home -->
+	<meta name="description" content="{description}">
 	<meta name="keywords" content="{keywords}">
-	<meta name="ROBOTS" content="INDEX, FOLLOW" /><!-- END: only_home -->
+	<meta name="ROBOTS" content="INDEX, FOLLOW" />
+	
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.mp4">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.hd.webm">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.ogv">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmhd.webm">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmsd.webm">
+	<!-- END: only_home -->
 	{FILE {header_seo}}
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -22,11 +30,7 @@
 	<link rel="shortcut icon" type="image/x-icon" href="{base}images/favicon.ico" />
 	<link rel="apple-touch-icon" type="image/png" href="{base}images/favicon.png" />
 	
-	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.mp4">
-	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.hd.webm">
-	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.ogv">
-	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmhd.webm">
-	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmsd.webm">
+	
 	
 	<script type="text/javascript">
 		var fn_base_script = '{base_script}',
@@ -51,6 +55,25 @@
 {FILE "templates/_header_svg.xhtml"}
 
 <div class="wrap">
+	<!-- BEGIN: header_logged -->
+	<div class="header-logged">
+		<div class="flx@fd-r@jc-fe@ai-c@ac-c@s-jc-sb h-100 items">
+			<div>
+				<a href="{base_script}{user_lang}/mi-cuenta">
+					<img src="{base_script}images/user-icon-b.svg" width="30px" height="30px" alt="mi-cuenta" class="pr-2" /> <span class="pt-1">{but_mi_cuenta}</span></a>
+			</div>
+			<div class="sep"></div>
+			<div>
+				<a href="javascript:void(0);"><img src="{base_script}images/cart.svg" width="25px" height="22px" alt="cart"/></a>
+			</div>
+			<div class="sep"></div>
+			<div>
+				<a href="{base_script}{user_lang}/logout">{but_logout}</a>
+			</div>
+		</div>
+	</div>
+	<!-- END: header_logged -->
+	
 	<header class="cp-1 cp-n@s">
 		<div class="hl">
 			<div class="pr-2">
@@ -72,11 +95,9 @@
 					</div>
 					<!-- END: header_lang_list_mob -->
 					
-					<!--//
 					<div class="h-100">
-						<img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" />
+						<a href="{base_script}{user_lang}/mi-cuenta"><img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" /></a>
 					</div>
-					//-->
 				</div>
 			</div>
 			
@@ -130,6 +151,13 @@
 						<nav class="pt-3">
 							<ul class="ln flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="menu">
 								{FILE {headerMenuTmpl}}
+								<!-- BEGIN: login_but_not_logged -->
+								<li>
+									<a href="{base_script}{user_lang}/mi-cuenta" class="login">
+										<img src="{base}images/user-icon.svg" width="25px" height="25px" alt="user" class="pr-2" /> {but_login}
+									</a>
+								</li>
+								<!-- END: login_but_not_logged -->
 							</ul>
 						</nav>
 					</div>

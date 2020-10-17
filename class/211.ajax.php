@@ -1479,7 +1479,206 @@ if($fn_ajax !== null)
 			
 			exit(json_encode($fn_result));
 		break;
+		
+		//cliente send request to recover pass
+		case "recPass":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+						
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+		
+			$fn_q = $db->FetchObject("
+				SELECT `ID`, `user_email`, `user_name`
+				FROM `users`
+				WHERE `user_email`=:e
+				LIMIT 1;
+			", array(
+				"e" => $fn_inputs['email']
+			));
 			
+			if(!$fn_q)
+			{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Error no exists',
+				);
+			}else{
+				//set new key
+				$fn_activation_key = md5(microtime());
+				
+				$db->Fetch("
+					UPDATE `users`
+					SET `user_activation_key`=:key
+					WHERE `ID`=:id
+					LIMIT 1;
+				", array(
+					"id" => $fn_q->ID,
+					"key" => $fn_activation_key,
+				));
+				
+				$fn_user_metas = $db->FetchValue("
+					SELECT `meta_value`
+					FROM `users_meta`
+					WHERE `meta_key`='user_pers_data'
+					AND `user_id`=:id
+					LIMIT 1;
+				", array(
+					"id" => $fn_q->ID
+				));
+				
+				if($fn_user_metas && isJson($fn_user_metas)) $fn_user_metas = json_decode($fn_user_metas, true);
+				
+				//send mail
+				$fn_to = $fn_inputs['email'];
+				$fn_subject = getLangItem('mail_recpassword');
+				
+				$fn_def_lang = $CONFIG['site']['defaultLang'];
+				
+				$fn_html_p = $lang_items[$fn_def_lang]['mail_recpassword_html'];
+				$fn_mail_html = $CONFIG['templates']['standartEmail'];
+				
+				$fn_html_p = str_replace(array(
+					"%first_name%",
+					"%user_name%",
+					"%site_link%"
+				), array(
+					($fn_user_metas) ? $fn_user_metas['u_name'] : getLangItem("mail_cliente"),
+					$fn_q->user_name,
+					"{$CONFIG['site']['base']}{$st_lang}/nueva-contrasena?activation_key={$fn_activation_key}"
+				), $fn_html_p);
+				
+				$fn_mail_html = str_replace(array(
+					'%message%',
+					'%regards%', 
+					'%site_name%', 
+					'%copyz%',
+					'%site_dir%', 
+					'%site_logo%',
+					'%site_link%',
+				), array(
+					$fn_html_p,
+					$lang_items[$fn_def_lang]['mail_regards'],
+					$CONFIG['site']['sitetitlefull'],
+					"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
+					'',
+					"",
+					"",
+				), $fn_mail_html);
+				
+				$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
+				
+				//envio del mail
+				$fn_send = @mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
+				
+				if($fn_send)
+				{
+					$fn_result = array(
+						'status' => 200,
+						'message' => 'Ordenado.',
+					);
+				}else{
+					$fn_result = array(
+						'status' => 400,
+						'message' => 'Error no exists',
+					);	
+				}
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+		
+		//asignar nueva pass al cliente
+		case "recUpPass":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			
+			if(!isset($fn_inputs['pass']) || !isset($fn_inputs['pass_repeat']) || empty($fn_inputs['pass']) || empty($fn_inputs['pass_repeat'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Empty fields',
+				'dom' => array("pass", "pass_repeat"),
+			)));
+			
+			if($fn_inputs['pass'] !== $fn_inputs['pass_repeat']) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Not Match!',
+				'dom' => array("pass", "pass_repeat"),
+			)));
+			
+			$fn_q = $db->FetchObject("
+				SELECT `ID`, `user_name`, `user_email`
+				FROM `users`
+				WHERE `user_email`=:e
+				AND `user_activation_key`=:a
+				LIMIT 1;
+			", array(
+				"e" => $fn_inputs['email'],
+				"a" => $fn_inputs['activation_key']
+			));
+			
+			if(!$fn_q)
+			{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Error no exists',
+				);
+			}else{
+				//check level
+				$fn_user_metas = $db->FetchValue("
+					SELECT `meta_value`
+					FROM `users_meta`
+					WHERE `meta_key`='user_level'
+					AND `user_id`=:id
+					LIMIT 1;
+				", array(
+					"id" => $fn_q->ID
+				));
+				
+				if($fn_user_metas && isJson($fn_user_metas)) $fn_user_metas = json_decode($fn_user_metas, true);
+				
+				if(!$fn_user_metas || $fn_user_metas > 99)
+				{
+					$fn_result = array(
+						'status' => 400,
+						'message' => 'No estas autorizado para hacer esto.',
+					);
+				}else{
+					$fn_rand_key = md5(microtime());
+					$fn_up = $db->Fetch("
+						UPDATE `users`
+						SET `user_pass`=:key, `user_activation_key`=:k
+						WHERE `ID`=:id
+						AND `user_activation_key`=:a
+					", array(
+						"id" => $fn_q->ID,
+						"k" => $fn_rand_key,
+						"key" => md5("{$fn_q->user_email}~{$fn_inputs['pass']}"),
+						"a" => $fn_inputs['activation_key']
+					));
+					
+					if($fn_up)
+					{
+						$fn_result = array(
+							'status' => 200,
+							'message' => 'Contraseña cambiada',
+						);
+					}else{
+						$fn_result = array(
+							'status' => 400,
+							'message' => 'Error al cambiar contraseña',
+						);
+					}
+				}
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+		
 		/* ------------------------------------------------------------------------------------------------ */
 		
 		//PAGE MANAGE AJAX CALLS ADMIN SIDE
@@ -1654,9 +1853,11 @@ if($fn_ajax !== null)
 						", array(
 							'id' => $fn_p['id']
 						));
-						
+												
 						$fn_new_input = $getPageData[0];
-						$fn_new_input->obj_title = $fn_new_input->obj_hash = "Visita-".date('Ymd-his');
+						$fn_rand = rand(0, 999);
+						$fn_new_input->obj_title = "{$fn_new_input->obj_title}-copia-{$fn_rand}";
+						$fn_new_input->obj_hash = (preg_match("/visita/", $fn_new_input->obj_title)) ? "Visita-".date('Ymd-his') : "{$fn_new_input->obj_hash}-copia-{$fn_rand}";
 						
 						$fn_q = $db->ExecuteSQL("
 							INSERT INTO `pages` (`obj_title`, `obj_hash`, `type`, `lang`, `create_date`, `active`, `protected`)
@@ -3023,7 +3224,7 @@ if($fn_ajax !== null)
 							$CONFIG['site']['sitetitlefull'],
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
-							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_p['f_email']}\" alt=\"logotype\" />",
+							"",
 							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}\">{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}</a>", //link
 							$fn_p['f_user_name'],
 							$fn_p['f_user_pass'],
@@ -3143,21 +3344,31 @@ if($fn_ajax !== null)
 						'message' => 'No coinciden las contraseñas introducidas :(',
 					)));
 					
-					//get user name;
-					$fn_user_name = $db->FetchValue("
-						SELECT `user_name`
-						FROM `users`
-						WHERE `ID`=:id
-						LIMIT 1;
-					", array(
-						'id' => $fn_p['id'],
-					));
-					
 					if(preg_match("/Usuarios/", $fn_ajax))
 					{
+						//get user name;
+						$fn_user_name = $db->FetchValue("
+							SELECT `user_name`
+							FROM `users`
+							WHERE `ID`=:id
+							LIMIT 1;
+						", array(
+							'id' => $fn_p['id'],
+						));
+						
 						$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_inputs['f_user_pass'], $CONFIG['site']['tooSHash']) : hash_hmac('sha512', "{$fn_user_name}~{$fn_inputs['f_user_pass']}", $CONFIG['site']['tooSHash'], false);
 					}else{
-						$fn_pass = md5("{$fn_user_name}~{$fn_inputs['f_user_pass']}");
+						//get user name;
+						$fn_user_email = $db->FetchValue("
+							SELECT `user_email`
+							FROM `users`
+							WHERE `ID`=:id
+							LIMIT 1;
+						", array(
+							'id' => $fn_p['id'],
+						));
+						
+						$fn_pass = md5("{$fn_user_email}~{$fn_inputs['f_user_pass']}");
 					}
 					
 					$fn_q = $db->Fetch("
@@ -3201,7 +3412,7 @@ if($fn_ajax !== null)
 							$CONFIG['site']['sitetitlefull'],
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
-							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['f_email']}\" alt=\"logotype\" />",
+							"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
 							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta\">{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta</a>", //link
 							$fn_user_name,
 							$fn_inputs['f_user_pass'],
@@ -4157,7 +4368,7 @@ if($fn_ajax !== null)
 						$CONFIG['site']['sitetitlefull'],
 						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 						"Client ID: <strong>{$fn_client['user_name']}</strong>",
-						"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['n_email']}\" alt=\"logotype\" />",
+						"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
 						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
 						$fn_client['user_email'],
 						$fn_set_new_password,
@@ -4235,7 +4446,7 @@ if($fn_ajax !== null)
 						$CONFIG['site']['sitetitlefull'],
 						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 						"Client ID: <strong>{$fn_set_new_name_user}</strong>",
-						"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['n_email']}\" alt=\"logotype\" />",
+						"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
 						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
 						$fn_inputs['n_email'],
 						$fn_set_new_password,
