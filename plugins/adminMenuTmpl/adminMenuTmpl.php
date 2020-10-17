@@ -1,6 +1,6 @@
 <?php
 
-class WIDGET_headerMenuTmpl {
+class WIDGET_adminMenuTmpl {
 	
 	private $CONFIG;
 	private $db;
@@ -36,7 +36,20 @@ class WIDGET_headerMenuTmpl {
 	 */
 	public function wHeader($fn_args)
 	{
+		return self::$fn_xtemplate_parse;
+	}
+	
+	/**
+	 * wPage function.
+	 * 
+	 * @access public
+	 * @param mixed $fn_args
+	 * @return void
+	 */
+	public function wPage($fn_args)
+	{
 		if(empty($fn_args['url'])) return;
+		if($this->too_login->isLogged() !== 200) return;
 		
 		//hash de paginas
 		$fn_arg_url = (preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
@@ -45,7 +58,7 @@ class WIDGET_headerMenuTmpl {
 		if(preg_match('/admin/', $fn_arg_url)) return;
 		
 		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
-		
+				
 		$fn_q_menus = $this->db->FetchArray("
 			SELECT m.*
 			FROM `menus_types` t 
@@ -53,7 +66,7 @@ class WIDGET_headerMenuTmpl {
 			WHERE t.`id`=:id
 			LIMIT 1;
 		", array(
-			'id' => '1',
+			'id' => '4',
 		));
 		
 		$fn_count_w = 0;
@@ -81,73 +94,18 @@ class WIDGET_headerMenuTmpl {
 			if($fn_q_structures)
 			{
 				$fn_menu_tree = menu_proccess_object($fn_q_structures);
-				
 				$fn_totla_mv = sizeof($fn_menu_tree);
 				
 				foreach($fn_menu_tree as $mk => $mv)
 				{
-					//level 1 -----------------------------------------------------------------
-					if(isset($mv['sublevel']))
-					{
-						$fn_total_sublevel = sizeof($mv['sublevel']);
-						
-						foreach($mv['sublevel'] as $sk => $sv)
-						{
-							$fn_sv_page_id = (isset($sv['p_id'])) ? $sv['p_id'] : false;
-							
-							$sv['p_title'] = (isset($sv['title']) && !empty($sv['title'])) ? $sv['title'] : '';
-							$sv['p_url'] = (isset($sv['url']) && !empty($sv['url'])) ? $sv['url'] : '';
-							if(!$sv['active']) continue;
-							
-							if($fn_sv_page_id)
-							{
-								$fn_p_data_l1 = $this->db->FetchArray("
-									SELECT *
-									FROM `pages`
-									WHERE `active`='1'
-									AND `id`=:i
-									LIMIT 1;
-								", array(
-									'i' => $fn_sv_page_id,
-								));
-								
-								if(isset($sv['title']) && empty($sv['title'])) $sv['title'] = $fn_p_data_l1['obj_title'];
-								if(isset($sv['url']) && empty($sv['url'])) $sv['url'] = "{$this->CONFIG['site']['base_script']}{$fn_args['st_lang']}/{$fn_p_data_l1['obj_hash']}";
-							}
-							
-							if($sv['url'] == "") $sv['url'] = 'javascript:void(0);';
-							
-							self::$fn_xtemplate_parse['assign'][] = $sv;
-							self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.submenu.row";
-							
-							//anti loop
-							if($sk > ($fn_total_sublevel-1) ) break;
-							$arrow_present = false;
-						}
-						
-						self::$fn_xtemplate_parse['assign'][] = array(
-							'class_parent' => 'parent',
-						);
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.submenu";
-						
-						if(!$arrow_present)
-						{
-							$arrow_present = true;
-							self::$fn_xtemplate_parse['assign'][] = '';
-							self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.arrow";
-						}
-					}
-					//level 0 -----------------------------------------------------------------
-					
 					$fn_mv_page_id = (isset($mv['p_id'])) ? $mv['p_id'] : false;
 					
 					$mv['p_title'] = (isset($mv['title']) && !empty($mv['title'])) ? $mv['title'] : '';
 					$mv['p_url'] = (isset($mv['url']) && !empty($mv['url'])) ? $mv['url'] : '';
 					
-					$mv['submenu'] = (isset($mv['sublevel'])) ? true : false;
-					
 					//saltamos si no esta activo
 					if(!$mv['active']) continue;
+					$mv['class_active'] = "";
 					
 					if($fn_mv_page_id)
 					{
@@ -161,6 +119,10 @@ class WIDGET_headerMenuTmpl {
 							'i' => $fn_mv_page_id,
 						));
 						
+						$fn_hash_correction = preg_replace("/\_/", "-", $fn_hash);
+						if($fn_p_data['obj_hash'] == $fn_hash) $mv['class_active'] = "active";
+						if($fn_p_data['obj_hash'] == $fn_hash_correction) $mv['class_active'] = "active";
+						
 						if(isset($mv['title']) && empty($mv['title'])) $mv['title'] = $fn_p_data['obj_title'];
 						if(isset($mv['url']) && empty($mv['url'])) $mv['url'] = "{$this->CONFIG['site']['base_script']}{$fn_args['st_lang']}/{$fn_p_data['obj_hash']}";
 					}
@@ -170,7 +132,7 @@ class WIDGET_headerMenuTmpl {
 					$fn_count_w++;
 					
 					self::$fn_xtemplate_parse['assign'][] = $mv;
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item";
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.adminMenuTmpl.row_item";
 					//anti loop
 					if($mk > ($fn_totla_mv-1) ) break;
 				}
@@ -178,20 +140,8 @@ class WIDGET_headerMenuTmpl {
 		}
 		
 		self::$fn_xtemplate_parse['assign'][] = array();
-		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl";
+		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.adminMenuTmpl";
 		
-		return self::$fn_xtemplate_parse;
-	}
-	
-	/**
-	 * wPage function.
-	 * 
-	 * @access public
-	 * @param mixed $fn_args
-	 * @return void
-	 */
-	public function wPage($fn_args)
-	{
 		return self::$fn_xtemplate_parse;
 	}
 	

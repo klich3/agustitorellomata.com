@@ -149,12 +149,42 @@ $(function()
 		//mobile click
 		$(document).on('click', '[menu-handler]', fn_menu_handler);
 		
-		//$(document).on('click', '[data-action]', e_action_submit_handler);
+		$(document).on('click', '[data-action]', e_action_handler);
 		$(document).on('click', '[data-event]', e_analytics_event);
 		
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
 		$(window).on('resize', e_resize).trigger('resize');
+	}
+	
+	e_action_handler = function() {
+		var ele = $(this),
+		dom_type = ele.attr('data-action'),
+		dom_data_ser = (ele.parents('form').length !== 0) ? ele.parents('form').serialize() : null;
+		
+		if(/(rec|Pass|client)/gim.test(dom_type)) ele.parents('form').find("input").removeClass("error");
+		
+		fn_call_ajax(dom_type, 
+		{
+			data:dom_data_ser
+		}, null, function(d)
+		{
+			if(debug) console.log(d);
+			
+			if(d.status == 200)
+			{
+				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
+				if(dom_type == 'recUpPass') window.location.href = "/login";
+				if(dom_type == 'clientPersonalData' || dom_type == 'clientUpPass') ele.parents('form').find('[data-message]').html('<img src="'+fn_base_script+'images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>');
+			}else{
+				if(dom_type == 'recPass') ele.parents('form').find("input").addClass("error");
+			}
+			
+			if(d.dom) for(var i in d.dom)
+			{
+				$('[name="'+d.dom[i]+'"]').addClass("error");
+			}
+		});
 	}
 	
 	//tab open close

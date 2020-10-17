@@ -77,12 +77,31 @@ class WIDGET_jsonToTmpl {
 		
 		$fn_json = self::parseByPageContent($fn_args, $fn_hash);
 				
-		if(!$fn_json) return;
+		if(!$fn_json)
+		{
+			$fn_hash = preg_replace("/\_/", "-", $fn_hash);
+			
+			$fn_json = self::parseByPageContent($fn_args, $fn_hash);
+			if(!$fn_json) return;
+		}
 		
 		$fn_json = base64_decode($fn_json);
 		$fn_json = html_entity_decode($fn_json, ENT_QUOTES | ENT_HTML5);
 		
 		if(!isJson($fn_json)) return;
+		
+		/*
+			replaces only on admin side
+		*/
+		if(class_exists('tooLogin') && $this->too_login->isLogged() == 200)
+		{
+			$fn_userData = $this->too_login->getUserData();
+			
+			foreach($fn_userData as $k => $v)
+			{
+				$fn_json = preg_replace("/%".$k."%/", $v, $fn_json);
+			}
+		}
 		
 		$fn_data = object_to_array(json_decode($fn_json));
 		$fn_hbox_count = 0;

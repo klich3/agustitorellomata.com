@@ -1,118 +1,27 @@
 <!-- BEGIN: mi_cuenta -->
-<div class="center-container mt-1 mb-1">
-	<div class="cp-5 pb-3">
-		
-		<div class="hl w-1-1 mt-2">&nbsp;</div>
-		
-		<div class="g">
-			
-			
-			<div class="w-1-1 tc">
-				<h3>{micuenta_welcome}</h3>
-				
-				<div class="mt-1">&nbsp;</div>
-			</div>
-			
-			<div class="w-1-1 mb-2">&nbsp;</div>
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<div class="ws-1-1 wm-9-10 wl-9-10 wxl-9-10 mb-2 fr">
-					<div class="success w-1-1">{micuenta_firststeps}</div>
-					<div class="error w-1-1 mt-2">{micuenta_shipponlyspain}</div>
-				</div>
-				
-				<ul class="ln">
-					<li class="sub-divider pb-2"><a href="{base}{user_lang}/mis-pedidos" class="tu">{menu_but_mis_pedidos}</a></li>
-					<li class="sub-divider pt-2 pb-2"><a href="{base}{user_lang}/mis-devoluciones" class="tu">{menu_but_mis_devoluciones}</a></li>
-					<li class="pt-3 pb-2"><a href="{base}{user_lang}/mis-direcciones" class="tu">{menu_but_misdirecciones}</a></li>
-				</ul>
-			</div>
-			
-			<div class="hl w-1-1 pt-1 mb-1">&nbsp;</div>
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 sub-divider pb-2">
-					<span class="label tu vb">{micuenta_datospers_title}</span>
-				</div>
-				
-				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 mt-2 sub-divider">
-					<div class="mb-4">{label_client_id} {user_name}</div>
-					
-					<form>
-						<fieldset>
-							<label for="u_name">{form_name}</label>
-						</fieldset>
-						
-						<fieldset>
-							<input type="text" name="u_name" value="{u_name}" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 {no_user_data}"/>
-						</fieldset>
-						
-						<fieldset>
-							<label for="u_surname">{form_surname}</label>
-						</fieldset>
-						
-						<fieldset>
-							<input type="text" name="u_surname" value="{u_surname}" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 {no_user_data}"/>
-						</fieldset>
-						
-						<fieldset>
-							<label for="u_idd">{form_cif}</label>
-						</fieldset>
-						
-						<fieldset>
-							<input type="text" name="u_idd" value="{u_idd}" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 {no_user_data}"/>
-						</fieldset>
-						
-						<fieldset>
-							<label for="u_tel">{form_tel}</label>
-						</fieldset>
-						
-						<fieldset>
-							<input type="text" name="u_tel" value="{u_tel}" class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 {no_user_data}"/>
-						</fieldset>
-						
-						<fieldset>
-							<a href="javascript:void(0);" data-action="clientPersonalData" class="button"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {form_save_but}</a>
-						</fieldset>
-						
-						<fieldset data-message>
-						</fieldset>
-					</form>
-				</div>
-			</div>
-			
-			<div class="hl w-1-1 pt-2 mb-2">&nbsp;</div>
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 sub-divider pb-2">
-					<span class="label tu vb">{micuenta_direcciones_title}</span>
-				</div>
-				
-				<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10 mt-4 sub-divider">
-					<!-- BEGIN: no_dirs -->
-					<p>{micuenta_no_direcciones_msg}</p>
-					<a href="{base}{user_lang}/mis-direcciones" class="button" data-event="mi-cuenta/mis-direcciones">{add_one_but}</a>
-					<div class="w-1-1 mb-2 clearfix">&nbsp;</div>
-					<!-- END: no_dirs -->
-					
-					<!-- BEGIN: dirs_row -->
-					<div>
-						<strong>{dir_name}</strong><br/>
-						
-						<strong>{lang_label_dir}:</strong> {dir_primary}<br/>
-						<strong>{lang_labe_dir} 2:</strong> {dir_secundary}<br/>
-						<strong>{lang_label_city}:</strong> {dir_city}<br/>
-						<strong>{lang_label_region}:</strong> {dir_region}<br/>
-						<strong>{lang_label_post}:</strong> {dir_post}<br/>
-						<strong>{lang_label_country}:</strong> ({dir_country}) {dir_country_name}<br/>
-					</div>
-					<div class="mb-1">&nbsp;</div>
-					<!-- END: dirs_row -->
-				</div>
-			</div>
-			
-		</div>
-		
+<div class="w-1-1 pt-4 pb-6">
+	<div class="w-1-1">
+		<h1 class="txt@c"><span class="txt@u">{lang_page_title_mi_cuenta}</span></h1>
 	</div>
 </div>
+
+<div class="w-1-1" data-cc-container>
+	<div class="c cc cp-4@s">
+		<div class="g">
+			<div class="ws-1-1 wm-2-10 wl-2-10 wxl-2-10 admin-menu sep">
+				{FILE {adminMenuTmpl}}
+			</div>
+			
+			<div class="w-1-1 pt-10 pb-2 hl"></div>
+			
+			<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
+				<div class="pl-2 pl-n@s">
+					{FILE {jsonToTmpl}}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="w-1-1 pb-10"></div>
 <!-- END: mi_cuenta -->
