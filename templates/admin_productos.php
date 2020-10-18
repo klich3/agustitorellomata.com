@@ -60,6 +60,8 @@ switch($g_action)
 		//edit normal content
 		$fn_meta_title = (!empty($fn_q_prod['lang_data']) && isJson($fn_q_prod['lang_data'])) ? object_to_array(json_decode($fn_q_prod['lang_data'])) : '';
 		
+		$fn_meta_subtitle = (!empty($fn_q_prod['subtitle_lang_data']) && isJson($fn_q_prod['subtitle_lang_data'])) ? object_to_array(json_decode($fn_q_prod['subtitle_lang_data'])) : '';
+		
 		//lang tabs and content inside
 		foreach($fn_lang as $lk => $lv)
 		{
@@ -73,6 +75,7 @@ switch($g_action)
 			$fn_for_data = array(
 				'lang' => $lv,
 				'lang_title' => (isset($fn_meta_title[$lv])) ? $fn_meta_title[$lv] : '',
+				'lang_subtitle' => (isset($fn_meta_subtitle[$lv])) ? $fn_meta_subtitle[$lv] : '',
 				'lang_content' => $fn_lang_content,
 				'lang_envio_extra' => $fn_lang_envio_extre,
 			);

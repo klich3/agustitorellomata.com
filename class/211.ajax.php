@@ -3619,16 +3619,28 @@ if($fn_ajax !== null)
 			
 			$fn_title_lang_data = json_encode($fn_title_lang_data);
 			//end titulos
+			
+			//subtitulos
+			$fn_subtitle_lang_data = array();
+			
+			if(isset($fn_p['subtitle'])) foreach($fn_p['subtitle'] as $tk => $tv)
+			{
+				$fn_subtitle_lang_data[$tk] = htmlentities($tv);
+			}
+			
+			$fn_subtitle_lang_data = json_encode($fn_subtitle_lang_data);
+			//end subtitulos
 	
 			//product
 			$fn_active = (isset($fn_p['active'])) ? 1 : 0;
 			
 			$fn_q = $db->Fetch("
 				UPDATE `product`
-				SET `lang_data`=:ld, `active`=:act, `menu_title`=:mtl, `hash`=:hash
+				SET `lang_data`=:ld, `active`=:act, `menu_title`=:mtl, `hash`=:hash, `subtitle_lang_data`=:sld
 				WHERE `id`=:pid
 			", array(
 				'ld' => $fn_title_lang_data,
+				'sld' => $fn_subtitle_lang_data,
 				'act' => $fn_active,
 				'mtl' => $fn_p['menu_title'],
 				'hash' => $fn_p['hash'],
@@ -3811,6 +3823,7 @@ if($fn_ajax !== null)
 						$fn_f_stock_min = (isset($fn_p['stock']['f_stock_min'])) ? $fn_p['stock']['f_stock_min'] : 0;
 						$fn_f_stock_base = (isset($fn_p['stock']['f_stock_base'])) ? $fn_p['stock']['f_stock_base'] : 0;
 						$fn_f_stock_count = (isset($fn_p['stock']['f_stock_count'])) ? $fn_p['stock']['f_stock_count'] : 0;
+						$fn_f_pax_multimplier = (isset($fn_p['stock']['pax_multimplier'])) ? $fn_p['stock']['pax_multimplier'] : 1;
 						
 						$fn_args_in = array();
 						
@@ -3829,7 +3842,7 @@ if($fn_ajax !== null)
 						//stock table
 						$db->ExecuteSQL("
 							UPDATE `product_stock` 
-							SET `size_id`=:szid, `color_id`=:cid, `precio_coste`=:pc, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc {$fn_args_in}, `precio_tachado`=:ptch
+							SET `size_id`=:szid, `color_id`=:cid, `precio_coste`=:pc, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc {$fn_args_in}, `precio_tachado`=:ptch, `pax_multimplier`=:mult
 							WHERE `prid`=:id
 							AND `item_base`='1'
 							LIMIT 1;
@@ -3842,6 +3855,7 @@ if($fn_ajax !== null)
 							'sb' => $fn_f_stock_base,
 							'sc' => $fn_f_stock_count,
 							'ptch' => $fn_f_precio_tachado,
+							'mult' => $fn_f_pax_multimplier,
 							'id' => $fn_p['id'],
 						));
 					}
@@ -3897,6 +3911,50 @@ if($fn_ajax !== null)
 				'status' => 200,
 				'message' => 'Ordenado',
 			)));
+		break;
+		
+		//cargamos lista de dependecias sobre categorias
+		case "manageCategoria":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(100, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No puede hacer esto, no tiene autorización!.',
+			)));
+			
+			$fn_q = $db->FetchAll("
+				SELECT *
+				FROM `category`
+			");
+			
+			if($fn_q)
+			{
+				try {
+					$fn_data = treeArray($fn_q);
+					
+					exit(json_encode(array(
+						'status' => 200,
+						'message' => 'Lista generada',
+						'data' => $fn_data,
+					)));
+				}catch(Exception $e)
+				{
+					exit(json_encode(array(
+						'status' => 400,
+						'message' => 'Por alguna causa no puedo cargar el contenido.',
+					)));
+				}
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => 'Por alguna causa no puedo cargar el contenido.',
+				)));
+			}
 		break;
 		
 		//creamos categoria y productos
@@ -3971,11 +4029,12 @@ if($fn_ajax !== null)
 				$fn_f_peso = (isset($fn_p['stock']['f_peso'])) ? $fn_p['stock']['f_peso'] : 0;
 				$fn_f_size_y = (isset($fn_p['stock']['f_size_y'])) ? $fn_p['stock']['f_size_y'] : 0;
 				$fn_f_size_x = (isset($fn_p['stock']['f_size_x'])) ? $fn_p['stock']['f_size_x'] : 0;
+				$fn_f_pax_multimplier = (isset($fn_p['stock']['pax_multimplier'])) ? $fn_p['stock']['pax_multimplier'] : 1;
 				
 				//stock table
 				$fn_stock = $db->ExecuteSQL("
-					INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`, `item_base`)
-					VALUES (:pid, :szid, :cid, :pr, :pv, :sm, :sb, :sc, :fp, :sy, :sx, '1');
+					INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`, `item_base`, `pax_multimplier`)
+					VALUES (:pid, :szid, :cid, :pr, :pv, :sm, :sb, :sc, :fp, :sy, :sx, '1', :mult);
 				", array(
 					'pid' => $fn_insert_id,
 					'szid' => (isset($fn_p['stock']['f_size_id'])) ? $fn_p['stock']['f_size_id'] : null,
@@ -3988,6 +4047,7 @@ if($fn_ajax !== null)
 					'fp' => ($fn_f_peso) ? $fn_f_peso : 0,
 					'sy' => ($fn_f_size_y) ? $fn_f_size_y : 0,
 					'sx' => ($fn_f_size_x) ? $fn_f_size_x : 0,
+					'mult' => ($fn_f_pax_multimplier) ? $fn_f_pax_multimplier : 1,
 				));
 			}
 			
@@ -4194,11 +4254,12 @@ if($fn_ajax !== null)
 						'p' =>  (isset($fn_p['var_peso']) && !empty($fn_p['var_peso'])) ? $fn_p['var_peso'] : "0.1",
 						'sy' => (isset($fn_p['var_size_y'])) ? $fn_p['var_size_y'] : 0,
 						'sx' => (isset($fn_p['var_size_x'])) ? $fn_p['var_size_x'] : 0,
+						'mult' => (isset($fn_p['pax_multimplier'])) ? $fn_p['pax_multimplier'] : 1,
 					);
 					
 					$fn_q_c = $db->ExecuteSQL("
-						INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_tachado`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`) 
-						VALUES (:prid, :s, :c, :pc, :pt, :pv, :sm, :sb, :sc, :p, :sy, :sx);
+						INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_tachado`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`, `pax_multimplier`) 
+						VALUES (:prid, :s, :c, :pc, :pt, :pv, :sm, :sb, :sc, :p, :sy, :sx, :mult);
 					", $fn_q_atr);
 				}catch (Exception $e) 
 				{
@@ -4216,7 +4277,7 @@ if($fn_ajax !== null)
 				//update
 				$fn_q_c = $db->Fetch("
 					UPDATE `product_stock`
-					SET `prid`=:prid, `size_id`=:s, `color_id`=:c, `precio_coste`=:pc, `precio_tachado`=:pt, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc, `peso`=:p, `size_y`=:sy, `size_x`=:sx
+					SET `prid`=:prid, `size_id`=:s, `color_id`=:c, `precio_coste`=:pc, `precio_tachado`=:pt, `precio_venta`=:pv, `stock_min`=:sm, `stock_base`=:sb, `stock_count`=:sc, `peso`=:p, `size_y`=:sy, `size_x`=:sx, `pax_multimplier`
 					WHERE `id`=:id
 				", array(
 					'id' => $fn_p['id'],
@@ -4232,6 +4293,7 @@ if($fn_ajax !== null)
 					'p' => (isset($fn_p['var_peso'])) ? $fn_p['var_peso'] : "0.1",
 					'sy' => (isset($fn_p['var_size_y'])) ? $fn_p['var_size_y'] : 0,
 					'sx' => (isset($fn_p['var_size_x'])) ? $fn_p['var_size_x'] : 0,
+					'mult' => (isset($fn_p['pax_multimplier'])) ? $fn_p['pax_multimplier'] : 1,
 				));
 			}
 			

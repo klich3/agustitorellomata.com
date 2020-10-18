@@ -1118,4 +1118,38 @@ function decodeLangData($fn_json, $fn_show_current_lang = true)
 	return ($fn_show_current_lang) ? $fn_title[$st_lang] : $fn_title;
 }
 
+/**
+ * treeArray function.
+ * 
+ * @access public
+ * @param mixed $array
+ * @param mixed $fn_by_value
+ * @param string $fn_push_by_key (default: 'id')
+ * @return void
+ */
+function treeArray($array, $fn_by_value = 'parent_id', $fn_push_by_key = 'id')
+{
+	$array = object_to_array($array);
+	$tree = array();
+	
+	// Create an associative array with each key being the ID of the item
+	foreach($array as $k => &$v) $tree[$v[$fn_push_by_key]] = &$v;
+	
+	// Loop over the array and add each child to their parent
+	foreach($tree as $k => &$v)
+	{
+		if(!$v[$fn_by_value]) continue;
+		$tree[$v[$fn_by_value]]['parent'][] = &$v;
+	}
+	
+	// Loop over the array again and remove any items that don't have a parent of 0;
+	foreach($tree as $k => &$v) 
+	{
+		if(!$v[$fn_by_value]) continue;
+		unset($tree[$k]);
+	}
+	
+	return array_values($tree);
+}
+
 ?>
