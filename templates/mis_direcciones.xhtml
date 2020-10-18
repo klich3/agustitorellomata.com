@@ -18,7 +18,131 @@
 				<div class="pl-2 pl-n@s">
 					<!--////-->
 					
-					
+					<div class="g">
+						<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2">
+							<div class="w-1-1 txt@u pb-3"><strong>{lang_title_dir_invoice}:</strong></div>
+							
+							<form data-form="invoice">
+								<fieldset>
+									<label for="user_pers_data[u_name]" class="pb-2"><strong>{form_name}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[u_name]" value="{user_pers_data.u_name}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[u_surname]" class="pb-2"><strong>{form_surname}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[u_surname]" value="{user_pers_data.u_surname}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[u_cif]" class="pb-2"><strong>{form_cif}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[u_cif]" value="{user_pers_data.u_cif}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[dir_country]" class="pb-2"><strong>{lang_label_country}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[dir_country]" value="{user_pers_data.dir_country}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[dir_city]" class="pb-2"><strong>{lang_label_city}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[dir_city]" value="{user_pers_data.dir_city}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[dir_primary]" class="pb-2"><strong>{lang_label_dir}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[dir_primary]" value="{user_pers_data.dir_primary}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[dir_post]" class="pb-2"><strong>{lang_label_post}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[dir_post]" value="{user_pers_data.dir_post}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[u_tel]" class="pb-2"><strong>{form_tel}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[u_tel]" value="{user_pers_data.u_tel}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_pers_data[u_email]" class="pb-2"><strong>{label_email}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_pers_data[u_email]" value="{user_pers_data.u_email}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset class="pt-10">
+									<a href="javascript:void(0);" data-action="clientUpInvoiceDir" class="button"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {button_save_address}</a>
+								</fieldset>
+								
+								<fieldset>
+									<div data-message class="h">
+										<img src="{base_script}images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>
+									</div>
+								</fieldset>
+							</form>
+						</div>
+						
+						<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2">
+							<div class="w-1-1 txt@u pb-3"><strong>{lang_title_dir_shipping}:</strong></div>
+							
+							<form data-form="shipping">
+								<fieldset>
+									<label for="user_dirs[u_name]" class="pb-2"><strong>{form_name}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[u_name]" value="{user_dirs.u_name}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[u_surname]" class="pb-2"><strong>{form_surname}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[u_surname]" value="{user_dirs.u_surname}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[u_cif]" class="pb-2"><strong>{form_cif}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[u_cif]" value="{user_dirs.u_cif}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[dir_country]" class="pb-2"><strong>{lang_label_country}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[dir_country]" value="{user_dirs.dir_country}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[dir_city]" class="pb-2"><strong>{lang_label_city}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[dir_city]" value="{user_dirs.dir_city}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[dir_primary]" class="pb-2"><strong>{lang_label_dir}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[dir_primary]" value="{user_dirs.dir_primary}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[dir_post]" class="pb-2"><strong>{lang_label_post}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[dir_post]" value="{user_dirs.dir_post}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[u_tel]" class="pb-2"><strong>{form_tel}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[u_tel]" value="{user_dirs.u_tel}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset>
+									<label for="user_dirs[u_email]" class="pb-2"><strong>{label_email}</strong> <span class="txt-red">*</span>:</label>
+									<input type="text" name="user_dirs[u_email]" value="{user_dirs.u_email}" class="w-1-1" />
+								</fieldset>
+								
+								<fieldset class="pt-10">
+									<input type="hidden" name="user_dirs[dir_name]" value="Por defecto" />
+									<input type="hidden" name="user_dirs[dir_id]" value="0" />
+									<a href="javascript:void(0);" data-action="clientUpShippingDir" class="button"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {button_save_address}</a>
+								</fieldset>
+								
+								<fieldset>
+									<div data-message class="h">
+										<img src="{base_script}images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>
+									</div>
+								</fieldset>
+							</form>
+						</div>
+					</div>
 					
 					<!--////-->
 				</div>
@@ -28,63 +152,4 @@
 </div>
 
 <div class="w-1-1 pb-10"></div>
-<!-- END: mis_direcciones -->
-
-<div class="center-container mt-3 mb-3">
-	<div class="cp-5 pb-3">
-		
-		<div class="w-1-1 mt-2">&nbsp;</div>
-		
-		<div class="g">
-			
-			<div class="w-1-1">
-				<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3 sub-divider pb-1">
-					<span class="label tu vb">{misdirecciones_title}</span>
-				</div>
-				
-				<div class="w-1-1">
-					<!-- BEGIN: no_dirs -->
-					<div class="mt-1">&nbsp;</div>
-					<p>{micuenta_no_direcciones_msg}</p>
-					<!-- END: no_dirs -->
-					<div class="mb-1">&nbsp;</div>
-				</div>
-			</div>
-			
-			<div class="w-1-1">
-				<p>{misdirecciones_asegurate_mod}</p>
-				<a href="javascript:void(0);" rel="nofollow" data-action="addDirection" class="button">{add_one_but}</a>
-				<div class="pb-4">&nbsp;</div>
-				
-				<ul class="ln g gws-1-1 gwm-1-3 gwl-1-3 gwxl-1-3" data-list-container>
-					<!-- BEGIN: dirs_row -->
-					<li class="{selected}" data-id="{dir_id}">
-						<div class="box w-1-1 mb-4">
-							<strong>{dir_name}</strong><br/>
-					
-							<strong>{lang_label_dir}:</strong> {dir_primary}<br/>
-							<strong>{lang_label_region} 2:</strong> {dir_secundary}<br/>
-							<strong>{lang_label_city}:</strong> {dir_city}<br/>
-							<strong>{lang_label_region}:</strong> {dir_region}<br/>
-							<strong>{lang_label_post}:</strong> {dir_post}<br/>
-							<strong>{lang_label_country}:</strong> ({dir_country}) {dir_country_name}<br/>
-						</div>
-						<div class="w-1-1">
-							<a href="javascript:void(0);" data-action="editDirection" class="button">{form_update_but} <svg class="ml-2" width="15" height="15" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#update-icon"></use></svg></a>
-							<a href="javascript:void(0);" data-action="delDirection" class="button">{form_del_but} <svg class="ml-2" width="15" height="15" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#del-icon"></use></svg></a>
-							<a href="javascript:void(0);" data-action="stDirectionDefault" class="button">{form_set_default_but}</a>
-						</div>
-						
-						<div class="clearfix">&nbsp;</div>
-						<div class="w-1-1 mb-4 hl">&nbsp;</div>
-					</li>
-					<!-- END: dirs_row -->
-				</ul>
-				
-			</div>
-			
-		</div>
-		
-	</div>
-</div>
 <!-- END: mis_direcciones -->

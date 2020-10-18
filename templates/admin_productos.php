@@ -85,40 +85,6 @@ switch($g_action)
 			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.tab_lang";
 		}
 		
-		//select size
-		$fn_q_size = $db->FetchAll("
-			SELECT *
-			FROM `product_size`;
-		");
-		
-		if($fn_q_size) foreach($fn_q_size as $ssk => $ssv)
-		{
-			$fn_for_data = object_to_array($ssv);
-			$fn_for_data['lang_title'] = langTitleJsonToStringJointer($ssv->lang_data);
-			$fn_for_data['selected_item'] = ($ssv->id == $fn_q_prod['size_id']) ? 'selected' : '';
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.size_sel";
-		}
-		//select size
-		
-		//select color
-		$fn_q_color = $db->FetchAll("
-			SELECT * 
-			FROM `product_color`;
-		");
-		
-		if($fn_q_color) foreach($fn_q_color as $sck => $scv)
-		{
-			$fn_for_data = object_to_array($scv); 
-			$fn_for_data['lang_title'] = langTitleJsonToStringJointer($scv->lang_data);
-			$fn_for_data['selected_item'] = ($scv->id == $fn_q_prod['color_id']) ? 'selected' : '';
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.color_sel";
-		}
-		//select color
-		
 		//categoria
 		if($fn_q_prod['cat_id'] !== 0)
 		{
@@ -243,38 +209,6 @@ switch($g_action)
 		}
 		
 		// MODAL ------------------------------------------------
-		
-		//size & color
-		$fn_q_c = $db->FetchAll("
-			SELECT *
-			FROM `product_color`;
-		");
-		
-		if($fn_q_c) foreach($fn_q_c as $ck => $cv)
-		{
-			$fn_f_data = object_to_array($cv);
-			$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($cv->lang_data);
-						
-			$fn_xtemplate_parse['assign'][] = $fn_f_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list.producto_color_item";
-		}
-		
-		unset($fn_f_data);
-		unset($fn_f_lang_title);
-		
-		$fn_q_s = $db->FetchAll("
-			SELECT *
-			FROM `product_size`;
-		");
-		
-		if($fn_q_s) foreach($fn_q_s as $sk => $sv)
-		{
-			$fn_f_data = object_to_array($sv);
-			$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($sv->lang_data);
-			
-			$fn_xtemplate_parse['assign'][] = $fn_f_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list.producto_size_item";
-		}
 		
 		//lang modal
 		if($fn_lang) foreach($fn_lang as $l)

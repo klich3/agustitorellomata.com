@@ -144,6 +144,30 @@ class tooLogin {
 		if(isset($_SESSION[$this->sessionName])) return $_SESSION[$this->sessionName];
 	}
 	
+	/*
+		update user data from DB
+	*/
+	public function updateUserData()
+	{
+		$fn_user_data = self::getUserData();
+
+		$fn_q = $this->db->FetchObject("
+			SELECT `user_email`, `user_name`
+			FROM `users`
+			WHERE `ID`=:id
+			LIMIT 1;
+		", array(
+			"id" => $fn_user_data->ID
+		));
+		
+		if($fn_q)
+		{
+			//assign user data
+			$_SESSION[$this->sessionName]->user_name = $fn_q->user_name;
+			$_SESSION[$this->sessionName]->user_email = $fn_q->user_email;
+		}
+	}
+	
 	/**
 	 * login function.
 	 * logea a un usuario 

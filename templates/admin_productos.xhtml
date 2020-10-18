@@ -10,7 +10,6 @@
 		<div class="uk-width-1-1 uk-margin-bottom">
 			<div class="uk-button-group">
 				<a href="#addProducto" data-uk-modal class="uk-button uk-button-small uk-button-primary">Crear producto</a>
-				<a href="javascript:void(0);" data-modal="admVariedad" class="uk-button uk-button-small" title="Administrar variedades de productos, color, tamaño." data-uk-tooltip>Adm. color/tamaño</a>
 			</div>
 		</div>
 		
@@ -169,24 +168,6 @@
 			<div class="uk-form-row">
 				<div class="uk-grid uk-grid-small">
 					<div class="uk-width-1-2">
-						<label for="stock[f_size_id]">Tamaño</label>
-						<select name="stock[f_size_id]" class="uk-width-1-1">
-							<!-- BEGIN: producto_size_item -->
-							<option value="{id}">{lang_parse}</option>
-							<!-- END: producto_size_item -->
-						</select>
-					</div>
-					
-					<div class="uk-width-1-2">
-						<label for="stock[f_color_id]">Color</label>
-						<select name="stock[f_color_id]" class="uk-width-1-1">
-							<!-- BEGIN: producto_color_item -->
-							<option value="{id}">{lang_parse}</option>
-							<!-- END: producto_color_item -->
-						</select>
-					</div>
-					
-					<div class="uk-width-1-2">
 						<label for="stock[f_precio_coste]">Precio coste</label>
 						<input type="number" name="stock[f_precio_coste]" value="" class="uk-width-1-1" />
 					</div>
@@ -281,41 +262,6 @@
 							
 							<hr/>
 							
-							<div class="uk-grid uk-grid-small">
-								<div class="uk-width-1-1 uk-margin">
-									<strong>Tipo de producto</strong>
-								</div>
-								
-								<div class="uk-width-4-10">
-									<div class="uk-form-row">
-										<label for="stock[size_id]">Tamaño:</label>
-										<select name="stock[size_id]" class="uk-width-1-1">
-											<!-- BEGIN: size_sel -->
-											<option value="{id}" {selected_item}>{lang_title}</option>
-											<!-- END: size_sel -->
-										</select>
-									</div>
-								</div>
-								
-								<div class="uk-width-4-10">
-									<div class="uk-form-row">
-										<label for="stock[color_id]">Color:</label>
-										<select name="stock[color_id]" class="uk-width-1-1">
-											<!-- BEGIN: color_sel -->
-											<option value="{id}" {selected_item}>{lang_title}</option>
-											<!-- END: color_sel -->
-										</select>
-									</div>
-								</div>
-								
-								<div class="uk-width-2-10">
-									Editar / añadir
-									<a href="javascript:void(0);" data-modal="varProducto" class="uk-button uk-button-small uk-button-primary"><i class="uk-icon uk-icon-edit"></i></a>
-								</div>
-							</div>
-							
-							<hr/>
-							
 							<div class="uk-width-1-1 uk-margin">
 								<strong>Descripción del producto</strong>
 							</div>
@@ -344,19 +290,6 @@
 										</div>
 									</div>
 
-<!-- // //-->
-<!-- // //-->
-<!-- // //-->
-<!-- // //-->									
-									<div class="uk-form-row">
-										<p>Lista de destacados</p>
-										
-									</div>
-<!-- // //-->
-<!-- // //-->
-<!-- // //-->
-<!-- // //-->
-									
 									<div class="uk-form-row">
 										<label for="lang_envio_extra[{lang}]">Información extra relacionado con envíos</label>
 										<textarea name="lang_envio_extra[{lang}]" class="uk-width-1-1" rows="4">{lang_envio_extra}</textarea>
@@ -388,11 +321,11 @@
 							<hr/>
 							
 							<div class="uk-form-row">
-								<label for="stock[precio_coste]">Precio coste €</label>
+								<label for="stock[precio_coste]">Precio coste (<span class="uk-text-small">producir</span>) €</label>
 								<input type="number" name="stock[precio_coste]" value="{precio_coste}" class="uk-width-1-1" />
 							</div>
 							<div class="uk-form-row">
-								<label for="stock[precio_venta]">Precio venta €</label>
+								<label for="stock[precio_venta]">Precio venta (<span class="uk-text-small">con iva</span>) €</label>
 								<input type="number" name="stock[precio_venta]" value="{precio_venta}" class="uk-width-1-1 uk-form-danger" />
 							</div>
 							
@@ -402,6 +335,12 @@
 							</div>
 							
 							<hr/>
+							
+							<div class="uk-form-row">
+								<label for="stock[pax_multimplier]">Producto en caja</label><br/>
+								<span class="uk-text-small"><span class="uk-badge uk-badge-notification uk-margin-small-bottom uk-text-small">Nota:</span> Si se trata de botellas, cantidad de botellas en una caja.</span>
+								<input type="number" name="stock[pax_multimplier]" value="{pax_multimplier}" class="uk-width-1-1" />
+							</div>
 							
 							<div class="uk-form-row">
 								<label for="stock[stock_min]">Stock mínimo</label><br/>
