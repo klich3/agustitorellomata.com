@@ -18,22 +18,64 @@
 			
 			<!-- BEGIN: group -->
 			<div class="w-1-1 pt-4 pb-4">
-				<h2 class="title txt@u">{cat_title}</h2>
+				<h1 class="title txt@c"><span class="txt@u">{cat_title}</span></h1>
 			</div>
 			
 				<!-- BEGIN: prod -->
 				<div class="w-1-1">
 					<div class="g gc">
 						<!-- BEGIN: row -->
-						<div class="ws-1-2 wm-1-5 wl-1-5 wxl-1-5 pb-3 sep">
-							<!-- BEGIN: a_init --><a href="{url}" target="_blank"><!-- END: a_init -->
+						<div class="ws-1-2 wm-1-4 wl-1-4 wxl-1-4 sep item">
+							<div class="cp-3">
 								<div class="thumb">
 									<img class="e" src="{base_script}images/blank.gif" data-preloadimages data-image="{image}" alt="{alt}" />
 								</div>
-								<div class="title w-1-1 txt@c@u pt-2">
+								
+								<div class="title w-1-1 txt@c@u pt-2" data-some-h>
 									<strong>{title}</strong>
 								</div>
-							<!-- BEGIN: a_final --></a><!-- END: a_final -->
+								
+								<!-- BEGIN: subtitle -->
+								<div class="subtitle w-1-1 txt@c@u pt-2">
+									<strong>{subtitle}</strong>
+								</div>
+								<!-- END: subtitle -->
+								
+								<!-- BEGIN: title_sep -->
+								<div class="sep-h w-1-1"></div>
+								<!-- END: title_sep -->
+								
+								<div>
+									<!-- BEGIN: multiplier -->
+									<div class="bot">{lang_box} {pax_multimplier} {lang_bot}</div>
+									<div class="bot-price">{precio_caja} €</div>
+									<!-- END: multiplier -->
+									<!-- BEGIN: venta_price -->
+									<div class="price">{precio_venta} € {lang_ud}</div>
+									<!-- END: venta_price -->
+								</div>
+								
+								<!-- BEGIN: ficha_link -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div>
+									<a href="{url}" target="_blank" class="w-1-1">
+										<div class="flx@fd-r@jc-sb@ai-c@ac-c">
+											<strong class="ficha">{lang_ver_ficha}</strong> 
+											<img src="{base_script}images/icon-verficha.svg" width="28" height="31" alt="ficha icono" />
+										</div>
+									</a>
+								</div>
+								<!-- END: ficha_link -->
+								
+								<!-- BEGIN: venta_but -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div>
+									<a href="javascript:void(0);" class="w-1-1 button" data-action="openCart" data-hash="{id}">{add_cart_but}</a>
+								</div>
+								<!-- END: venta_but -->
+							</div>
 						</div>
 						<!-- END: row -->
 					</div>
