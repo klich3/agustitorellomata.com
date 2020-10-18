@@ -11,6 +11,20 @@ $fn_p = $cl_m->parse("POST");
 $fn_r = $cl_m->parse("REQ");
 $g_action = (isset($fn_g['action'])) ? $fn_g['action'] : null;
 
+$fn_dir_fields = array(
+	"u_name" => "Nombre",
+	"u_surname" => "Apellido",
+	"u_lastname" => "Apellido",
+	"u_idd" => "Id interna",
+	"u_tel" => "Telefono",
+	"u_cif" => "CIF/NIF",
+	"u_email" => "Email",
+	"dir_country" => "País",
+	"dir_city" => "Ciudad",
+	"dir_primary" => "Dirección",
+	"dir_post" => "C.P.",
+);
+
 //defaults
 $fn_xtemplate_parse['assign'][] = array(
 	'randome_pass' => substr(md5(uniqid(mt_rand(), true)), 0, 8),
@@ -19,11 +33,13 @@ $fn_xtemplate_parse['parse'][] = '';
 
 //select pag inicial
 $fn_q = $db->FetchAll("
-	SELECT u.*
+	SELECT u.*, md.`meta_value` as 'user_data'
 	FROM `users` u
 	LEFT JOIN `users_meta` m ON(m.`user_id`=u.`ID`)
+	LEFT JOIN `users_meta` md ON(md.`user_id`=u.`ID`)
 	WHERE m.`meta_key`='user_level'
 	AND m.`meta_value`='15'
+	OR md.`meta_key`='user_pers_data'
 ");
 
 if($fn_q) 
@@ -35,6 +51,8 @@ if($fn_q)
 		
 		$fn_for_data = object_to_array($uv);
 		
+		if(isset($fn_for_data['user_data']) && isJson($fn_for_data['user_data'])) $fn_for_data = array_merge($fn_for_data, json_decode($fn_for_data['user_data'], true));
+				
 		$fn_q_userstatus = $db->FetchValue("
 			SELECT `status_value`
 			FROM `users_status`
@@ -59,22 +77,6 @@ if($fn_q)
 	);
 	$fn_xtemplate_parse['parse'][] = 'admin_clientes.message';
 }
-
-//country_sel
-$fn_q_sel_country = $db->FetchAll("
-	SELECT *
-	FROM `apps_countries`
-");
-
-if($fn_q_sel_country) foreach($fn_q_sel_country as $ck => $cv)
-{
-	$fn_for_data = object_to_array($cv);
-	$fn_for_data['country_code'] = strtolower($cv->country_code);
-	
-	$fn_xtemplate_parse['assign'][] = $fn_for_data;
-	$fn_xtemplate_parse['parse'][] = 'admin_clientes.country_sel';
-}
-//end country_sel
 
 //edit page
 switch($g_action)
@@ -106,66 +108,58 @@ switch($g_action)
 			return;
 		}
 		
-		//meta dirs
-		$fn_q_meta_dirs = $db->FetchValue("
-			SELECT `meta_value`
+		//client invoice data
+		$fn_q_metas = $db->FetchAll("
+			SELECT *
 			FROM `users_meta`
 			WHERE `user_id`=:uid
-			AND `meta_key`='user_dirs'
-			LIMIT 1;
 		", array(
 			'uid' => $fn_g['id'],
 		));
 		
-		if(!empty($fn_q_meta_dirs) && isJson($fn_q_meta_dirs))
+		foreach($fn_q_metas as $k => $v)
 		{
-			$fn_dirs_array = json_decode($fn_q_meta_dirs);
+			$fn_k = $v->meta_key;
 			
-			foreach($fn_dirs_array as $dk => $dv)
+			if(preg_match("/user_dirs/", $fn_k) && isJson($v->meta_value))
 			{
-				$fn_for_data = object_to_array($dv);
-				$fn_for_data['user_id'] = $fn_g['id'];
+				$fn_for_data = json_decode($v->meta_value, true);
 				
-				if(isset($dv->dir_default) && $dv->dir_default)
+				if($fn_for_data) foreach($fn_for_data as $k => $v)
 				{
+					if(preg_match("/dir_name|dir_id/", $k)) continue;
 					
-					$fn_xtemplate_parse['assign'][] = '';
-					$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.dir_row.default';
+					$fn_xtemplate_parse['assign'][] = array(
+						"title" => $fn_dir_fields[$k],
+						"value" => $v,
+					);
+					$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_dirs.row';
 				}
 				
 				$fn_xtemplate_parse['assign'][] = $fn_for_data;
-				$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.dir_row';
+				$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_dirs';
 			}
-		}else{
-			$fn_xtemplate_parse['assign'][] = array(
-				'status' => 400,
-				'message' => 'Ahora mismo este cliente no tiene direcciones guardadas.'
-			);
-			$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.message';
+			
+			if(preg_match("/user_pers_data/", $fn_k) && isJson($v->meta_value))
+			{
+				$fn_for_data = json_decode($v->meta_value, true);
+				
+				if($fn_for_data) foreach($fn_for_data as $k => $v)
+				{
+					if(preg_match("/dir_name|dir_id/", $k)) continue;
+					
+					$fn_xtemplate_parse['assign'][] = array(
+						"title" => $fn_dir_fields[$k],
+						"value" => $v,
+					);
+					$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_pers_data.row';
+				}
+				
+				$fn_xtemplate_parse['assign'][] = $fn_for_data;
+				$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_pers_data';
+			}
 		}
-		
-		//user data pers
-		$fn_q_meta_persdata = $db->FetchValue("
-			SELECT `meta_value`
-			FROM `users_meta`
-			WHERE `user_id`=:uid
-			AND `meta_key`='user_pers_data'
-			LIMIT 1;
-		", array(
-			'uid' => $fn_g['id'],
-		));
-		
-		if(!empty($fn_q_meta_persdata) && isJson($fn_q_meta_persdata))
-		{
-			$fn_for_data = json_decode($fn_q_meta_persdata);
-		
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.client_data_pers';
-		}else{
-			$fn_xtemplate_parse['assign'][] = '';
-			$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.no_client_data_pers';
-		}
-		
+			
 		//user status
 		$fn_q_statuts = $db->FetchAll("
 			SELECT *

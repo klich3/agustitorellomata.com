@@ -35,6 +35,22 @@ if($fn_g && isset($fn_g['activation_key']) && !empty($fn_g['activation_key']))
 		", array(
 			'act' => $fn_g['activation_key'],
 		));
+		
+		$fn_user_id = $db->FetchValue("
+			SELECT `ID`
+			FROM `users`
+			WHERE `user_activation_key`=:act
+		", array(
+			'act' => $fn_g['activation_key'],
+		));
+		
+		$fn_q = $db->Fetch("
+			INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+			VALUES (:uid, 'user_access', '1') 
+			ON DUPLICATE KEY UPDATE `meta_value`='1';
+		", array(
+			'uid' => $fn_user_id,
+		));
 	
 		$fn_xtemplate_parse['assign'][] = array(
 			'type' => 'success',

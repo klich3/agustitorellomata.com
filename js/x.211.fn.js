@@ -162,7 +162,17 @@ $(function()
 		dom_type = ele.attr('data-action'),
 		dom_data_ser = (ele.parents('form').length !== 0) ? ele.parents('form').serialize() : null;
 		
-		if(/(rec|Pass|client)/gim.test(dom_type)) ele.parents('form').find("input").removeClass("error");
+		if(/(rec|Pass|client|clientUpInvoiceDir|clientUpShippingDir)/gim.test(dom_type)) ele.parents('form').find("input").removeClass("error");
+		
+		if(/(newClient)/gim.test(dom_type))
+		{
+			var accept = ele.parents('form').find("input[name='accept']").is(":checked");
+			if(!accept)
+			{
+				ele.parents('form').find("input[name='accept']").addClass("error");
+				return;
+			}
+		}
 		
 		fn_call_ajax(dom_type, 
 		{
@@ -173,14 +183,15 @@ $(function()
 			
 			if(d.status == 200)
 			{
+				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
 				if(dom_type == 'recUpPass') window.location.href = "/login";
-				if(dom_type == 'clientPersonalData' || dom_type == 'clientUpPass') ele.parents('form').find('[data-message]').html('<img src="'+fn_base_script+'images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>');
+				if(/(clientUpInvoiceDir|clientUpShippingDir|clientPersonalData|clientUpPass)/gim.test(dom_type)) ele.parents('form').find('[data-message]').show();
 			}else{
 				if(dom_type == 'recPass') ele.parents('form').find("input").addClass("error");
 			}
 			
-			if(d.dom) for(var i in d.dom)
+			if(d.dom && d.dom.length !== 0) for(var i in d.dom)
 			{
 				$('[name="'+d.dom[i]+'"]').addClass("error");
 			}

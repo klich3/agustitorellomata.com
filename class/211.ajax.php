@@ -452,7 +452,7 @@ if($fn_ajax !== null)
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							"Client ID: <strong>{$fn_set_new_name_user}</strong>",
 							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['u_email']}\" alt=\"logotype\" />",
-							"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
+							"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}", //link
 							$fn_inputs['u_email'],
 							$fn_set_new_password,
 						), $fn_mail_html);
@@ -1922,7 +1922,24 @@ if($fn_ajax !== null)
 						'status' => 400,
 						'message' => 'Uiii sobre que item? podrías refrescar?',
 					)));
-				
+					
+					$fn_q = $db->FetchValue("
+						SELECT `obj_hash`
+						FROM `pages`
+						WHERE `id`=:id
+						LIMIT 1;
+					", array(
+						"id" => $fn_p['id']
+					));
+					
+					$fn_template_filename = processUrl(preg_replace('/^([A-Za-z]{2})\//m', '', $fn_q));
+					$fn_isSystemTemplate = (file_exists($CONFIG['site']['templatepath'].$fn_template_filename.'.xhtml')) ? true : false;
+					
+					if($fn_isSystemTemplate) exit(json_encode(array(
+						'status' => 400,
+						'message' => 'No se puede borrar una pantalla del sistema.',
+					)));
+					
 					//del page 
 					$fn_q = $db->Fetch("
 						DELETE FROM `pages`
@@ -3225,7 +3242,7 @@ if($fn_ajax !== null)
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
 							"",
-							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}\">{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}</a>", //link
+							"{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}", //link
 							$fn_p['f_user_name'],
 							$fn_p['f_user_pass'],
 						), $fn_mail_html);
@@ -3413,7 +3430,7 @@ if($fn_ajax !== null)
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
 							"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
-							"<a href=\"{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta\">{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta</a>", //link
+							"{$CONFIG['site']['base']}{$fn_def_lang}/mi-cuenta",
 							$fn_user_name,
 							$fn_inputs['f_user_pass'],
 						), $fn_mail_html);
@@ -4272,7 +4289,6 @@ if($fn_ajax !== null)
 		break;
 		
 		//crear usuario recuperar contraseña
-		case "recoveryPass":
 		case "newClient":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
@@ -4282,6 +4298,7 @@ if($fn_ajax !== null)
 			if(!isset($fn_p['data'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'dom' => array("n_email"),
 			)));
 			
 			parse_str($fn_p['data'], $fn_inputs);
@@ -4289,11 +4306,13 @@ if($fn_ajax !== null)
 			if(!isset($fn_inputs['n_email']) || empty($fn_inputs['n_email'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'dom' => array("n_email"),
 			)));
 			
 			if(emailValidation($fn_inputs['n_email'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_email_not_valid'),
+				'dom' => array("n_email"),
 			)));
 			
 			$fn_f_check_email = $cl_m->parseSTMP($fn_inputs['n_email'], false);
@@ -4301,102 +4320,28 @@ if($fn_ajax !== null)
 			if(!$fn_f_check_email) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
+				'dom' => array("n_email"),
 			)));
 			
 			$fn_check_exist_mail = $db->FetchArray("
 				SELECT COUNT(*) AS 'count', `user_email`
 				FROM `users`
 				WHERE `user_email`=:em
-				AND `ID` > '9999'
 				LIMIT 1;
 			", array(
 				'em' => $fn_inputs['n_email'],
 			));
 			
-			$fn_set_new_password = substr(md5(rand()), 8);
-			$fn_new_act_key = md5(microtime());
-			
-			if($fn_check_exist_mail && $fn_check_exist_mail['count'] !== "0")
+			if($fn_check_exist_mail && $fn_check_exist_mail['count'] != "0")
 			{
-				if($fn_ajax == 'newClient') exit(json_encode(array(
+				exit(json_encode(array(
 					'status' => 400,
-					'message' => getLangItem('msg_new_mail_exist'),
+					'message' => getLangItem('msg_new_client_create_error'),
+					'dom' => array("n_email"),
 				)));
-				
-				//recuperamos pass
-				$fn_q = $db->Fetch("
-					UPDATE `users`
-					SET `user_status`='0', `user_pass`=MD5(:np), `user_activation_key`=:ac
-					WHERE `user_email`=:en
-					LIMIT 1;
-				", array(
-					'np' => $fn_set_new_password,
-					'ac' => $fn_new_act_key,
-					'en' => $fn_check_exist_mail['user_email'],
-				));
-				
-				if($fn_q)
-				{
-					$fn_client = $db->FetchArray("
-						SELECT `user_name`, `user_email`
-						FROM `users`
-						WHERE `user_email`=:en
-						LIMIT 1;
-					", array(
-						'en' => $fn_check_exist_mail['user_email'],
-					));
-					
-					$fn_to = $fn_check_exist_mail['user_email'];
-					$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_recover_pass');
-					
-					$fn_html_p = getLangItem('mail_recover_pass_html');
-					$fn_mail_html = $CONFIG['templates']['standartEmail'];
-					
-					$fn_mail_html = str_replace(array(
-						'%message%',
-						'%regards%', 
-						'%site_name%', 
-						'%copyz%',
-						'%site_dir%', 
-						'%site_logo%',
-						'%site_link%',
-						'%user_name%',
-						'%user_pass%',
-					), array(
-						$fn_html_p,
-						getLangItem('mail_regards'),
-						$CONFIG['site']['sitetitlefull'],
-						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
-						"Client ID: <strong>{$fn_client['user_name']}</strong>",
-						"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
-						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
-						$fn_client['user_email'],
-						$fn_set_new_password,
-					), $fn_mail_html);
-					
-					$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
-					
-					//envio del mail
-					@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-					
-					exit(json_encode(array(
-						'status' => 200,
-						'message' => getLangItem('msg_new_client_mail_sended'),
-					)));
-				}else{
-					exit(json_encode(array(
-						'status' => 400,
-						'message' => getLangItem('msg_recovery_pass_send_error'),
-					)));
-				}
 			}else{
-				if($fn_ajax == 'recoveryPass' && !$fn_check_exist_mail['user_email']) exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('msg_rec_mail_noexist'),
-				)));
-
-				//enviamos mail de activacion y contraseña nueva
-				
+				$fn_new_act_key = md5(microtime());
+				$fn_set_new_password = substr(md5(rand()), 8);
 				$fn_set_new_name_user = substr(str_replace(array('.', ' '), '', microtime()), 8);
 				$fn_today_date = date('Y-m-d H:i:s');
 				
@@ -4404,11 +4349,11 @@ if($fn_ajax !== null)
 				
 				$fn_q = $db->ExecuteSQL("
 					INSERT INTO `users` (`user_name`, `user_email`, `user_pass`, `user_registred`, `user_status`, `user_activation_key`)
-					VALUES (:un, :en, MD5(:np), :td, '0', :ac);
+					VALUES (:un, :en, :ps, :td, '0', :ac);
 				", array(
 					'un' => $fn_set_new_name_user,
 					'en' => $fn_f_check_email,
-					'np' => $fn_set_new_password,
+					'ps' => md5("{$fn_f_check_email}~{$fn_set_new_password}"),
 					'td' => $fn_today_date,
 					'ac' => $fn_new_act_key,
 				));
@@ -4425,7 +4370,7 @@ if($fn_ajax !== null)
 					));
 					
 					$fn_to = $fn_f_check_email;
-					$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_new_client');
+					$fn_subject = getLangItem('mail_subject_new_client');
 					
 					$fn_html_p = getLangItem('mail_new_client_html');
 					$fn_mail_html = $CONFIG['templates']['standartEmail'];
@@ -4447,7 +4392,7 @@ if($fn_ajax !== null)
 						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 						"Client ID: <strong>{$fn_set_new_name_user}</strong>",
 						"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
-						"<a href=\"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}\">{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}</a>", //link
+						"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}", //link
 						$fn_inputs['n_email'],
 						$fn_set_new_password,
 					), $fn_mail_html);
@@ -4455,20 +4400,92 @@ if($fn_ajax !== null)
 					$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
 					
 					//envio del mail
-					@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
+					$fn_send = @mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
 					
-					exit(json_encode(array(
-						'status' => 200,
-						'message' => getLangItem('msg_new_client_mail_sended'),
-					)));
+					if($fn_send)
+					{
+						exit(json_encode(array(
+							'status' => 200,
+							'message' => getLangItem('msg_new_client_mail_sended'),
+						)));
+					}else{
+						exit(json_encode(array(
+							'status' => 400,
+							'message' => getLangItem('msg_new_client_create_error'),
+						)));
+					}
 				}else{
 					exit(json_encode(array(
 						'status' => 400,
 						'message' => getLangItem('msg_new_client_create_error'),
 					)));
 				}
-				
 			}
+		break;
+		
+		//client update pass desde su admin
+		case "clientUpPass":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+				'dom' => array("pass", "pass_repeat")
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => array("pass", "pass_repeat")
+			)));
+			
+			//array(1) { ["data"]=> string(44) "u_name=test&u_surname=123&u_idd=123&u_tel=13" }
+			parse_str($fn_p['data'], $fn_inputs);
+			
+			if(!isset($fn_inputs['pass']) || !isset($fn_inputs['pass_repeat']) || empty($fn_inputs['pass']) || empty($fn_inputs['pass_repeat'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Empty fields',
+				'dom' => array("pass", "pass_repeat"),
+			)));
+			
+			if($fn_inputs['pass'] !== $fn_inputs['pass_repeat']) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Not Match!',
+				'dom' => array("pass", "pass_repeat"),
+			)));
+			
+			$fn_login_user_data = $too_login->getUserData();
+			
+			$fn_up = $db->Fetch("
+				UPDATE `users`
+				SET `user_pass`=:key
+				WHERE `ID`=:id
+			", array(
+				"id" => $fn_login_user_data->ID,
+				"key" => md5("{$fn_login_user_data->user_email}~{$fn_inputs['pass']}"),
+			));
+			
+			if($fn_up)
+			{
+				$too_login->updateUserData();
+				
+				$fn_result = array(
+					'status' => 200,
+					'message' => 'Contraseña cambiada',
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Error al cambiar contraseña',
+				);
+			}
+			
+			exit(json_encode($fn_result));
 		break;
 		
 		//modificacion de datos personales del usuario
@@ -4483,25 +4500,53 @@ if($fn_ajax !== null)
 			if($u_level !== 200) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('no_level_msg'),
+				'dom' => array("u_name", "u_surname", "user_name")
 			)));
 			
 			if(!isset($fn_p['data'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'dom' => array("u_name", "u_surname", "user_name")
 			)));
 			
 			//array(1) { ["data"]=> string(44) "u_name=test&u_surname=123&u_idd=123&u_tel=13" }
 			parse_str($fn_p['data'], $fn_inputs);
 			
 			$fn_login_user_data = $too_login->getUserData();
-			$fn_user_id = ($fn_login_user_data->ID !== '1') ? $fn_login_user_data->ID : exit(json_encode(array(
+			$fn_user_id = ($fn_login_user_data->ID) ? $fn_login_user_data->ID : exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_client_persdata_no_updated'),
+				'dom' => array("u_name", "u_surname", "user_name")
 			)));
 			
-			$fn_json_data = json_encode($fn_inputs);
+			$fn_inJson = $fn_inputs;
+			unset($fn_inJson['user_name']);
+			unset($fn_inJson['user_email']);
+			unset($fn_inJson['pass']);
+			unset($fn_inJson['pass_repeat']);
 			
-			dm_nsw($CONFIG['site']['dm_nws'], $fn_login_user_data->user_email, "{$fn_inputs['u_name']} {$fn_inputs['u_surname']}", $fn_inputs['u_tel']);
+			$fn_get_user_pers_data = $db->FetchValue("
+				SELECT `meta_value`
+				FROM `users_meta`
+				WHERE `user_id`=:id
+				AND `meta_key`='user_pers_data'
+				LIMIT 1;
+			", array(
+				"id" => $fn_login_user_data->ID
+			));
+			
+			$fn_json_data = ($fn_get_user_pers_data && isJson($fn_get_user_pers_data)) ? json_encode(array_merge(json_decode($fn_get_user_pers_data, true), $fn_inJson)) : json_encode($fn_inJson);
+			
+			//update user name
+			if(isset($fn_inputs['user_name'])) $db->Fetch("
+				UPDATE `users`
+				SET `user_name`=:u
+				WHERE `ID`=:id
+				LIMIT 1;
+			", array(
+				"id" => $fn_login_user_data->ID,
+				"u" => $fn_inputs['user_name']
+			));
 			
 			//save
 			$fn_q = $db->Fetch("
@@ -4516,6 +4561,8 @@ if($fn_ajax !== null)
 			
 			if($fn_q)
 			{
+				$too_login->updateUserData();
+				
 				exit(json_encode(array(
 					'status' => 200,
 					'message' => getLangItem('msg_client_persdata_updated'),
@@ -4524,16 +4571,13 @@ if($fn_ajax !== null)
 				exit(json_encode(array(
 					'status' => 400,
 					'message' => getLangItem('msg_client_persdata_no_updated'),
+					'dom' => array("u_name", "u_surname", "user_name")
 				)));
 			}
 		break;
 		
-		//cliente manage directions
-		case "submitNewDirection":
-		case "getDirection":
-		case "addDirection":
-		case "delDirection":
-		case "stDirectionDefault":
+		case "clientUpInvoiceDir":
+		case "clientUpShippingDir":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
@@ -4544,177 +4588,87 @@ if($fn_ajax !== null)
 			if($u_level !== 200) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('no_level_msg'),
+				'dom' => array("u_name", "u_surname", "user_name")
 			)));
 			
-			if(!preg_match('/(getDirection|submitNewDirection)/', $fn_ajax) && !isset($fn_p['dir_id'])) exit(json_encode(array(
+			if(!isset($fn_p['data'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'dom' => array("u_name", "u_surname", "user_name")
+			)));
+			
+			//array(1) { ["data"]=> string(44) "u_name=test&u_surname=123&u_idd=123&u_tel=13" }
+			parse_str($fn_p['data'], $fn_inputs);
+			
+			$fn_type = ($fn_ajax == "clientUpInvoiceDir") ? "user_pers_data" : "user_dirs";
+			
+			
+			$fn_error = array();
+			//check fields
+			if(!isset($fn_inputs[$fn_type]['u_name']) || empty($fn_inputs[$fn_type]['u_name'])) array_push($fn_error, "{$fn_type}[u_name]");
+			if(!isset($fn_inputs[$fn_type]['u_email']) || empty($fn_inputs[$fn_type]['u_email'])) array_push($fn_error, "{$fn_type}[u_email]");
+			if(!isset($fn_inputs[$fn_type]['u_surname']) || empty($fn_inputs[$fn_type]['u_surname'])) array_push($fn_error, "{$fn_type}[u_surname]");
+			if(!isset($fn_inputs[$fn_type]['u_tel']) || empty($fn_inputs[$fn_type]['u_tel'])) array_push($fn_error, "{$fn_type}[u_tel]");
+			if(!isset($fn_inputs[$fn_type]['u_cif']) || empty($fn_inputs[$fn_type]['u_cif'])) array_push($fn_error, "{$fn_type}[u_cif]");
+			if(!isset($fn_inputs[$fn_type]['dir_country']) || empty($fn_inputs[$fn_type]['dir_country'])) array_push($fn_error, "{$fn_type}[dir_country]");
+			if(!isset($fn_inputs[$fn_type]['dir_city']) || empty($fn_inputs[$fn_type]['dir_city'])) array_push($fn_error, "{$fn_type}[dir_city]");
+			if(!isset($fn_inputs[$fn_type]['dir_primary']) || empty($fn_inputs[$fn_type]['dir_primary'])) array_push($fn_error, "{$fn_type}[dir_primary]");
+			if(!isset($fn_inputs[$fn_type]['dir_post']) || empty($fn_inputs[$fn_type]['dir_post'])) array_push($fn_error, "{$fn_type}[dir_post]");
+			if(!isset($fn_inputs[$fn_type]['dir_country']) || empty($fn_inputs[$fn_type]['dir_country'])) array_push($fn_error, "{$fn_type}[dir_country]");
+			
+			if(sizeof($fn_error) !== 0) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => $fn_error
 			)));
 			
 			$fn_login_user_data = $too_login->getUserData();
 			
-			//get user_dirs
-			$fn_q_meta_dirs = $db->FetchValue("
+			$fn_user_id = ($fn_login_user_data->ID) ? $fn_login_user_data->ID : exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_client_persdata_no_updated')
+			)));
+			
+			//datos de facturacion
+			$fn_get_user_pers_data = $db->FetchValue("
 				SELECT `meta_value`
 				FROM `users_meta`
-				WHERE `user_id`=:uid
-				AND `meta_key`='user_dirs'
+				WHERE `user_id`=:id
+				AND `meta_key`=:mkey
 				LIMIT 1;
 			", array(
-				'uid' => $fn_login_user_data->ID,
+				"id" => $fn_login_user_data->ID,
+				"mkey" => ($fn_ajax == "clientUpInvoiceDir") ? "user_pers_data" : "user_dirs",
 			));
 			
-			$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs) : array();
+			$fn_inJson = ($fn_ajax == "clientUpInvoiceDir") ? $fn_inputs['user_pers_data'] : $fn_inputs['user_dirs'];
+			$fn_json_data = ($fn_get_user_pers_data && isJson($fn_get_user_pers_data)) ? json_encode(array_merge(json_decode($fn_get_user_pers_data, true), $fn_inJson)) : 
+				json_encode($fn_inJson);
 			
-			$fn_data_out = array();
-			$fn_data_out['lang'] = array(
-				'lang_label_dir' => getLangItem('lang_label_dir'),
-				'lang_label_region' => getLangItem('lang_label_region'),
-				'lang_label_city' => getLangItem('lang_label_city'),
-				'lang_label_region' => getLangItem('lang_label_region'),
-				'lang_label_post' => getLangItem('lang_label_post'),
-				'lang_label_country' => getLangItem('lang_label_country'),
-				'form_update_but' => getLangItem('form_update_but'),
-				'form_del_but' => getLangItem('form_del_but'),
-				'form_set_default_but' => getLangItem('form_set_default_but'),
-				'form_save_but' => getLangItem('form_save_but'),
-				'form_misdirecciones_name' => getLangItem('form_misdirecciones_name'),
-			);
-			
-			$ifSave = false;
-			
-			switch($fn_ajax)
-			{
-				case "submitNewDirection":
-					//array(1) { ["data"]=> string(96) "dir_name=test&dir_primary=&dir_secundary=&dir_city=&dir_region=&dir_post=&dir_country=am&dir_id=" }
-					parse_str($fn_p['data'], $fn_inputs);
-					
-					if(isset($fn_inputs['dir_up']) && $fn_inputs['dir_up'])
-					{
-						//modif
-						$fn_edit_id = $fn_inputs['dir_id'];
-						if(!isset($fn_inputs['dir_id'])) unset($fn_inputs['dir_id']);
-						
-						foreach($fn_dir_data as $dk => $dv)
-						{
-							$fn_id = ($dv->dir_id == 0) ? '0' : $dv->dir_id;
-							
-							if($fn_id == $fn_edit_id)
-							{
-								$fn_inp_con = array();
-								
-								foreach($fn_inputs as $ik => $iv)
-								{
-									$fn_inp_con[$ik] = htmlentities($iv);
-								}
-								
-								$fn_inputs['dir_id'] = $fn_edit_id;
-								$fn_dir_data[$dk] = $fn_inp_con;
-							}
-						}
-					}else{
-						//add new
-						//unset($fn_inputs['dir_id']);
-						$fn_inputs['dir_id'] = count($fn_dir_data);
-						
-						$fn_inp_con = array();
-						
-						foreach($fn_inputs as $ik => $iv)
-						{
-							$fn_inp_con[$ik] = htmlentities($iv);
-						}
-						
-						//ponemos el primer item como default
-						if(count($fn_dir_data) == 0) $fn_inp_con['dir_default'] = 1;
-						
-						$fn_dir_data[] = $fn_inp_con;
-					}
-					
-					$fn_data_out['dir'] = $fn_inputs;
-					$ifSave = true;
-				break;
-				
-				case "getDirection":
-					$fn_q_contries = $db->FetchAll("
-						SELECT `country_code` AS 'c', `country_name` AS 'n'
-						FROM `apps_countries`
-						WHERE `active`='1';
-					");
-					
-					if($fn_q_contries) foreach($fn_q_contries as $ck => $cv)
-					{
-						$fn_data_out['countries'][] = array(
-							'c' => strtolower($cv->c),
-							'n' => $cv->n,
-						);
-					}
-					
-					if(isset($fn_p['dir_id'])) foreach($fn_dir_data as $dk => $dv)
-					{
-						if($dv->dir_id == $fn_p['dir_id']) $fn_data_out['dir'] = object_to_array($dv);
-					}
-					
-					$fn_q = true;
-				break;
-				
-				case "delDirection":
-					$fn_data_mod = array();
-				
-					//borramos direccion
-					foreach($fn_dir_data as $dk => $dv)
-					{
-						if($dv->dir_id == $fn_p['dir_id']) continue;
-						$fn_data_mod[] = $dv;
-					}
-					
-					$fn_dir_data = $fn_data_mod;
-					$ifSave = true;
-				break;
-				
-				case "stDirectionDefault":
-				case "addDirection":
-					//desmarcamos otros defaults y dejamos este como principal
-					if(count($fn_dir_data) !== 0) foreach($fn_dir_data as $dk => $dv)
-					{
-						if($dv->dir_id == $fn_p['dir_id'])
-						{
-							$fn_dir_data[$dk]->dir_default = 1;
-						}else{
-							if(isset($fn_dir_data[$dk]->dir_default)) unset($fn_dir_data[$dk]->dir_default);
-						}
-					}
-					
-					$ifSave = true;
-				break;
-			}
-			
-			if($ifSave)
-			{
-				$fn_dir_data = json_encode($fn_dir_data);
-				
-				//save
-				$fn_q = $db->Fetch("
-					INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
-					VALUES (:uid, 'user_dirs', :iv) 
-					ON DUPLICATE KEY UPDATE `meta_value`=:ivv;
-				", array(
-					'uid' => $fn_login_user_data->ID,
-					'iv' => $fn_dir_data,
-					'ivv' => $fn_dir_data,
-				));
-			}
+			//save
+			$fn_q = $db->Fetch("
+				INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+				VALUES (:uid, :mkey, :mval) 
+				ON DUPLICATE KEY UPDATE `meta_value`=:mvald;
+			", array(
+				'uid' => $fn_login_user_data->ID,
+				'mkey' => ($fn_ajax == "clientUpInvoiceDir") ? "user_pers_data" : "user_dirs",
+				'mval' => $fn_json_data,
+				'mvald' => $fn_json_data,
+			));
 			
 			if($fn_q)
 			{
+				$too_login->updateUserData();
+				
 				exit(json_encode(array(
 					'status' => 200,
-					'message' => 'Dirección establecida',
-					'data' => $fn_data_out,
+					'message' => getLangItem('msg_client_pers_data_saved'),
 				)));
 			}else{
 				exit(json_encode(array(
 					'status' => 400,
-					'message' => 'No he podido actualizar nada :(',
+					'message' => getLangItem('msg_client_persdata_no_updated'),
 				)));
 			}
 		break;
@@ -4772,7 +4726,6 @@ if($fn_ajax !== null)
 			//si no esta la session iniciada la iniciamos
 			if(!isset($_SESSION)) session_start();
 			
-			
 			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
 			{
 				unset($_SESSION['cart']);
@@ -4793,7 +4746,6 @@ if($fn_ajax !== null)
 			
 			$fn_p_c = (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : 12;
 			$fn_p_s = (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : 8;
-			
 			
 			if((isset($fn_inputs['product_var_size']) && is_numeric($fn_inputs['product_var_size'])) && (isset($fn_inputs['product_var_color']) && is_numeric($fn_inputs['product_var_color'])))
 			{
@@ -5048,204 +5000,7 @@ if($fn_ajax !== null)
 //------->		
 		
 		/* ------------------------------------------------------------------------------------------------ */
-		
-		//get all colors sizes
-		case "getColorSizes":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
-			
-			if($u_level !== 200) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No puede hacer esto, no tiene autorización!.',
-			)));
-			
-			$fn_array_out = array();
-			
-			$fn_q_c = $db->FetchAll("
-				SELECT *
-				FROM `product_color`;
-			");
-			
-			$fn_q_s = $db->FetchAll("
-				SELECT *
-				FROM `product_size`;
-			");
-			
-			if($fn_q_c) foreach($fn_q_c as $ck => $cv)
-			{
-				$fn_f_data = object_to_array($cv);
-				$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($cv->lang_data);
 				
-				$fn_array_out['color'][] = $fn_f_data;
-			}
-			
-			unset($fn_f_data);
-			
-			if($fn_q_s) foreach($fn_q_s as $sk => $sv)
-			{
-				$fn_f_data = object_to_array($sv);
-				$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($sv->lang_data);
-				
-				$fn_array_out['size'][] = $fn_f_data;
-			}
-			
-			//idiomas para los fields
-			$fn_array_out['lang'] = (isset($CONFIG['site']['lang']) && isJson($CONFIG['site']['lang'])) ?  json_decode($CONFIG['site']['lang']) : array($CONFIG['site']['defaultLang']);
-			
-			if(sizeof($fn_array_out) !== 0)
-			{
-				exit(json_encode(array(
-					'status' => 200,
-					'message' => 'Ya lo tengo',
-					'data' => $fn_array_out,
-				)));
-			}else{
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => 'No he podido crear la lista',
-				)));
-			}
-		break;
-		
-		//add/update color size
-		case "ctUpColorSize":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
-			
-			if($u_level !== 200) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No puede hacer esto, no tiene autorización!.',
-			)));
-			
-			if(!isset($fn_p['data'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No me estas mandando nada.',
-			)));
-			
-			parse_str($fn_p['data'], $fn_inputs);
-			
-			$fn_data_out = array();
-			$fn_db = ($fn_inputs['f_ctAdmType'] == 'color') ? 'product_color' : 'product_size';
-			$fn_lang_parse = array();
-			$fn_create_or_update = true;
-			
-			//titulo
-			$fn_title_lang_data = array();
-			
-			foreach($fn_inputs['f_lang_data'] as $tk => $tv)
-			{
-				$fn_title_lang_data[] = htmlentities($tv);
-				$fn_lang_parse[$tk] = htmlentities($tv);
-			}
-			$fn_title_lang_data = implode(' | ', $fn_title_lang_data);
-			
-			$fn_lang_parse = json_encode($fn_lang_parse);
-			
-			if(isset($fn_inputs['id']) && empty($fn_inputs['id']))
-			{
-				//create
-				$fn_q = $db->ExecuteSQL("
-					INSERT INTO :db (`lang_data`)
-					VALUES (:vl);
-				", array(
-					'db' => $fn_db,
-					'vl' => $fn_lang_parse,
-				));
-			}else{
-				//update
-				$fn_q = $db->Fetch("
-					UPDATE :db 
-					SET `lang_data`=:ln
-					WHERE `id`=:id
-				", array(
-					'db' => $fn_db,
-					'ln' => $fn_lang_parse,
-					'id' => $fn_inputs['id'],
-				));
-				
-				$fn_create_or_update = false;
-			}
-			
-			if($fn_q)
-			{
-				exit(json_encode(array(
-					'status' => 200,
-					'message' => 'Ya lo tengo',
-					'data' => array(
-						'id' => ($fn_create_or_update) ? $fn_q : $fn_inputs['id'],
-						'lang_data' => $fn_lang_parse,
-						'lang_parse' => $fn_title_lang_data,
-						'type' => $fn_inputs['f_ctAdmType'],
-						'create' => $fn_create_or_update,
-					),
-				)));
-			}else{
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => 'No hay nada respecto a lo que me preguntas',
-				)));
-			}
-		break;
-		
-		//del color size
-		case "delSizeItem":
-		case "delColorItem":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
-			
-			if($u_level !== 200) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No puede hacer esto, no tiene autorización!.',
-			)));
-			
-			if(!isset($fn_p['id'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'De que estamos hablando?',
-			)));
-			
-			if(!isset($fn_p['type'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'No sé que tipo.',
-			)));
-			
-			$fn_db = ($fn_p['type'] == 'color') ? 'product_color' : 'product_size';
-			
-			$fn_q = $db->Fetch("
-				DELETE FROM :db
-				WHERE `id`=:id
-			", array(
-				'db' => $fn_db,
-				'id' => $fn_p['id'],
-			));
-			
-			if($fn_q)
-			{
-				exit(json_encode(array(
-					'status' => 200,
-					'message' => 'Ya lo tengo, eliminado',
-				)));
-			}else{
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => 'No he podido eliminar nada :(',
-				)));
-			}
-		break;
-		
-		/* ------------------------------------------------------------------------------------------------ */
-		
 		//get data para editar contenido desde modal
 		case "getEditData":
 			if(IsHotlink()) exit(json_encode(array(
@@ -5548,259 +5303,6 @@ if($fn_ajax !== null)
 					'status' => 400,
 					'message' => 'Oh no! Algo falla no puedo leer los datos.',
 				)));
-			}
-		break;
-		
-		/* ------------------------------------------------------------------------------------------------ */
-		
-		/*
-		case "submitForms":
-			
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			if(!isset($fn_p['type'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('form_error_404'),
-			)));
-			
-			$fn_result = array();
-			
-			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
-			
-			switch($fn_p['type'])
-			{
-				case "contact":
-				case "contacto":
-					$fn_error_doms = array();
-					
-					//check inputs
-					foreach($fn_inputs as $fk => $fv)
-					{
-						if(preg_match('/(name|email|message)/', $fk))
-						{
-							//empty check
-							if(empty($fv)) $fn_error_doms[] = $fk;
-						
-							//email check
-							if(preg_match('/email/', $fk) && emailValidation($fv)) $fn_error_doms[] = $fk;
-						}
-					}
-					
-					if(sizeof($fn_error_doms) == 0)
-					{
-						dm_nsw($CONFIG['site']['dm_nws'], $fn_inputs['c_email'], $fn_inputs['c_name'], '');
-						
-						$fn_message = htmlspecialchars($fn_inputs['c_message'], ENT_COMPAT, 'UTF-8');
-						$fn_message_to_mail = "<p><strong>Nombre</strong> {$fn_inputs['c_name']}</p> <p><strong>Tema</strong> {$fn_inputs['c_subject']}</p> <p><strong>Mensaje</strong><br/>{$fn_message}</p>" ;
-						
-						$fn_to = $CONFIG['site']['mailinfo'];
-						$fn_subject = "[Contacto] - {$CONFIG['site']['sitetitlefull']}";
-						
-						$fn_mail_html = str_replace(array(
-							'%message%',
-							'%regards%', 
-							'%site_name%', 
-							'%copyz%',
-							'%site_dir%', 
-							'%site_logo%', 
-						), array(
-							$fn_message_to_mail,
-							getLangItem('regards'),
-							$CONFIG['site']['sitetitlefull'],
-							$CONFIG['site']['sitecopyz'],
-							'',
-							'',
-						), $CONFIG['templates']['standartEmail']);
-						
-						$fn_content = preparehtmlmail($fn_inputs['c_email'], $fn_mail_html);
-						
-						if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
-						{
-							exit(json_encode(array(
-								'status' => 200,
-								'message' => getLangItem('lang_contact_success'),
-							)));
-						}else{
-							exit(json_encode(array(
-								'status' => 400,
-								'message' => getLangItem('lang_contact_error_send'),
-								'dom' => $fn_error_doms
-							)));
-						}
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => getLangItem('lang_contact_error'),
-							'dom' => $fn_error_doms
-						)));
-					}
-				break;
-			}
-			
-			exit;
-		break;
-		*/
-		
-		/* ------------------------------------------------------------------------------------------------ */
-		
-		/* sin login categorias expuesto al publico */
-		
-		case "productManager":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			if(!isset($fn_p['a'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => '[M3689]',
-			)));
-			
-			//parse_str($fn_p['data'], $fn_inputs);
-			
-			switch($fn_p['a'])
-			{
-				case "category":
-					//a = action, i = id
-					$fn_q_a = array();
-					$fn_w = '';
-					
-					if(empty($fn_p['i'])) exit(json_encode(array(
-						'status' => 400,
-						'message' => getLangItem('lang_fail_query'),
-					)));
-					
-					if($fn_p['i'] !== 'all')
-					{
-						$fn_w = "AND `cat_id`=:i";
-						$fn_q_a = array(
-							'i' => $fn_p['i'],
-						);
-					}
-					
-					$fn_q = $db->FetchAll("
-						SELECT `id`, `lang_data`, `gallery_id`
-						FROM `product`
-						WHERE `active`='1'
-						{$fn_w}
-						ORDER BY `order` ASC
-					", $fn_q_a);
-					
-					if($fn_q)
-					{
-						$fn_q_out = array();
-						
-						foreach($fn_q as $qk => $qv)
-						{
-							$for_data = object_to_array($qv);
-							
-							$for_data['lang_data'] = decodeLangData($qv->lang_data);
-							$for_data['image'] = getThumbFromGallery($qv->gallery_id);
-							
-							$fn_q_out[] = $for_data;
-						}
-						
-						shuffle($fn_q_out);
-						
-						exit(json_encode(array(
-							'status' => 200,
-							'message' => "[M3720]",
-							'data' => $fn_q_out,
-							'lang' => array(
-								'lang_details' => getLangItem('lang_details'),
-								'lang_buy_now_button' => getLangItem('lang_buy_now_button'),
-							),
-						)));
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => getLangItem('lang_no_items'),
-						)));
-					}
-				break;
-				
-				case "collection":
-///---------------->
-///---------------->
-///---------------->
-///---------------->
-///---------------->
-///---------------->
-///---------------->
-///---------------->
-				break;
-				
-				case "getProductDetails":
-					if(empty($fn_p['i'])) exit(json_encode(array(
-						'status' => 400,
-						'message' => getLangItem('lang_fail_query'),
-					)));
-					
-					$fn_q_prod = $db->FetchArray("
-						SELECT `id`, `lang_data`, `hash`, `gallery_id`
-						FROM `product`
-						WHERE `active`='1'
-						AND `id`=:i
-						LIMIT 1
-					", array(
-						'i' => $fn_p['i'],
-					));
-					
-					if($fn_q_prod)
-					{
-						$fn_data_out = $fn_q_prod;
-						$fn_data_out['lang_data'] = decodeLangData($fn_data_out['lang_data']);
-						
-						$fn_q_prod_metas = $db->FetchAll("
-							SELECT * 
-							FROM `product_meta`
-							WHERE `p_id`=:i
-						", array(
-							'i' => $fn_q_prod['id'],
-						));
-						
-						if(sizeof($fn_q_prod_metas) !== 0)
-						{
-							foreach($fn_q_prod_metas as $mk => $mv)
-							{
-								$fn_data_out[$mv->m_key] = (preg_match('/(_content|_envio_ex)/', $mv->m_key)) ? decodeLangData($mv->m_value) : $mv->m_value;
-							}
-						}
-						
-						$fn_q_prod_gallery = $db->FetchValue("
-							SELECT `objects`
-							FROM `gallery`
-							WHERE `id`=:i
-						", array(
-							'i' => $fn_q_prod['gallery_id'],
-						));
-						
-						$fn_data_out['slider'] = array(
-							"config" => array(
-								'dom' => 'slider_product',
-								'type' => 'dual',	
-								'showArrows' => false,
-								'showDots' => false,
-							),
-							'data' => ($fn_q_prod_gallery) ? json_decode($fn_q_prod_gallery, true) : null,
-						);
-						
-						exit(json_encode(array(
-							'status' => 200,
-							'message' => "[M3798]",
-							'data' => $fn_data_out,
-						)));
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => getLangItem('lang_no_items'),
-						)));
-					}
-					
-				break;
 			}
 		break;
 		

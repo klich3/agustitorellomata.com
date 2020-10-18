@@ -3513,6 +3513,13 @@ form {
   margin-left: 0;
 }
 
+input[type="radio"],
+input[type="checkbox"] {
+  display: inline-block;
+  height: auto;
+  min-height: auto;
+}
+
 input[type="radio"].error,
 input[type="checkbox"].error {
   -webkit-box-shadow: 0px 0px 4px #ff0000;

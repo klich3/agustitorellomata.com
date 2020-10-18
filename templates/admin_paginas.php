@@ -243,62 +243,6 @@ switch($g_action)
 		return;
 	break;
 	
-	case "showComments":
-		
-		$fn_q_comments = $db->FetchAll("
-			SELECT *
-			FROM `blog_comments`
-			WHERE `p_id`=:pid
-			AND `parent`='0'
-			ORDER BY `date_create` DESC;
-		", array(
-			'pid' => $fn_g['id'],
-		));
-		
-		if($fn_q_comments) foreach($fn_q_comments as $ck => $cv)
-		{
-			$fn_for_data = object_to_array($cv);
-			$fn_for_data['active'] = ($cv->active == 1) ? 'Aprobado y visible' : 'No aprobado';
-			
-			//parents
-			$fn_parent_q = $db->FetchAll("
-				SELECT *
-				FROM `blog_comments`
-				WHERE `p_id`=:pid
-				AND `parent`=:pr
-				ORDER BY `date_create` ASC;
-			", array(
-				'pid' => $fn_g['id'],
-				'pr' => $cv->id,
-			));
-			
-			if($fn_parent_q)
-			{
-				foreach($fn_parent_q as $rk => $rv)
-				{
-					$fn_for_data_loc = object_to_array($rv);
-					$fn_for_data_loc['active'] = ($rv->active == 1) ? 'Aprobado y visible' : 'No aprobado';
-					$fn_for_data_loc['parent_id'] = $cv->id;
-					
-					$fn_xtemplate_parse['assign'][] = $fn_for_data_loc;
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.blog_comments.row.reply.row";
-				}
-				
-				$fn_xtemplate_parse['assign'][] = '';
-				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.blog_comments.row.reply";
-			}
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.blog_comments.row";
-		}
-	
-		$fn_xtemplate_parse['assign'][] = array(
-			'pid' => $fn_g['id'],
-		);
-		$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.blog_comments";
-		return;
-	break;
-	
 	case "list":
 	default:
 		
@@ -335,40 +279,18 @@ switch($g_action)
 					case "2": //articulo
 						$fn_type_page = "row_page";
 					break;
-					
-					case "3": //blog
-						$fn_type_page = "row_blog";
-						
-						//counter de comentarios
-						$fn_comments_count = $db->FetchValue("
-							SELECT COUNT(*) AS 'count'
-							FROM `blog_comments`
-							WHERE `p_id`=:pid;
-						", array(
-							'pid' => $pv->id,
-						));
-						
-						$comment_count_pub = $db->FetchValue("
-							SELECT COUNT(*) AS 'count'
-							FROM `blog_comments`
-							WHERE `p_id`=:pid
-							AND `active`='1'
-						", array(
-							'pid' => $pv->id,
-						));
-						//counter de comentarios
-						
-						$fn_for_data['comment_count_pub'] = ($comment_count_pub) ? $comment_count_pub : 0;
-						$fn_for_data['comment_count'] = ($fn_comments_count) ? $fn_comments_count : 0;
-						$fn_for_data['lang_name'] = $fn_q_lang_name;
-					break;
 				}
+				
+				$fn_template_filename = processUrl(preg_replace('/^([A-Za-z]{2})\//m', '', $fn_for_data['obj_hash']));
+				$fn_isSystemTemplate = (file_exists($CONFIG['site']['templatepath'].$fn_template_filename.'.xhtml')) ? true : false;
+				
+				$fn_for_data['is_system'] = ($fn_isSystemTemplate) ? "- [<strong class=\"uk-text-warning\">Es una pantalla del sistema</strong>]" : "";
 				
 				//tipo de pagina title
 				if(isset($pv->type)) $fn_for_data['type'] = $fn_q_page_types_title_by_id[$pv->type];
 				
 				//pagins protegidas
-				if(!$pv->protected)
+				if(!$pv->protected && !$fn_isSystemTemplate)
 				{
 					$fn_xtemplate_parse['assign'][] = '';
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list_page.{$fn_type_page}.delAllow";
