@@ -1,185 +1,129 @@
 <!-- BEGIN: cart -->
-<div class="center-container mt-1 mb-1">
-	<div class="cp-5 pb-3">
-		
-		<div class="w-1-1 mt-3 hl">&nbsp;</div>
-		
-		<div class="g">
-			<!-- BEGIN: no_cart -->
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<div class="w-1-1">
-					{message}
-				</div>
-				
-				<div class="w-1-1 mt-2">
-					<a href="{base}{user_lang}/tienda" class="button" data-event="cart/tienda">{but_ir_a_la_tienda}</a>
-				</div>
+<div class="w-1-1" data-cc-container>
+  <div class="c cc cp-4@s">
+	<div class="w-1-1">
+	  {FILE {jsonToTmpl}}
+	</div>
+  </div>
+  
+  <div class="g">
+	  <!-- BEGIN: no_cart -->
+	  <div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+		  <div class="w-1-1">
+			  {message}
+		  </div>
+		  
+		  <div class="w-1-1 mt-2">
+			  <a href="{base}{user_lang}/tienda" class="button" data-event="cart/tienda">{but_ir_a_la_tienda}</a>
+		  </div>
+	  </div>
+	  <!-- END: no_cart -->
+	  
+	  <!-- BEGIN: cart -->
+	  <div class="w-1-1 cp-2 pb-3">
+		  <div class="g gc">
+			  <div class="hs w-3-10">&nbsp;</div>
+			  
+			  <div class="hs w-2-10 brd-b pb-1">
+				  <strong class="txt@u">{lang_cart_producto_title}</strong>
+			  </div>
+			  
+			  <div class="hs w-2-10 brd-b pb-1 txt@c">
+				  <strong class="txt@u">{lang_cart_precio_title}</strong>
+			  </div>
+			  
+			  <div class="hs w-2-10 brd-b pb-1 txt@c">
+				  <strong class="txt@u">{lang_cart_cantidad_title}</strong>
+			  </div>
+			  
+			  <div class="w-1-10 brd-b pb-1 txt@r">
+				  <strong class="txt@u">total</strong>
+			  </div>
+		  </div>
+	  </div>
+	  	  
+	  <!-- BEGIN: row -->
+	  <div class="w-1-1 cp-2">
+		  <div class="g item" data-pid="{p_id}" data-cid="{cat_id}" data-szid="{s_id}" data-clid="{c_id}">
+			<div class="w-3-10">
+			  <img src="{base}images/blank.gif" data-image="{thumb}" data-preloadimages class="e" title="product {title} image preview" />
 			</div>
-			<!-- END: no_cart -->
 			
-			<!-- BEGIN: cart -->
-			<div class="w-1-1" data-cart-container>
-				<div class="g">
-					<div class="hs w-2-10">&nbsp;</div>
-					
-					<div class="hs w-1-10">&nbsp;</div>
-					
-					<div class="hs w-4-10 tu sub-divider pb-1">
-						{lang_cart_producto_title}
-					</div>
-					
-					<div class="hs w-1-10 tu tc sub-divider pb-1">
-						{lang_cart_cantidad_title}
-					</div>
-					
-					<div class="hs w-1-10 tu tc sub-divider pb-1">
-						total
-					</div>
-					
-					<div class="ws-1-1 wm-1-10 wl-1-10 wxl-1-10 tu sub-divider hs-sub-divider pb-1">
-						<a href="javascript:history.back();" class="fr tu"><svg width="14" height="12" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#back-icon"></use></svg> {back_button}</a>
-					</div>
-					
-				</div>
+			<div class="w-2-10">
+		    	<div class="title txt@u"><strong>{title}</strong></div>
+		    	<div class="subtitle txt@u"><strong>{subtitle}</strong></div>
+			</div>
+			
+			<div class="w-2-10">
+				<!-- BEGIN: multiplier -->
+				<div class="bot">{lang_box} {pax_multimplier} {lang_bot}</div>
+				<div class="bot-price">{precio_caja} €</div>
+				<!-- END: multiplier -->
+				<!-- BEGIN: venta_price -->
+				<div class="price">{precio_venta} € {lang_ud}</div>
+				<!-- END: venta_price -->
+			</div>
+			<div class="w-2-10">
 				
-				<!-- BEGIN: row -->
-				<div class="g item" data-pid="{p_id}" data-cid="{cat_id}" data-szid="{s_id}" data-clid="{c_id}">
-					<div class="ws-1-1 wm-2-10 wl-2-10 wxl-2-10">
-						<a href="{base}{user_lang}/{hash}" data-event="cart/{hash}">
-							<img src="{base}images/blank.gif" data-image="{thumb}" data-preloadimages class="e" title="product {title} image preview" />
-						</a>
-					</div>
-					
-					<div class="hs w-1-10">&nbsp;</div>
-					
-					<div class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10 tu">
-						<div class="w-1-1 mt-2 hl clearfix">&nbsp;</div>
-						<a href="{base}{user_lang}/{hash}" rel="nofollow" class="tc" data-event="cart/{hash}">{title}</a>
-						<div class="g">
-							<div class="w-1-2">
-								{lang_size}: <strong>{size}</strong>
-							</div>
-							<div class="w-1-2">
-								{lang_color}: <strong>{color}</strong>
-							</div>
+				<div class="g">
+					<div class="w-1-1">{cart_cant_bot}</div>
+					<div class="w-8-10">
+						<div class="w-1-1">
+							<input type="number" name="item[{cat_id}][{p_id}]" min="1" max="{stock_count}" value="{pax}" data-pax {only_read} class="w-1-1"/>
 						</div>
 					</div>
-					
-					<div class="w-1-1 mt-2 hl clearfix">&nbsp;</div>
-
-					<div class="w-1-3 ws-1-3 wm-1-10 wl-1-10 wxl-1-10 tu tc">
-						<input type="number" name="item[{cat_id}][{p_id}]" min="1" max="{stock_count}" value="{pax}" data-pax {only_read} class="w-1-1"/>
+					<div class="w-2-10">
+						<a href="javascript:void(0);" data-action="delCart" data-event="cart/del-cart">
+							<img src="{base_script}images/icon-trash.svg" width="22px" height="27px" />
+						</a>
 					</div>
-				
-					<div class="w-1-3 ws-1-3 wm-1-10 wl-1-10 wxl-1-10 tu tc price">
-						{price}&euro;
+					<div class="w-1-1"></div>
+					<div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
+						<a href="javascript:void(0);">
+							<img src="{base_script}images/icon-minus.svg" width="25px" height="25px" />
+						</a>
+						<a href="javascript:void(0);">
+							<img src="{base_script}images/icon-plus.svg" width="25px" height="25px" />
+						</a>
 					</div>
-					
-					<div class="w-1-3 ws-1-3 wm-1-10 wl-1-10 wxl-1-10 tu tc">
-						<!-- BEGIN: del_but -->
-						<a href="javascript:void(0);" data-action="delCart" data-event="cart/del-cart"><svg width="20" height="20" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#trash-icon-grey"></use></svg></a>
-						<!-- END: del_but -->
+					<div class="w-2-10"></div>
+				</div>
+			</div>
+			<div class="w-1-10 txt@r">
+				<strong class="txt-org">{price} &euro;</strong>
+			</div>
+		  </div>
+		  <div class="w-1-1 br"></div>
+	  </div>
+	  <!-- END: row -->
+	  
+	  <div class="brd-b w-1-1 pt-2 pb-2"></div>
+	  <div class="w-1-1 pt-4"></div>
+	  
+	  <div class="w-1-1 cp-2">
+		  <div class="g">
+			  <div class="w-8-10"></div>
+			  <div class="w-2-10">
+				  <div class="g" data-subtotal-container>
+						<div class="w-1-2 txt@u"><strong>{lang_iva} ({cart_iva_percent}%)</strong></div>
+						<div class="w-1-2 txt@r"><strong class="txt@u txt-org">{cart_iva} &euro;</strong></div>
+						
+						<div class="w-1-2 txt@u"><strong>subtotal</strong></div>
+						<div class="w-1-2 txt@r"><strong class="txt@u txt-org">{cart_subtotal} &euro;</strong></div>
 					</div>
-				</div>
-				<!-- END: row -->
-			</div>
-			
-			<div class="w-1-1 sub-divider hs">&nbsp;</div>
-			<div class="w-1-1 pt-3">&nbsp;</div>
-			
-<!-- BEGIN: hide -->
-			
-			<!-- BEGIN: dir_shipping -->
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<!-- BEGIN: no_dir -->
-				<p>{msg_checkout_nodir}</p>
-							<a href="{base}{user_lang}/mis-direcciones" class="button tu" data-event="cart/mis-direcciones">{menu_but_misdirecciones}</a>
-				<!-- END: no_dir -->
-				<!-- BEGIN: dir -->
-				<div class="box w-1-1 mb-4">
-					<strong>{dir_name}</strong><br/>
-			
-					<strong>{lang_label_dir}:</strong> {dir_primary}<br/>
-					<strong>{lang_label_region} 2:</strong> {dir_secundary}<br/>
-					<strong>{lang_label_city}:</strong> {dir_city}<br/>
-					<strong>{lang_label_region}:</strong> {dir_region}<br/>
-					<strong>{lang_label_post}:</strong> {dir_post}<br/>
-					<strong>{lang_label_country}:</strong> ({dir_country}) {dir_country_name}<br/>
-				</div>
-				<!-- END: dir -->
-			</div>
-			
-			<div class="w-1-1 pt-3 hl">&nbsp;</div>
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<!-- BEGIN: no_shipping_comp -->
-				
-				<p>{msg_no_shipping_companies}</p>
-				<!-- END: no_shipping_comp -->
-				
-				<!-- BEGIN: shipping_comp -->
-				{title_select_shipping_comp}<br/>
-				<select name="r_sel_shipping" class="w-1-1">
-					<!-- BEGIN: sel_envio -->
-					<option value="{id}" {comp_selected}>{title}</option>
-					<!-- END: sel_envio -->
-				</select>
-				<!-- END: shipping_comp -->
-				
-				<!-- BEGIN: history_shipping_comp -->
-				{title_select_shipping_comp}<br/>
-				<strong>{title}</strong>
-				<!-- END: history_shipping_comp -->
-			</div>
-			<!-- END: dir_shipping -->
-			<!-- BEGIN: no_dir_shipping -->
-			<div class="ws-1-1 wm-2-3 wl-2-3 wxl-2-3">
-				<p>{msg_no_logged}</p>
-				
-				<div class="w-1-1 pt-3">&nbsp;</div>
-				
-				<a href="{base}{user_lang}/login" class="button tu" data-event="cart/login">{menu_but_login}</a>
-				<a href="{base}{user_lang}/login" class="button tu" data-event="cart/registro">{menu_but_register}</a>
-			</div>
-			<!-- END: no_dir_shipping -->
-
-<!-- END: hide -->
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">&nbsp;</div>
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">&nbsp;</div>
-			
-			<div class="w-1-1 pt-3 hl">&nbsp;</div>
-			
-			<div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
-				<div class="g" data-subtotal-container>
-					<div class="w-1-2 tu tr">{lang_iva} ({cart_iva_percent}%)</div>
-					<div class="w-1-2 tu tr">{cart_iva}&euro;</div>
-					
-					<div class="w-1-2 tu tr">subtotal</div>
-					<div class="w-1-2 tu tr">{cart_subtotal}&euro;</div>
-					<!-- BEGIN: hide -->
-					<div class="w-1-2 tu tr">{lang_envio}</div>
-					<div class="w-1-2 tu tr">{cart_shipping_cost}&euro;</div>
-					
-					<div class="w-1-2 tu tr">total</div>
-					<div class="w-1-2 tu tr">{cart_total}&euro;</div>
-					<!-- END: hide -->
-				</div>
-				
-				<div class="w-1-1" data-cart-buttons>
-					<div class="w-1-1 pt-3">&nbsp;</div>
-					<!-- BEGIN: checkout_button -->
-					<a href="{base}{user_lang}/checkout" rel="nofollow" class="button fr" data-event="cart/checkout">{cart_checkout_but}</a>
-					<!-- END: checkout_button -->
-				</div>
-			</div>
-			<!-- END: cart -->
-		</div>
-		
-		<div class="w-1-1 mt-3 hl">&nbsp;</div>
-	</div>
-</div>
-<div class="mb-2">
-	{FILE {productos_destacados_footer}}
+				  
+				    <div class="w-1-1"></div>
+				  
+				  <div class="w-1-1" data-cart-buttons>
+						<div class="w-1-1 pt-3">&nbsp;</div>
+						<!-- BEGIN: checkout_button -->
+						<a href="{base}{user_lang}/checkout" rel="nofollow" class="button fr" data-event="cart/checkout">{cart_checkout_but}</a>
+						<!-- END: checkout_button -->
+					</div>
+			  </div>
+		  </div>
+	  </div>
+	  
+  </div>
 </div>
 <!-- END: cart -->

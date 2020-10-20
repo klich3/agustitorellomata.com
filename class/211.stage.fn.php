@@ -69,6 +69,9 @@ function get_header($fn_args)
 		'header_popup_data' => (isset($CONFIG['site']['initial_page_header_popup_enabled']) && $CONFIG['site']['initial_page_header_popup_enabled'] == 1) ? json_encode(array('gid' => $CONFIG['site']['initial_page_header_popup_id'])) : 'false',
 		
 		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
+		
+		'cart_hide' => (isset($_SESSION['cart'])) ? false : true,
+		'cart_items' => (isset($_SESSION['cart']) && isset($_SESSION['cart_checkout'])) ? $_SESSION['cart_checkout']['cart_count'] : 0,
 	));
 	
 	//custom settings
