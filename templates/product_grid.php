@@ -105,13 +105,14 @@ if($fn_q_cat_list)
 					);
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.subtitle";
 				}
-							
+				
 				//interios del grupos
 				$fn_xtemplate_parse['assign'][] = array(
 					'title' => html_entity_decode(decodeLangData($vi->lang_data)),
 					'image' => ($fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
 					'alt' => $fn_file['alt'],
-					'id' => $vi->id 
+					'id' => $vi->id,
+					'cat' => $vi->cat_id,
 				); 
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row";
 			}

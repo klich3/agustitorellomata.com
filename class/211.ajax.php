@@ -22,111 +22,50 @@ if($fn_ajax !== null)
 	
 	switch($fn_ajax)
 	{
-
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->	
 		
-		//client get product variety
-		case "getProdVariety":
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		
+		case "openCart":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
 			)));
 			
-			if(isset($fn_p['p']) && !is_numeric($fn_p['p'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => '[PR:137]',
-			)));
-			
-			if(isset($fn_p['s']) && !is_numeric($fn_p['s'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => '[PR:138]',
-			)));
-			
-			$fn_q_array = array(
-				'p' => $fn_p['p'],
-			);
-			
-			$fn_s = "";
-			
-			if(isset($fn_p['s']))
+			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
 			{
-				$fn_s = "AND `size_id`=:s";
-				$fn_q_array['s'] = $fn_p['s'];
-			}
-			
-			$fn_q = $db->FetchAll("
-				SELECT `precio_venta`, `size_id`, `color_id`, `item_base`
-				FROM `product_stock`
-				WHERE `prid`=:p
-				{$fn_s}
-				AND `stock_count`!='0'
-			", $fn_q_array);
-			
-			//--colores
-			$fn_color_q = $db->FetchAll("
-				SELECT *
-				FROM `product_color`
-			");
-			
-			$fn_color = array();
-			
-			if($fn_color_q) foreach($fn_color_q as $ck => $cv)
-			{
-				$fn_d = object_to_array($cv);
-				
-				$fn_title = (isset($fn_d['lang_data']) && isJson($fn_d['lang_data'])) ? object_to_array(json_decode($fn_d['lang_data'])) : '';
-				$fn_color[$fn_d['id']] = (isset($fn_title[$st_lang])) ? $fn_title[$st_lang] : $fn_title[$CONFIG['site']['defaultLang']];
-			}
-						
-			//out global
-			if($fn_q && sizeof($fn_q) != 0)
-			{
-				$fn_out = array();
-				$fn_colors_inlist = array();
-				
-				foreach($fn_q as $k => $v)
-				{
-					$fn_for_data = object_to_array($v);
-					
-					//if(in_array($fn_for_data['color_id'], $fn_colors_inlist)) continue;
-					
-					$fn_colors_inlist[] = $fn_for_data['color_id'];
-
-					$fn_for_data['color_title'] = $fn_color[$fn_for_data['color_id']];
-					$fn_out[] = $fn_for_data;
-				}
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
 				
 				exit(json_encode(array(
-					'status' => 200,
-					'message' => '[PR:165]',
-					'data' => $fn_out,
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
 				)));
 			}
 			
-			exit(json_encode(array(
-				'status' => 400,
-				'message' => '[PR:155]',
-			)));
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('cart_generado'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('cart_error_generar'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
 		break;
 		
-		//client reclamacion submit
-		case "reclamacionSend":
+		case "addCart":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			$u_level = $too_login->isAuth(15, false);
-			
-			if($u_level !== 200) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('no_level_msg'),
 			)));
 			
 			if(!isset($fn_p['data'])) exit(json_encode(array(
@@ -134,102 +73,281 @@ if($fn_ajax !== null)
 				'message' => getLangItem('msg_no_data'),
 			)));
 			
-			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			//'data' => string 'product_id=2&category_id=1' (length=26)
+			//parse_str($fn_p['data'], $fn_inputs);
+			$fn_inputs = json_decode($fn_p['data'], true);
 			
-			if(empty($fn_inputs['f_or_id'])) exit(json_encode(array(
+			//si no esta la session iniciada la iniciamos
+			if(!isset($_SESSION)) session_start();
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+			}
+			
+			if(!is_numeric($fn_inputs['product_id']) || !is_numeric($fn_inputs['category_id'])) exit(json_encode(array(
 				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
-				'dom' => array('f_or_id'),
+				'message' => getLangItem('msg_error_param'),
+			)));
+						
+			$fn_var = '';
+			$fn_isVars = false;
+			
+			$fn_q_check_stock_array = array(
+				'pid' => $fn_inputs['product_id'],
+			);
+			
+			$fn_p_c = (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : 12;
+			$fn_p_s = (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : 8;
+			
+			if((isset($fn_inputs['product_var_size']) && is_numeric($fn_inputs['product_var_size'])) && (isset($fn_inputs['product_var_color']) && is_numeric($fn_inputs['product_var_color'])))
+			{
+				$fn_var = "AND `size_id`=:s AND `color_id`=:c";
+				
+				$fn_q_check_stock_array['s'] = $fn_p_s;
+				$fn_q_check_stock_array['c'] = $fn_p_c;
+				
+				$fn_isVars = true;
+			}
+			
+			//id del producto en el carrito
+			$fn_pr_cart_id = md5("{$fn_inputs['product_id']}{$fn_p_s}{$fn_p_c}");
+			
+			//añadimos al carrito
+			$fn_q_check_stock = $db->FetchArray("
+				SELECT `stock_count`, `size_id`, `color_id`
+				FROM `product_stock` 
+				WHERE `prid`=:pid
+				{$fn_var}
+				LIMIT 1;
+			", $fn_q_check_stock_array);
+			
+			$fn_updated = false;
+
+			//vacio añadimos uno nuevo
+			if(!isset($_SESSION['cart']) && $fn_q_check_stock >= 1)
+			{
+				$fn_updated = true;
+				
+				$_SESSION['cart'][$fn_pr_cart_id] = array(
+					'cat_id' => $fn_inputs['category_id'],
+					'p_id' => $fn_inputs['product_id'],
+					's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
+					'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+					'pax' => '1',
+				);
+			}
+			
+			//añadimos a la lista
+			if(isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0 && !$fn_updated)
+			{
+				//existe sumamos un pax
+				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
+				{
+					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
+					
+					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
+				}else{
+					$_SESSION['cart'][$fn_pr_cart_id] = array(
+						'cat_id' => $fn_inputs['category_id'],
+						'p_id' => $fn_inputs['product_id'],
+						's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
+						'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+						'pax' => '1',
+					);
+				}
+			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('add_item_cart'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('add_item_cart_error'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+		
+		case "delCart":
+		case "reloadItemsCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
 			)));
 			
-			$fn_order_id = $db->FetchValue("
-				SELECT `id`
-				FROM `orders`
-				WHERE `order_id`=:oid
-				LIMIT 1;
-			", array(
-				'oid' => $fn_inputs['f_or_id'],
-			));
+			//'p_id':dom_pid,'cat_id':dom_cat_id,'pax':dom_pax_value
 			
-			if($fn_order_id)
+			if(!isset($fn_p['p_id']) || !isset($fn_p['cat_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!is_numeric($fn_p['p_id']) || !is_numeric($fn_p['cat_id']) || !is_numeric($fn_p['c_id']) || !is_numeric($fn_p['s_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_error_param'),
+			)));
+			
+			if($fn_ajax == 'reloadItemsCart' && !isset($fn_p['pax'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']))
 			{
-				$fn_rec_data = base64_encode(json_encode($fn_inputs));
-				$fn_date = date('Y-m-d H:i:s');
-				
-				$db->Fetch("
-					INSERT INTO `orders_reclamacion` (`o_id`, `data`, `date`)
-					VALUES (:oid, :rdt, :dt);
-				", array(
-					'oid' => $fn_order_id,
-					'rdt' => $fn_rec_data,
-					'dt' => $fn_date,
-				));
-			}
-			
-			$getUserData = $too_login->getUserData();
-			/*
-				var_dump($getUserData);
-				object(stdClass)[1]
-			  public 'ID' => string '1' (length=1)
-			  public 'user_name' => string '211' (length=3)
-			  public 'user_email' => string 'admin@211.com' (length=13)
-			  public 'user_status' => string '1' (length=1)
-			  public 'user_add_date' => string '2017-02-25 17:22:14' (length=19)
-			  public 'status_value' => string 'Activo' (length=6)
-			  public 'user_level' => string '100' (length=3)
-			  public 'time_stamp' => int 1488910705
-
-			*/
-			
-			$fn_message = getLangItem('mail_message_reclamacion');
-			$fn_message = str_replace(array(
-				'%ID%',
-				'%MOTIVO%'
-			), array(
-				$getUserData->ID,
-				$fn_inputs['f_subject']
-			), $fn_message);
-			
-			$fn_message .= htmlspecialchars($fn_inputs['f_message'], ENT_COMPAT, 'UTF-8');
-			
-			$fn_to = $CONFIG['site']['mailinfo'];
-			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
-			
-			//html y content del mail
-			$fn_mail_html = $CONFIG['templates']['standartEmail'];
-			
-			$fn_mail_html = str_replace(array(
-				'%message%',
-				'%regards%', 
-				'%site_name%', 
-				'%copyz%',
-				'%site_dir%', 
-				'%site_logo%', 
-			), array(
-				$fn_message,
-				getLangItem('regards'),
-				$CONFIG['site']['sitetitlefull'],
-				$CONFIG['site']['sitecopyz'],
-				'',
-				'<img src="'.$CONFIG['site']['base'].'m/logo.png?" alt="logotype" />',
-			), $fn_mail_html);
-			
-			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
-			
-			//envio del mail
-			if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
-			{
-				exit(json_encode(array(
-					'status' => 200,
-					'message' => getLangItem('contact_form_confirm'),
-				)));
-			}else{
 				exit(json_encode(array(
 					'status' => 400,
-					'message' => getLangItem('contact_form_error'),
+					'message' => getLangItem('cart_empty'),
 				)));
 			}
+			
+			if(sizeof($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+				
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			//del cart
+			if($fn_ajax == 'delCart')
+			{
+				//id del item en el cart
+				$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
+				
+				if(sizeof($_SESSION['cart']) !== 0 && array_key_exists($fn_pr_cart_id, $_SESSION['cart'])) unset($_SESSION['cart'][$fn_pr_cart_id]);
+				if(sizeof($_SESSION['cart']) == 0)
+				{
+					unset($_SESSION['cart']);
+					
+					exit(json_encode(array(
+						'status' => 400,
+						'message' => getLangItem('cart_empty'),
+					)));
+				}
+			}
+			
+			//reloadcart
+			if($fn_ajax == 'reloadItemsCart') foreach($_SESSION['cart'] as $ck => $cv)
+			{
+				if($cv['cat_id'] == $fn_p['cat_id'] && $cv['p_id'] == $fn_p['p_id'])
+				{
+					$fn_q_check_stock = $db->FetchValue("
+						SELECT `stock_count`
+						FROM `product_stock` 
+						WHERE `prid`=:prid
+						AND `color_id`=:cid
+						AND `size_id`=:sid
+						LIMIT 1;
+					", array(
+						'prid' => $cv['p_id'],
+						'cid' => $cv['c_id'],
+						'sid' => $cv['s_id'],
+					));
+					
+					$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
+					
+					$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_p['pax'] < $fn_q_check_stock) ? $fn_p['pax'] : $fn_q_check_stock;
+				}
+			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+						
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => getLangItem('add_item_cart'),
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => getLangItem('add_item_cart_error'),
+				);
+			}
+			
+			exit(json_encode($fn_result));
 		break;
+
+		case "stShippingReloadCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['t_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(!isset($_SESSION) || !isset($_SESSION['cart']))
+			{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			if(sizeof($_SESSION['cart']) == 0)
+			{
+				unset($_SESSION['cart']);
+				unset($_SESSION['cart_checkout']);
+				
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('cart_empty'),
+				)));
+			}
+			
+			
+			//
+			//	array (size=1)
+			// 't_id' => string '9' (length=1)
+			//
+			
+			$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_p['t_id'];
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
+			
+			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
+			
+			if($fn_process_cart)
+			{
+				$fn_result = array(
+					'status' => 200,
+					'message' => 'Recalculado',
+					'data' => $fn_process_cart,
+				);
+			}else{
+				$fn_result = array(
+					'status' => 400,
+					'message' => 'Hay algún error al calcular la tarifa',
+				);
+			}
+			
+			exit(json_encode($fn_result));
+		break;
+		
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
 		
 		case "checkoutPayment":
 			if(IsHotlink()) exit(json_encode(array(
@@ -908,6 +1026,127 @@ if($fn_ajax !== null)
 			}
 			
 			exit;
+		break;
+		
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
+		
+		//client reclamacion submit
+		case "reclamacionSend":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			
+			if(empty($fn_inputs['f_or_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => array('f_or_id'),
+			)));
+			
+			$fn_order_id = $db->FetchValue("
+				SELECT `id`
+				FROM `orders`
+				WHERE `order_id`=:oid
+				LIMIT 1;
+			", array(
+				'oid' => $fn_inputs['f_or_id'],
+			));
+			
+			if($fn_order_id)
+			{
+				$fn_rec_data = base64_encode(json_encode($fn_inputs));
+				$fn_date = date('Y-m-d H:i:s');
+				
+				$db->Fetch("
+					INSERT INTO `orders_reclamacion` (`o_id`, `data`, `date`)
+					VALUES (:oid, :rdt, :dt);
+				", array(
+					'oid' => $fn_order_id,
+					'rdt' => $fn_rec_data,
+					'dt' => $fn_date,
+				));
+			}
+			
+			$getUserData = $too_login->getUserData();
+			/*
+				var_dump($getUserData);
+				object(stdClass)[1]
+			  public 'ID' => string '1' (length=1)
+			  public 'user_name' => string '211' (length=3)
+			  public 'user_email' => string 'admin@211.com' (length=13)
+			  public 'user_status' => string '1' (length=1)
+			  public 'user_add_date' => string '2017-02-25 17:22:14' (length=19)
+			  public 'status_value' => string 'Activo' (length=6)
+			  public 'user_level' => string '100' (length=3)
+			  public 'time_stamp' => int 1488910705
+
+			*/
+			
+			$fn_message = getLangItem('mail_message_reclamacion');
+			$fn_message = str_replace(array(
+				'%ID%',
+				'%MOTIVO%'
+			), array(
+				$getUserData->ID,
+				$fn_inputs['f_subject']
+			), $fn_message);
+			
+			$fn_message .= htmlspecialchars($fn_inputs['f_message'], ENT_COMPAT, 'UTF-8');
+			
+			$fn_to = $CONFIG['site']['mailinfo'];
+			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
+			
+			//html y content del mail
+			$fn_mail_html = $CONFIG['templates']['standartEmail'];
+			
+			$fn_mail_html = str_replace(array(
+				'%message%',
+				'%regards%', 
+				'%site_name%', 
+				'%copyz%',
+				'%site_dir%', 
+				'%site_logo%', 
+			), array(
+				$fn_message,
+				getLangItem('regards'),
+				$CONFIG['site']['sitetitlefull'],
+				$CONFIG['site']['sitecopyz'],
+				'',
+				'<img src="'.$CONFIG['site']['base'].'m/logo.png?" alt="logotype" />',
+			), $fn_mail_html);
+			
+			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
+			
+			//envio del mail
+			if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => getLangItem('contact_form_confirm'),
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('contact_form_error'),
+				)));
+			}
 		break;
 		
 		//------------------------------------------------------------------------------------------------
@@ -4212,13 +4451,6 @@ if($fn_ajax !== null)
 		
 		/* ------------------------------------------------------------------------------------------------ */
 		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->	
 		//creamos actualizamos variedad de producto
 		case "upVarProducto":
 			if(IsHotlink()) exit(json_encode(array(
@@ -4734,332 +4966,6 @@ if($fn_ajax !== null)
 				)));
 			}
 		break;
-		
-		case "openCart":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
-			{
-				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
-				
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('cart_empty'),
-				)));
-			}
-			
-			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			
-			if($fn_process_cart)
-			{
-				$fn_result = array(
-					'status' => 200,
-					'message' => getLangItem('cart_generado'),
-					'data' => $fn_process_cart,
-				);
-			}else{
-				$fn_result = array(
-					'status' => 400,
-					'message' => getLangItem('cart_error_generar'),
-				);
-			}
-			
-			exit(json_encode($fn_result));
-		break;
-
-		case "addCart":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			if(!isset($fn_p['data'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
-			)));
-			
-			//'data' => string 'product_id=2&category_id=1' (length=26)
-			parse_str($fn_p['data'], $fn_inputs);
-			
-			//si no esta la session iniciada la iniciamos
-			if(!isset($_SESSION)) session_start();
-			
-			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
-			{
-				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
-			}
-			
-			if(!is_numeric($fn_inputs['product_id']) || !is_numeric($fn_inputs['category_id'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_error_param'),
-			)));
-			
-			$fn_var = '';
-			$fn_isVars = false;
-			
-			$fn_q_check_stock_array = array(
-				'pid' => $fn_inputs['product_id'],
-			);
-			
-			$fn_p_c = (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : 12;
-			$fn_p_s = (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : 8;
-			
-			if((isset($fn_inputs['product_var_size']) && is_numeric($fn_inputs['product_var_size'])) && (isset($fn_inputs['product_var_color']) && is_numeric($fn_inputs['product_var_color'])))
-			{
-				$fn_var = "AND `size_id`=:s AND `color_id`=:c";
-				
-				$fn_q_check_stock_array['s'] = $fn_p_s;
-				$fn_q_check_stock_array['c'] = $fn_p_c;
-				
-				$fn_isVars = true;
-			}
-			
-			//id del producto en el carrito
-			$fn_pr_cart_id = md5("{$fn_inputs['product_id']}{$fn_p_s}{$fn_p_c}");
-			
-			//añadimos al carrito
-			$fn_q_check_stock = $db->FetchArray("
-				SELECT `stock_count`, `size_id`, `color_id`
-				FROM `product_stock` 
-				WHERE `prid`=:pid
-				{$fn_var}
-				LIMIT 1;
-			", $fn_q_check_stock_array);
-			
-			$fn_updated = false;
-
-			//vacio añadimos uno nuevo
-			if(!isset($_SESSION['cart']) && $fn_q_check_stock >= 1)
-			{
-				$fn_updated = true;
-				
-				$_SESSION['cart'][$fn_pr_cart_id] = array(
-					'cat_id' => $fn_inputs['category_id'],
-					'p_id' => $fn_inputs['product_id'],
-					's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
-					'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
-					'pax' => '1',
-				);
-			}
-			
-			//añadimos a la lista
-			if(isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0 && !$fn_updated)
-			{
-				//existe sumamos un pax
-				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
-				{
-					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
-					
-					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
-				}else{
-					$_SESSION['cart'][$fn_pr_cart_id] = array(
-						'cat_id' => $fn_inputs['category_id'],
-						'p_id' => $fn_inputs['product_id'],
-						's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
-						'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
-						'pax' => '1',
-					);
-				}
-			}
-			
-			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			
-			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
-			
-			if($fn_process_cart)
-			{
-				$fn_result = array(
-					'status' => 200,
-					'message' => getLangItem('add_item_cart'),
-					'data' => $fn_process_cart,
-				);
-			}else{
-				$fn_result = array(
-					'status' => 400,
-					'message' => getLangItem('add_item_cart_error'),
-				);
-			}
-			
-			exit(json_encode($fn_result));
-		break;
-
-		case "delCart":
-		case "reloadItemsCart":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			//'p_id':dom_pid,'cat_id':dom_cat_id,'pax':dom_pax_value
-			
-			if(!isset($fn_p['p_id']) || !isset($fn_p['cat_id'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
-			)));
-			
-			if(!is_numeric($fn_p['p_id']) || !is_numeric($fn_p['cat_id']) || !is_numeric($fn_p['c_id']) || !is_numeric($fn_p['s_id'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_error_param'),
-			)));
-			
-			if($fn_ajax == 'reloadItemsCart' && !isset($fn_p['pax'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
-			)));
-			
-			if(!isset($_SESSION) || !isset($_SESSION['cart']))
-			{
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('cart_empty'),
-				)));
-			}
-			
-			if(sizeof($_SESSION['cart']) == 0)
-			{
-				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
-				
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('cart_empty'),
-				)));
-			}
-			
-			//del cart
-			if($fn_ajax == 'delCart')
-			{
-				//id del item en el cart
-				$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
-				
-				if(sizeof($_SESSION['cart']) !== 0 && array_key_exists($fn_pr_cart_id, $_SESSION['cart'])) unset($_SESSION['cart'][$fn_pr_cart_id]);
-				if(sizeof($_SESSION['cart']) == 0)
-				{
-					unset($_SESSION['cart']);
-					
-					exit(json_encode(array(
-						'status' => 400,
-						'message' => getLangItem('cart_empty'),
-					)));
-				}
-			}
-			
-			//reloadcart
-			if($fn_ajax == 'reloadItemsCart') foreach($_SESSION['cart'] as $ck => $cv)
-			{
-				if($cv['cat_id'] == $fn_p['cat_id'] && $cv['p_id'] == $fn_p['p_id'])
-				{
-					$fn_q_check_stock = $db->FetchValue("
-						SELECT `stock_count`
-						FROM `product_stock` 
-						WHERE `prid`=:prid
-						AND `color_id`=:cid
-						AND `size_id`=:sid
-						LIMIT 1;
-					", array(
-						'prid' => $cv['p_id'],
-						'cid' => $cv['c_id'],
-						'sid' => $cv['s_id'],
-					));
-					
-					$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
-					
-					$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_p['pax'] < $fn_q_check_stock) ? $fn_p['pax'] : $fn_q_check_stock;
-				}
-			}
-			
-			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
-						
-			if($fn_process_cart)
-			{
-				$fn_result = array(
-					'status' => 200,
-					'message' => getLangItem('add_item_cart'),
-					'data' => $fn_process_cart,
-				);
-			}else{
-				$fn_result = array(
-					'status' => 400,
-					'message' => getLangItem('add_item_cart_error'),
-				);
-			}
-			
-			exit(json_encode($fn_result));
-		break;
-
-		case "stShippingReloadCart":
-			if(IsHotlink()) exit(json_encode(array(
-				'status' => 400,
-				'message' => 'Ajax Fraud cached!',
-			)));
-			
-			if(!isset($fn_p['t_id'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
-			)));
-			
-			if(!isset($_SESSION) || !isset($_SESSION['cart']))
-			{
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('cart_empty'),
-				)));
-			}
-			
-			if(sizeof($_SESSION['cart']) == 0)
-			{
-				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
-				
-				exit(json_encode(array(
-					'status' => 400,
-					'message' => getLangItem('cart_empty'),
-				)));
-			}
-			
-			
-			/*
-				array (size=1)
-			  't_id' => string '9' (length=1)
-			*/
-			
-			$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_p['t_id'];
-			
-			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			
-			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
-			
-			if($fn_process_cart)
-			{
-				$fn_result = array(
-					'status' => 200,
-					'message' => 'Recalculado',
-					'data' => $fn_process_cart,
-				);
-			}else{
-				$fn_result = array(
-					'status' => 400,
-					'message' => 'Hay algún error al calcular la tarifa',
-				);
-			}
-			
-			exit(json_encode($fn_result));
-		break;
-			
-		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
-//------->		
 		
 		/* ------------------------------------------------------------------------------------------------ */
 				

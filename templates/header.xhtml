@@ -54,6 +54,12 @@
 <body>
 {FILE "templates/_header_svg.xhtml"}
 
+<div class="cart-wrap">
+	<div class="cp-1" data-cart-container>
+		
+	</div>
+</div>
+
 <div class="wrap">
 	<!-- BEGIN: header_logged -->
 	<div class="header-logged">
@@ -63,8 +69,13 @@
 					<img src="{base_script}images/user-icon-b.svg" width="30px" height="30px" alt="mi-cuenta" class="pr-2" /> <span class="pt-1">{but_mi_cuenta}</span></a>
 			</div>
 			<div class="sep"></div>
-			<div>
-				<a href="javascript:void(0);"><img src="{base_script}images/cart.svg" width="25px" height="22px" alt="cart"/></a>
+			<div class="cart">
+				<div>
+					<a href="javascript:void(0);" data-action="openCart"><img src="{base_script}images/cart.svg" width="25px" height="22px" alt="cart"/></a>
+				</div>
+				<div>
+					<div class="cart-not {cart_hide}">{cart_items}</div>
+				</div>
 			</div>
 			<div class="sep"></div>
 			<div>

@@ -84,6 +84,26 @@ $(function()
 		'<a href="javascript:void(0);" data-cookies="accept">Aceptar</a>'+
 	'</div>');
 	
+	//cart
+	$.template('cart', '<div class="cart-container"> \
+			<div class="w-1-1"> \
+			<a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a> \
+			</div> \
+			<div class="w-1-1 pt-2"></div> \
+			<div class="container"> \
+				{{if data.status == 400}} \
+					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}} \
+				{{else}} \
+					status 200 ${status} \
+				{{/if}} \
+				{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}} \
+			</div> \
+		</div> \
+	');
+	
+	/*
+	array(2) { ["product_id"]=> int(9) ["category_id"]=> int(0) } {"status":200,"message":"Producto a\u00f1adido al carrito","data":{"cart_checkout":{"cart_count":1,"cart_subtotal":64.35,"cart_iva":11.17,"cart_iva_percent":"21","cart_peso":0},"cart_wiva_checkout":{"cart_subtotal":42.01,"cart_iva":11.17},"cart":[{"cat_id":0,"p_id":9,"s_id":"8","c_id":"12","pax":"1","hash":"kripta-gran-reserva","title":"Kripta gran reserva","stock_count":"0","thumb":"\/\/too:8888\/agustitorellomata.com\/content\/0.49509100-155410494179da4c33caee614887ef6aac01b192ddw_450h_.jpg","price":53.18}],"lang":{"lang_iva":"IVA","lang_no_iva":"No hay iva","lang_envio":"Env\u00edo","cart_shipping_included":"Incluido en el precio"}}}*/
+	
 	//_G vars
 	var _G = {
 		FIRSTRUN:false,
@@ -181,8 +201,8 @@ $(function()
 		
 		if(/closeCart/gim.test(dom_type))
 		{
-			$('html').removeClass('menu-open');
-			$('.cart [data-cart-container]').empty();
+			$('html').removeClass('menu-open').removeClass('openCart');;
+			$('[data-cart-container]').empty();
 			
 			//recargamos la pagina en checkout
 			if($('html').attr('data-hash') == 'checkout') location.reload();
@@ -190,187 +210,20 @@ $(function()
 			return;
 		}
 		
-//------->
-//------->
-		/*
-		switch(dom_type)
+		if(/openCart/gim.test(dom_type))
 		{
-			case "closeCart":
-				$('html').removeClass('menu-open');
-				$('.cart [data-cart-container]').empty();
-				
-				//recargamos la pagina en checkout
-				if($('html').attr('data-hash') == 'checkout') location.reload();
-				
-				return;
-			break;
-			
-			case "openCart":
-				needCall = true;
-				
-				//quitamos el mob menu
-				$('.cart .mobile-menu').addClass('h');
-				
-				var fn_hash = dom_type,
-					fn_data = {
-						'wiva':determineCart
-					},
-					fn_before = function()
-					{
-						$('.cart [data-cart-container]').html($.tmpl('cartPreloader'));
-						$('html').addClass('menu-open');
-						
-						$(document).keyup(function(e) 
-						{
-							if (e.keyCode == 27) $('.cart [data-action="closeCart"]').trigger('click');
-						});
-					},
-					fn_success = function(d)
-					{
-						trace(d);
-						
-						$('.cart [data-cart-container]').html($.tmpl('cartItem', d));
-						
-						if(d.status == 200 && d.data.cart.length !== 0)
-						{
-							$('.cart [data-cart-buttons]').removeClass('h');
-							$('.cart input[data-pax]').off('change').on('change', fn_chenge_item_cart_handler);
-						}
-					};
-			break;
-			
-			
-			case "delCart":
-				needCall = true;
-				
-				var dom_pid = ele.parents('.item').attr('data-pid'),
-					dom_cat_id = ele.parents('.item').attr('data-cid'),
-					dom_s_id = ele.parents('.item').attr('data-szid'),
-					dom_c_id = ele.parents('.item').attr('data-clid'),
-					determineCart = ele.parents('[data-cart-container]').is('form');
-				
-				var fn_hash = dom_type,
-					fn_data = {
-						'p_id':dom_pid,
-						'cat_id':dom_cat_id,
-						'c_id':dom_c_id,
-						's_id':dom_s_id
-					},
-					fn_before = function()
-					{
-						if(determineCart) $('.cart [data-cart-container]').html($.tmpl('cartPreloader'));
-					},
-					fn_success = function(d)
-					{
-						trace(d);
-						
-						if(d.status == 200 && d.cart && d.data.cart.length !== 0)
-						{
-							if(!determineCart)
-							{
-								//stage
-								$('[data-subtotal-container] .item[data-cid="'+dom_pid+'"][data-pid="'+dom_cat_id+'"][data-clid="'+dom_c_id+'"][data-szid="'+dom_s_id+'"]').remove();
-								
-								//update subtotal
-								$('[data-subtotal-container]').html($.tmpl('stageCartSubtotal', d.data));
-							}else{
-								//cart side
-								
-								//del item
-								$('.cart .item[data-cid="'+dom_pid+'"][data-pid="'+dom_cat_id+'"][data-clid="'+dom_c_id+'"][data-szid="'+dom_s_id+'"]').remove();
-								
-								//update subtotal
-								$('.cart [data-cart-subtotal]').html($.tmpl('cartSubtotal', d.data));
-							}
-						}else{
-							//cart empty
-							if(!determineCart)
-							{
-								//stage remove all content
-								$('[data-subtotal-container]').empty();
-								$('[data-cart-container]').empty();
-								$('[data-cart-buttons]').addClass('h');
-								location.reload();
-							}else{
-								//cart side
-								$('.cart [data-cart-container]').html($.tmpl('cartItem', d));
-							}
-							
-							if($('[data-cart-container] .item').length == 0)
-							{
-								$('.cart [data-cart-buttons]').addClass('h');
-							}else{
-								$('.cart [data-cart-buttons]').removeClass('h');
-							}
-						}
-					};
-			break;
-			
-			case "addCart":
-				var dom_form = ele.parents('form'),
-					dom_ser = dom_form.serialize();
-			
-				needCall = true;
-				
-				var fn_hash = dom_type,
-					fn_data = {
-						'data':dom_ser
-					},
-					fn_before = function()
-					{
-						if(dom_type == 'addCart')
-						{
-							$('.cart [data-cart-container]').html($.tmpl('cartPreloader'));
-							$('html').addClass('menu-open');
-						}else{
-							ele.find('[data-preloader]').removeClass('h');
-						}
-					},
-					fn_success = function(d)
-					{
-						if(dom_type !== 'addCart') ele.find('[data-preloader]').addClass('h');
-						
-						trace(d);
-						
-						if(d.status == 200)
-						{
-							if(dom_type == 'newClient' || dom_type == 'recoveryPass') dom_form.find('input').val('');
-							if(dom_type == 'submitNewDirection')
-							{
-								//borramos form
-								ele.parents('li').remove();
-								
-								//añadimos el resultado final
-								$.tmpl('dir', {
-									'type':'savedDirection',
-									'data':d.data
-								}).prependTo('[data-list-container]');
-							}
-							if(dom_type == 'addCart')
-							{
-								$('[data-cart-buttons]').removeClass('h');
-								$('.cart [data-cart-buttons]').removeClass('h');
-								$('.cart [data-cart-container]').html($.tmpl('cartItem', d));
-								$('.cart input[data-pax]').off('change').on('change', fn_chenge_item_cart_handler);
-							}
-						}
-						
-						if(dom_form.find('[data-message]').length !== 0)
-						{
-							dom_form.find('[data-message]').html($.tmpl('form_message', d));
-						
-							clearTimeout($.data(this, 'msgTimer'));
-							$.data(this, 'msgTimer', setTimeout(function()
-							{
-								dom_form.find('[data-message]').html('');
-							}, 7000));
-						}
-					};
-			break;
+			//quitamos el mob menu
+			$('html').removeClass('menu-open').addClass('openCart');
+			$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:"preload"}));
 		}
-			*/
-//------->
-//------->
+		
+		if(/addCart/gim.test(dom_type))
+		{
+			var dom_data_ser = JSON.stringify({
+				"product_id": ele.data('id') || 0,
+				"category_id": ele.data('cat') || 0
+			});
+		}
 		
 		fn_call_ajax(dom_type, 
 		{
@@ -379,8 +232,12 @@ $(function()
 		{
 			if(debug) console.log(d);
 			
+			if(/(add|open)Cart/gim.test(dom_type)) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+			
 			if(d.status == 200)
 			{
+				if(/(add|open)Cart/gim.test(dom_type)) $('.cart-not.h').text(d.data.cart.length).removeClass('h');
+				
 				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
 				if(dom_type == 'recUpPass') window.location.href = "/login";
