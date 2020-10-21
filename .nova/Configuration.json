@@ -1,6 +1,7 @@
 {
   "apexskier.eslint.config.fixOnSave" : "Disable",
   "apexskier.typescript.config.isEnabledForJavascript" : "Disable",
+  "prettier.default-config.useTabs" : "Global Default",
   "prettier.format-on-save" : "Disable",
   "workspace.color" : 6,
   "workspace.name" : "agustitorellomata.com (live)",

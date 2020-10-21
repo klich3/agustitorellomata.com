@@ -3720,9 +3720,14 @@ html.menu-open .menu-nav [data-source="social"] svg {
 
 /*  -------  */
 
+html.openCart body,
+html.openCart {
+  overflow: hidden;
+}
+
 .cart-wrap {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -3748,6 +3753,7 @@ html.openCart .cart-wrap {
 
 html.openCart [data-cart-container] {
   right: 0;
+  overflow: auto;
 }
 
 .cart-container {
@@ -4028,6 +4034,8 @@ main .product-grid .item .sep-h::after {
 }
 
 html[data-hash="cart"] .button,
+html[data-hash="cart"] button,
+main .product-grid .item button,
 main .product-grid .item .button {
   padding: 0.6em 1.2em !important;
 }
@@ -4156,9 +4164,16 @@ button.button {
   transition: all 0.25s ease-out;
 }
 
-.button:hover {
+.button:hover:not(.disabled) {
   color: #000 !important;
   background-color: #b99219;
+}
+
+button[disabled]:hover,
+button[disabled],
+.button.disabled {
+  color: #000 !important;
+  background-color: #ccc !important;
 }
 
 .activity_list .title {
@@ -4255,11 +4270,66 @@ a.secundary {
   background-color: #808080;
 }
 
+[data-cc-container] .item .subtitle,
+[data-cc-container] .item .title {
+  font-size: 1.08rem;
+  font-weight: bold;
+}
+
+[data-cc-container] .item .subtitle {
+  font-weight: 100;
+}
+
+[data-subtotal-container],
+[data-cc-container] .label,
+[data-cc-container] .item .bot-price,
+[data-cc-container] .item .bot,
+[data-cc-container] .price,
+[data-cc-container] .item .price {
+  font-size: 1.38rem;
+  font-weight: bold;
+}
+
+[data-cc-container] .item .thumb {
+  width: auto;
+  max-width: 187px;
+  max-height: 324px;
+}
+
+[data-cc-container] .sep {
+  position: relative;
+  padding: 23px 0;
+}
+
+[data-cc-container] .sep::after {
+  content:"";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 98%;
+  height: 1px;
+  background: #ccc;
+  
+  transform: 			    translate(-50%, -50%);
+  -webkit-transform: 	translate(-50%, -50%);
+  -ms-transform: 		  translate(-50%, -50%);
+  -o-transform: 		  translate(-50%, -50%);
+  -moz-transform:		  translate(-50%, -50%);
+}
+
+.button.small {
+  font-size: 0.92rem;
+}
+
 @media (max-width: 768px) {
   [data-hash="home"] main {
     padding-top: 0;
   }
   
+  [data-cc-container] .sep {
+    padding: 6px 0;
+  }
   .sep-r:after {
     display: none;
   }
