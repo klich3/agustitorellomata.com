@@ -225,6 +225,14 @@ $(function()
 			});
 		}
 		
+		//update cart items
+		/*
+		if(/upCart/gim.test(dom_type))
+		{
+			
+		}
+		*/
+		
 		fn_call_ajax(dom_type, 
 		{
 			data:dom_data_ser
@@ -236,12 +244,20 @@ $(function()
 			
 			if(d.status == 200)
 			{
-				if(/(add|open)Cart/gim.test(dom_type)) $('.cart-not.h').text(d.data.cart.length).removeClass('h');
+				//update header cart counter
+				if(/(up|add|open)Cart/gim.test(dom_type)) $('.cart-not.h').text(d.data.cart.length).removeClass('h');
 				
 				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
 				if(dom_type == 'recUpPass') window.location.href = "/login";
-				if(/(clientUpInvoiceDir|clientUpShippingDir|clientPersonalData|clientUpPass)/gim.test(dom_type)) ele.parents('form').find('[data-message]').show();
+				if(/(reclamacionSend|clientUpInvoiceDir|clientUpShippingDir|clientPersonalData|clientUpPass)/gim.test(dom_type)) ele.parents('form').find('[data-message]').show();
+				
+				//clean form
+				if(/(reclamacionSend)/gim.test(dom_type))
+				{
+					ele.parents('form').find('select').val(0);
+					ele.parents('form').find(':input').val("");
+				}
 			}else{
 				if(dom_type == 'recPass') ele.parents('form').find("input").addClass("error");
 			}

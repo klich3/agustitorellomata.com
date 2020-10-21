@@ -22,7 +22,97 @@ if($fn_ajax !== null)
 	
 	switch($fn_ajax)
 	{
+		//-----------------------------------------------------------------------------
 		
+		case "amdin-test-delsession":
+			$u_level = $too_login->isAuth(100, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No puede hacer esto, no tiene autorización!.',
+			)));
+			
+			unset($_SESSION['cart']);
+			unset($_SESSION['cart_checkout']);
+			exit;
+		break;
+		
+		case "amdin-test-showsesion":
+			$u_level = $too_login->isAuth(100, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No puede hacer esto, no tiene autorización!.',
+			)));
+			
+			var_dump($_SESSION);
+			exit;
+		break;
+		
+		case "amdin-test-mailhtml":
+				$u_level = $too_login->isAuth(100, false);
+				
+				if($u_level !== 200) exit(json_encode(array(
+					'status' => 400,
+					'message' => 'No puede hacer esto, no tiene autorización!.',
+				)));
+				
+				$fn_json_compras = array(
+					'oneproduct' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"promote":{"id":"1","active":"1","p_id":"4","title":"test","lang_data":null,"oferta_value":"10","desc":"\u00f3\u00e9","code":"dg10","max":"1","used":"0","date_update":"2017-07-05 22:51:46"},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":170.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:09:18"},"cart_wiva_checkout":{"cart_subtotal":260.85,"cart_iva":54.78}}',
+					
+					'global' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"promote":{"id":"2","active":"1","p_id":"0","title":"test","lang_data":null,"oferta_value":"10","desc":"\u00f3\u00e9","code":"g10","max":"10","used":"1","date_update":"2017-07-05 22:52:23","global_userd":1},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":179.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:09:31"},"cart_wiva_checkout":{"cart_subtotal":242.86,"cart_iva":51}}',
+					
+					'normal' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":179.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:08:59"},"cart_wiva_checkout":{"cart_subtotal":269.85,"cart_iva":56.67}}',
+				);
+				
+				echo "oferta 1 producto<br/><hr/>";
+				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['oneproduct'])));
+				echo "<br/><br/><hr/><br/><br/>";
+				echo "oferta global<br/><hr/>";
+				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['global'])));
+				echo "<br/><br/><hr/><br/><br/>";
+				echo "normal<br/><hr/>";
+				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['normal'])));
+				
+				exit;
+			break;
+			
+			case "amdin-test-mailsendsimple":
+				$cabeceras = 'From: webmaster@example.com' . "\r\n" .
+							'Reply-To: webmaster@example.com' . "\r\n" .
+							'X-Mailer: PHP/' . phpversion();
+		
+				$fn_email = @mail($CONFIG['site']['mailinfo'], 'test', 'test', $cabeceras);
+				var_dump($fn_email);
+				exit;
+			break;
+			
+			case "amdin-test-mailsend":
+				//asignamos el pago y respuesta
+				//creamos mails de aviso de pagos
+				$fn_get_order_data_based = $db->FetchValue("
+					SELECT `data_cart`
+					FROM `orders`
+					WHERE `order_id`=:oid
+				", array(
+					'oid' => $fn_g['o'],
+				));
+				
+				if($fn_get_order_data_based)
+				{
+				
+					$fn_order_data = base64_decode($fn_get_order_data_based);
+					$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
+					
+					//mails
+					sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_data);
+					sendAdminNotice($fn_g['o']);
+				}
+				exit;
+			break;
+		
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		
@@ -116,7 +206,7 @@ if($fn_ajax !== null)
 			
 			//añadimos al carrito
 			$fn_q_check_stock = $db->FetchArray("
-				SELECT `stock_count`, `size_id`, `color_id`
+				SELECT `stock_count`, `size_id`, `color_id`, `precio_venta`, `pax_multimplier`
 				FROM `product_stock` 
 				WHERE `prid`=:pid
 				{$fn_var}
@@ -136,6 +226,8 @@ if($fn_ajax !== null)
 					's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
 					'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
 					'pax' => '1',
+					'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
+					'precio_venta' => $fn_q_check_stock['precio_venta'],
 				);
 			}
 			
@@ -146,7 +238,6 @@ if($fn_ajax !== null)
 				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
 				{
 					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
-					
 					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
 				}else{
 					$_SESSION['cart'][$fn_pr_cart_id] = array(
@@ -155,6 +246,8 @@ if($fn_ajax !== null)
 						's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
 						'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
 						'pax' => '1',
+						'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
+						'precio_venta' => $fn_q_check_stock['precio_venta'],
 					);
 				}
 			}
@@ -180,8 +273,8 @@ if($fn_ajax !== null)
 			exit(json_encode($fn_result));
 		break;
 		
+		case "upCart":
 		case "delCart":
-		case "reloadItemsCart":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
@@ -315,12 +408,6 @@ if($fn_ajax !== null)
 				)));
 			}
 			
-			
-			//
-			//	array (size=1)
-			// 't_id' => string '9' (length=1)
-			//
-			
 			$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_p['t_id'];
 			
 			$fn_process_cart = cartProcessAndCalc($_SESSION);
@@ -345,6 +432,110 @@ if($fn_ajax !== null)
 		break;
 		
 		//-----------------------------------------------------------------------------
+		
+		case "reclamacionSend":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+			)));
+			
+			if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
+			
+			if(empty($fn_inputs['f_or_id'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => array('f_or_id'),
+			)));
+			
+			$fn_order_id = $db->FetchValue("
+				SELECT `id`
+				FROM `orders`
+				WHERE `order_id`=:oid
+				LIMIT 1;
+			", array(
+				'oid' => $fn_inputs['f_or_id'],
+			));
+			
+			if($fn_order_id)
+			{
+				$fn_rec_data = base64_encode(json_encode($fn_inputs));
+				$fn_date = date('Y-m-d H:i:s');
+				
+				$db->Fetch("
+					INSERT INTO `orders_reclamacion` (`o_id`, `data`, `date`)
+					VALUES (:oid, :rdt, :dt);
+				", array(
+					'oid' => $fn_order_id,
+					'rdt' => $fn_rec_data,
+					'dt' => $fn_date,
+				));
+			}
+			
+			$getUserData = $too_login->getUserData();
+			
+			$fn_message = getLangItem('mail_message_reclamacion');
+			$fn_message = str_replace(array(
+				'%ID%',
+				'%MOTIVO%'
+			), array(
+				$getUserData->ID,
+				$fn_inputs['f_subject']
+			), $fn_message);
+			
+			$fn_message .= htmlspecialchars($fn_inputs['f_message'], ENT_COMPAT, 'UTF-8');
+			
+			$fn_to = $CONFIG['site']['mailinfo'];
+			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
+			
+			//html y content del mail
+			$fn_mail_html = $CONFIG['templates']['standartEmail'];
+			
+			$fn_mail_html = str_replace(array(
+				'%message%',
+				'%regards%', 
+				'%site_name%', 
+				'%copyz%',
+				'%site_dir%', 
+				'%site_logo%', 
+			), array(
+				$fn_message,
+				getLangItem('regards'),
+				$CONFIG['site']['sitetitlefull'],
+				$CONFIG['site']['sitecopyz'],
+				'',
+				'<img src="'.$CONFIG['site']['base'].'m/logo-mail.png" alt="logotype" />',
+			), $fn_mail_html);
+			
+			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
+			
+			//envio del mail
+			if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => getLangItem('contact_form_confirm'),
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('contact_form_error'),
+					'dom' => array("f_subject", "f_or_id", "f_message")
+				)));
+			}
+		break;
+		
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
