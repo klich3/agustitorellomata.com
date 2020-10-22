@@ -32,23 +32,13 @@ if($too_login->isLogged() == 400)
 				if(!$cv['thumb']) $cv['thumb'] = "{$CONFIG['site']['base']}images/nofoto.png";
 				
 				if(!isset($cv['pax'])) $cv['pax'] = 1;
+				if(!isset($cv['multimplier'])) $cv['multimplier'] = 0;
 				
-				$fn_price_total_row = 0;
-				$fn_price_total_row = $cv['pax'] * $cv['precio_venta'];
 				
 				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1)
 				{
-					$cv['precio_caja'] = round($cv['pax_multimplier'] * $cv['precio_venta'], 2)." €";
-					
-					if(isset($cv['multimplier']))
-					{
-						$fn_price_total_row = $fn_price_total_row + (($cv['multimplier'] * $cv['pax_multimplier']) * $cv['precio_venta']);
-						
-						$cv['precio_current_cajas'] = round($cv['multimplier'] * $cv['pax_multimplier'] * $cv['precio_venta'], 2)." €";
-					}else{
-						$cv['multimplier'] = 0;
-						$cv['precio_current_cajas'] = "";
-					}
+					//precio por una caja
+					$cv['precio_caja'] = round($cv['pax_multimplier'] * $cv['price_unit'] , 2);
 					
 					$fn_xtemplate_parse['assign'][] = $cv;
 					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.multiplier';
@@ -57,18 +47,11 @@ if($too_login->isLogged() == 400)
 					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.multiplier_selector';
 				}
 				
-				$cv['price_bot'] = round($cv['pax'] * $cv['precio_venta'], 2). " €";
-				$cv['price_total_row'] = round($fn_price_total_row, 2);
-				
 				$fn_xtemplate_parse['assign'][] = $cv;
 				$fn_xtemplate_parse['parse'][] = 'cart.cart.row';
 			}
 			
-			$fn_out_stage_data = $fn_process_cart['cart_wiva_checkout'];
-			$fn_out_stage_data['cart_iva_percent'] = $fn_process_cart['cart_checkout']['cart_iva_percent'];
-			$fn_out_stage_data['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
-			
-			$fn_xtemplate_parse['assign'][] = $fn_out_stage_data;
+			$fn_xtemplate_parse['assign'][] = $fn_process_cart['checkout'];
 			$fn_xtemplate_parse['parse'][] = 'cart.cart';
 		}else{
 			$fn_xtemplate_parse['assign'][] = array(
