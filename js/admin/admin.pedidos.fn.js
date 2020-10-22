@@ -33,14 +33,19 @@ $(function()
 				'{{if data.user.user_payment_name}}<strong>Al pagar uso nombre:</strong> ${data.user.user_payment_name}{{/if}}'+
 				'{{else}}No te puedo mostrar estos datos ya que hubo problema en el proceso de guardada.{{/if}}</div>'+
 			//direccion
-		    '<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_dir}}<strong>Nombre de la entrada:</strong> ${data.user_dir.dir_name}<br/><strong>Dir. primaria:</strong> ${data.user_dir.dir_primary}<br/><strong>Dir. secundaria:</strong> ${data.user_dir.dir_secundary}<br/><strong>Ciudad:</strong> ${data.user_dir.dir_city}<br/><strong>Region:</strong> ${data.user_dir.dir_region}<br/><strong>Cod. Postal:</strong> ${data.user_dir.dir_post}<br/><strong>País:</strong> ${data.user_dir.dir_country} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
+		    '<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_dir}}<strong>Nombre de la entrada:</strong> ${data.user_dir.dir_name}<br/><strong>Dir. primaria:</strong> ${data.user_dir.dir_primary}<br/><strong>Ciudad:</strong> ${data.user_dir.dir_city}<br/><strong>Region:</strong> ${data.user_dir.dir_region}<br/><strong>Cod. Postal:</strong> ${data.user_dir.dir_post}<br/><strong>País:</strong> ${data.user_dir.dir_country} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
 			    
 		'</div></div></div>'+
 	
 		//carrito
-		'<div class="uk-width-1-1 uk-margin-top uk-margin-bottom"><table class="uk-table uk-table-condensed uk-table-striped"><thead><tr><th class="uk-text-center">Articulo</th><th class="uk-text-center">Tamaño</th><th class="uk-text-center">Color</th><th class="uk-text-center">Cantidad</th><th class="uk-text-center">Precio</th></tr></thead><tbody>'+
+		'<div class="uk-width-1-1 uk-margin-top uk-margin-bottom"><table class="uk-table uk-table-condensed uk-table-striped"><thead><tr><th class="uk-text-center">Articulo</th><th class="uk-text-center">Cajas</th><th class="uk-text-center">Cantidad</th><th class="uk-text-center">Precio</th></tr></thead><tbody>'+
 	        
-	    '{{each(i, v) data.cart}}<tr><td class="uk-text-center">${v.title}</td><td class="uk-text-center">${v.size}</td><td class="uk-text-center">${v.color}</td><td class="uk-text-center">${v.pax}</td><td class="uk-text-center">${v.price}</td></tr>{{if data.promote && data.promote.p_id==v.p_id}}<tr><td colspan="3" class="uk-text-center">Descuento aplicado a uno de los productos de (<i>${v.title}</i>) de (${data.promote.oferta_value}%) <strong>${data.promote.code}</strong></td></tr>{{/if}}{{/each}}'+
+	    '{{each(i, v) data.cart}}<tr> \
+			<td class="uk-text-center">${v.title}</td> \
+			<td class="uk-text-center">{{if v.multimplier}}${v.multimplier}{{else}}0{{/if}}</td> \
+			<td class="uk-text-center">${v.pax}</td> \
+			<td class="uk-text-center">${v.price}</td> \
+			</tr>{{if data.promote && data.promote.p_id==v.p_id}}<tr><td colspan="3" class="uk-text-center">Descuento aplicado a uno de los productos de (<i>${v.title}</i>) de (${data.promote.oferta_value}%) <strong>${data.promote.code}</strong></td></tr>{{/if}}{{/each}}'+
 	        
 	    '</tbody></table></div><div class="uk-grid uk-grid-small">'+
 	    

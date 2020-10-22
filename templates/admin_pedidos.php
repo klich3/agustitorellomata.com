@@ -53,21 +53,24 @@ if($fn_q_orders)
 		
 		if($ov->payment_type == "redsys")
 		{
-			$fn_response = base64_decode($ov->data_response);
-			$fn_response = json_decode($fn_response, true);
-			
-			$fn_Error = array();
-			
-			if(isset($fn_response['Ds_AuthorisationCode']) && empty($fn_response['Ds_AuthorisationCode']) || !preg_match('/[a-zA-Z0-9]+\ ?/', $fn_response['Ds_AuthorisationCode'])) $fn_Error[] = 'Sin código de autorización.';
-			
-			if(isset($fn_response['Ds_ErrorCode']))
+			if($ov->data_response !== NULL)
 			{
-				$fn_redsys_error = \Redsys\Messages\Messages::getByCode($fn_response['Ds_ErrorCode']);
-				$fn_redsys_error = (is_null($fn_redsys_error)) ? "" : "- {$fn_redsys_error['message']}";
-				$fn_Error[] = "Hay un error presente ({$fn_response['Ds_ErrorCode']}) {$fn_redsys_error}";
+				$fn_response = base64_decode($ov->data_response);
+				$fn_response = json_decode($fn_response, true);
+				
+				$fn_Error = array();
+				
+				if(isset($fn_response['Ds_AuthorisationCode']) && empty($fn_response['Ds_AuthorisationCode']) || !preg_match('/[a-zA-Z0-9]+\ ?/', $fn_response['Ds_AuthorisationCode'])) $fn_Error[] = 'Sin código de autorización.';
+				
+				if(isset($fn_response['Ds_ErrorCode']))
+				{
+					$fn_redsys_error = \Redsys\Messages\Messages::getByCode($fn_response['Ds_ErrorCode']);
+					$fn_redsys_error = (is_null($fn_redsys_error)) ? "" : "- {$fn_redsys_error['message']}";
+					$fn_Error[] = "Hay un error presente ({$fn_response['Ds_ErrorCode']}) {$fn_redsys_error}";
+				}
+				
+				$fn_redsys_response = (sizeof($fn_Error) !== 0) ?  '<i class="uk-icon-exclamation-circle uk-text-danger"></i> '. implode('<br/>', $fn_Error) : '<i class="uk-icon-check-circle uk-text-success"></i> Transacción correcta';
 			}
-			
-			$fn_redsys_response = (sizeof($fn_Error) !== 0) ?  '<i class="uk-icon-exclamation-circle uk-text-danger"></i> '. implode('<br/>', $fn_Error) : '<i class="uk-icon-check-circle uk-text-success"></i> Transacción correcta';
 		}
 		
 		$fn_for_data['redsys_response'] = ($ov->payment_type == "redsys") ? $fn_redsys_response : "(Paypal) No disponible, solo Redsys";

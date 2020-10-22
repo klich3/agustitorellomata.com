@@ -87,7 +87,10 @@ if($fn_q_cat_list)
 					$fn_xtemplate_parse['assign'][] = $fn_stock;
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_price";
 					
-					$fn_xtemplate_parse['assign'][] = "";
+					$fn_xtemplate_parse['assign'][] = array(
+						'id' => $vi->id,
+						'cat_id' => $vi->cat_id,
+					);
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_but";
 				}
 				
@@ -112,13 +115,13 @@ if($fn_q_cat_list)
 					'image' => ($fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
 					'alt' => $fn_file['alt'],
 					'id' => $vi->id,
-					'cat' => $vi->cat_id,
+					'cat_id' => $vi->cat_id,
 				); 
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row";
 			}
 			
 			//pructos
-			$fn_xtemplate_parse['assign'][] = array();
+			$fn_xtemplate_parse['assign'][] = "";
 			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod";
 		}
 		

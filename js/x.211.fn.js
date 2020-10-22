@@ -145,11 +145,13 @@ $(function()
 			
 			switch(_G.TYPE)
 		    {
-			    /*
-			    case "product_grid":
+			    case "checkout":
+					$('html[data-hash="checkout"] :input').on("change", e_checkoutValidator_handler);
 			    break;
-				*/
-		    }
+		    	
+				case "cart":
+				break;
+			}
 		});
 		
 		fn_init_fn();
@@ -182,10 +184,95 @@ $(function()
 		$(window).on('resize', e_resize).trigger('resize');
 	}
 	
-	e_action_handler = function() {
+	//validador de checkout
+	e_checkoutValidator_handler = function()
+	{
 		var ele = $(this),
-		dom_type = ele.attr('data-action'),
+			form = ele.parents("form"),
+			doms = form.find(":input[required]"),
+			emptyFields = 0;
+		
+		if(doms) for(var e in doms)
+		{
+			if(!$.isNumeric(e)) continue;
+			if($(doms[e]).val() == "") emptyFields++;
+		}
+		
+		if(!$('[name="p_pay_type"]').is(":checked")) emptyFields++;
+		
+		if(!emptyFields)
+		{
+			var dom_p = $('input[name="p_agree_privacy"]').is(":checked") ? true : false,
+				dom_y = $('input[name="p_agree_payment"]').is(":checked") ? true : false;
+			
+			if(dom_p && dom_y && emptyFields == 0)
+			{
+				$('[data-action="checkoutPayment"]').attr('disabled', false);
+			}else{
+				$('[data-action="checkoutPayment"]').attr('disabled', true);
+			}
+		}
+	}
+	
+	e_action_handler = function(e, fn) {
+		var ele = $(this),
+		dom_type = (fn) ? fn : ele.attr('data-action'),
 		dom_data_ser = (ele.parents('form').length !== 0) ? ele.parents('form').serialize() : null;
+		
+		//cart buttons
+		if(/cartUpItem/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			if(itm.val() == undefined || itm.val() == "")
+			{
+				itm.val(1);
+			}else{
+				itm.val(parseFloat(itm.val()) + 1);
+			}
+			
+			e_action_handler(e, 'upCart');
+			return;
+		}
+		
+		if(/cartDownItem/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			itm.val(parseFloat((itm.val() == 0) ? 0 : itm.val() - 1));
+			e_action_handler(e, 'upCart');
+			return;
+		}
+		
+		if(/cartDelItem/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			itm.val(0);
+			
+			var itms = ele.parents('.item').find('[data-group="control"]'),
+				isDel = false;
+			
+			if(itms)
+			{
+				var totalItms = itms.length;
+				var countItms = 0;
+				
+				for(var i in itms)
+				{
+					if(!$.isNumeric(i)) continue;
+					
+					if($(":input", itms[i]).val() == 0) countItms++;
+				}
+				
+				if(totalItms == countItms)
+				{
+					ele.parents('.item').remove();
+					e_action_handler(e, 'delCart');
+				}else{
+					e_action_handler(e, 'upCart');
+				}
+			}
+			
+			return;
+		}
 		
 		if(/(rec|Pass|client|clientUpInvoiceDir|clientUpShippingDir)/gim.test(dom_type)) ele.parents('form').find("input").removeClass("error");
 		
@@ -220,19 +307,31 @@ $(function()
 		if(/addCart/gim.test(dom_type))
 		{
 			var dom_data_ser = JSON.stringify({
-				"product_id": ele.data('id') || 0,
-				"category_id": ele.data('cat') || 0
+				"p_id": ele.data('id'),
+				"cat_id": ele.data('cat')
 			});
 		}
 		
 		//update cart items
-		/*
-		if(/upCart/gim.test(dom_type))
+		if(/(del|up)Cart/gim.test(dom_type))
 		{
-			
+			var dom_data_ser = JSON.stringify({
+				"p_id": $(e.currentTarget).parents('.item').data('pid'),
+				"cat_id": $(e.currentTarget).parents('.item').data('cid'),
+				"pax": $(e.currentTarget).parents('.item').find('[data-pax]').val(),
+				"multimplier" : $(e.currentTarget).parents('.item').find('[data-multimplier]').val(),
+			});
 		}
-		*/
 		
+		if(/checkoutPayment/gim.test(dom_type))
+		{
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			e.stopPropagation();
+			
+			ele.find('span').removeClass('h');
+		}
+				
 		fn_call_ajax(dom_type, 
 		{
 			data:dom_data_ser
@@ -242,10 +341,13 @@ $(function()
 			
 			if(/(add|open)Cart/gim.test(dom_type)) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
 			
+			//reload add cart / del
+			if(/(up|del)Cart/gim.test(dom_type)) window.location.reload();
+			
 			if(d.status == 200)
 			{
 				//update header cart counter
-				if(/(up|add|open)Cart/gim.test(dom_type)) $('.cart-not.h').text(d.data.cart.length).removeClass('h');
+				if(/(up|add|open)Cart/gim.test(dom_type)) $('.cart-not').text(d.data.cart.length).removeClass('h');
 				
 				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
@@ -258,9 +360,34 @@ $(function()
 					ele.parents('form').find('select').val(0);
 					ele.parents('form').find(':input').val("");
 				}
+				
+				if(/checkoutPayment/gim.test(dom_type))
+				{
+					//si hay algun fallo redireccionamos a la pagina de tienda o home
+					if(d.data && d.data.redirect) window.location.href = d.data.redirect;
+					
+					if(d.data && d.data.pay_html)
+					{
+						var dom_container = $('<div/>', {
+							'class':'h',
+							'id':'paymentform'
+						});
+						
+						$('body').append(dom_container).find('#paymentform').html(d.data.pay_html);
+						$('#paymentform form').submit();
+					}
+				}
+				
 			}else{
 				if(dom_type == 'recPass') ele.parents('form').find("input").addClass("error");
+				
+				if(/checkoutPayment/gim.test(dom_type))
+				{
+					$('[data-message]').html(d.message);
+				}
 			}
+			
+			if(/checkoutPayment/gim.test(dom_type)) ele.find('span').addClass('h');
 			
 			if(d.dom && d.dom.length !== 0) for(var i in d.dom)
 			{

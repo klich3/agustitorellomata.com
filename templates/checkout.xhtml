@@ -75,6 +75,7 @@
                     name="u_name"
                     value="{u_name}"
                     class="w-1-1"
+                    required
                   />
                 </div>
 
@@ -88,6 +89,7 @@
                     name="u_surname"
                     value="{u_surname}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -100,6 +102,7 @@
                     name="u_cif"
                     value="{u_cif}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -112,6 +115,7 @@
                     name="dir_country"
                     value="{dir_country}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -124,6 +128,7 @@
                     name="dir_city"
                     value="{dir_city}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -136,6 +141,7 @@
                     name="dir_primary"
                     value="{dir_primary}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -148,6 +154,7 @@
                     name="dir_post"
                     value="{dir_post}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -160,6 +167,7 @@
                     name="u_tel"
                     value="{u_tel}"
                     class="w-1-1"
+                    required
                   />
                 </div>
                 <div class="w-1-1 mt-4">
@@ -172,6 +180,7 @@
                     name="u_email"
                     value="{u_email}"
                     class="w-1-1"
+                    required
                   />
                 </div>
               </div>
@@ -202,17 +211,6 @@
                       <span class="ml-2">{creditcard}</span>
                     </li>
                     <!-- END: pay_rd -->
-                    <!-- BEGIN: pay_pp -->
-                    <li>
-                      <input
-                        type="radio"
-                        name="p_pay_type"
-                        value="pp"
-                        required
-                      />
-                      <span class="ml-2">PayPal</span>
-                    </li>
-                    <!-- END: pay_pp -->
                   </ul>
                 </div>
               </div>
@@ -276,12 +274,14 @@
                 </div>
                 <div class="w-1-3 txt@c">
                   <div class="g">
+                    <!-- BEGIN: cajas -->
                     <div class="w-1-1 txt@c">
                       <strong>{cart_cant_cajas}</strong>
                     </div>
-                    <div class="w-1-1 txt@c">{multimplier}</div>
+                    <div class="w-1-1 txt@c pb-10">{multimplier}</div>
 
                     <div class="pt-2"></div>
+                    <!-- END: cajas -->
 
                     <div class="w-1-1 txt@c">
                       <strong>{cart_cant_bot}</strong>
@@ -357,7 +357,7 @@
 
                   <div class="w-1-1 hs">
                     <button
-                      data-action="data-pay"
+                      data-action="checkoutPayment"
                       disabled
                       class="ws-1-1 fr button small"
                       data-event="checkout/pay"

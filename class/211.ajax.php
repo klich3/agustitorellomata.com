@@ -176,7 +176,7 @@ if($fn_ajax !== null)
 				unset($_SESSION['cart_checkout']);
 			}
 			
-			if(!is_numeric($fn_inputs['product_id']) || !is_numeric($fn_inputs['category_id'])) exit(json_encode(array(
+			if(!is_numeric($fn_inputs['p_id']) || !is_numeric($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
 			)));
@@ -185,31 +185,17 @@ if($fn_ajax !== null)
 			$fn_isVars = false;
 			
 			$fn_q_check_stock_array = array(
-				'pid' => $fn_inputs['product_id'],
+				'pid' => $fn_inputs['p_id'],
 			);
 			
-			$fn_p_c = (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : 12;
-			$fn_p_s = (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : 8;
-			
-			if((isset($fn_inputs['product_var_size']) && is_numeric($fn_inputs['product_var_size'])) && (isset($fn_inputs['product_var_color']) && is_numeric($fn_inputs['product_var_color'])))
-			{
-				$fn_var = "AND `size_id`=:s AND `color_id`=:c";
-				
-				$fn_q_check_stock_array['s'] = $fn_p_s;
-				$fn_q_check_stock_array['c'] = $fn_p_c;
-				
-				$fn_isVars = true;
-			}
-			
 			//id del producto en el carrito
-			$fn_pr_cart_id = md5("{$fn_inputs['product_id']}{$fn_p_s}{$fn_p_c}");
+			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
 			
 			//añadimos al carrito
 			$fn_q_check_stock = $db->FetchArray("
-				SELECT `stock_count`, `size_id`, `color_id`, `precio_venta`, `pax_multimplier`
+				SELECT `stock_count`, `precio_venta`, `pax_multimplier`
 				FROM `product_stock` 
 				WHERE `prid`=:pid
-				{$fn_var}
 				LIMIT 1;
 			", $fn_q_check_stock_array);
 			
@@ -221,12 +207,11 @@ if($fn_ajax !== null)
 				$fn_updated = true;
 				
 				$_SESSION['cart'][$fn_pr_cart_id] = array(
-					'cat_id' => $fn_inputs['category_id'],
-					'p_id' => $fn_inputs['product_id'],
-					's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
-					'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+					'cat_id' => $fn_inputs['cat_id'],
+					'p_id' => $fn_inputs['p_id'],
 					'pax' => '1',
 					'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
+					'multimplier' => '0',
 					'precio_venta' => $fn_q_check_stock['precio_venta'],
 				);
 			}
@@ -241,12 +226,11 @@ if($fn_ajax !== null)
 					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
 				}else{
 					$_SESSION['cart'][$fn_pr_cart_id] = array(
-						'cat_id' => $fn_inputs['category_id'],
-						'p_id' => $fn_inputs['product_id'],
-						's_id' => (isset($fn_inputs['product_var_size'])) ? $fn_inputs['product_var_size'] : $fn_q_check_stock['size_id'],
-						'c_id' => (isset($fn_inputs['product_var_color'])) ? $fn_inputs['product_var_color'] : $fn_q_check_stock['color_id'],
+						'cat_id' => $fn_inputs['cat_id'],
+						'p_id' => $fn_inputs['p_id'],
 						'pax' => '1',
 						'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
+						'multimplier' => '0',
 						'precio_venta' => $fn_q_check_stock['precio_venta'],
 					);
 				}
@@ -280,21 +264,17 @@ if($fn_ajax !== null)
 				'message' => 'Ajax Fraud cached!',
 			)));
 			
-			//'p_id':dom_pid,'cat_id':dom_cat_id,'pax':dom_pax_value
+			//parse_str($fn_p['data'], $fn_inputs);
+			$fn_inputs = json_decode($fn_p['data'], true);
 			
-			if(!isset($fn_p['p_id']) || !isset($fn_p['cat_id'])) exit(json_encode(array(
+			if(!isset($fn_inputs['p_id']) || !isset($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
 			)));
 			
-			if(!is_numeric($fn_p['p_id']) || !is_numeric($fn_p['cat_id']) || !is_numeric($fn_p['c_id']) || !is_numeric($fn_p['s_id'])) exit(json_encode(array(
+			if(!is_numeric($fn_inputs['p_id']) || !is_numeric($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
-			)));
-			
-			if($fn_ajax == 'reloadItemsCart' && !isset($fn_p['pax'])) exit(json_encode(array(
-				'status' => 400,
-				'message' => getLangItem('msg_no_data'),
 			)));
 			
 			if(!isset($_SESSION) || !isset($_SESSION['cart']))
@@ -316,66 +296,48 @@ if($fn_ajax !== null)
 				)));
 			}
 			
+			//id del item en el cart
+			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
+			
 			//del cart
 			if($fn_ajax == 'delCart')
 			{
-				//id del item en el cart
-				$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
-				
 				if(sizeof($_SESSION['cart']) !== 0 && array_key_exists($fn_pr_cart_id, $_SESSION['cart'])) unset($_SESSION['cart'][$fn_pr_cart_id]);
 				if(sizeof($_SESSION['cart']) == 0)
 				{
 					unset($_SESSION['cart']);
 					
 					exit(json_encode(array(
-						'status' => 400,
+						'status' => 200,
 						'message' => getLangItem('cart_empty'),
 					)));
 				}
 			}
 			
 			//reloadcart
-			if($fn_ajax == 'reloadItemsCart') foreach($_SESSION['cart'] as $ck => $cv)
+			$fn_q_check_stock = $db->FetchValue("
+				SELECT `stock_count`
+				FROM `product_stock` 
+				WHERE `prid`=:prid
+				LIMIT 1;
+			", array(
+				'prid' => $fn_inputs['p_id'],
+			));
+			
+			foreach($_SESSION['cart'] as $k => $v)
 			{
-				if($cv['cat_id'] == $fn_p['cat_id'] && $cv['p_id'] == $fn_p['p_id'])
+				if($v['p_id'] == $fn_inputs['p_id'] && $v['cat_id'] == $fn_inputs['cat_id'])
 				{
-					$fn_q_check_stock = $db->FetchValue("
-						SELECT `stock_count`
-						FROM `product_stock` 
-						WHERE `prid`=:prid
-						AND `color_id`=:cid
-						AND `size_id`=:sid
-						LIMIT 1;
-					", array(
-						'prid' => $cv['p_id'],
-						'cid' => $cv['c_id'],
-						'sid' => $cv['s_id'],
-					));
-					
-					$fn_pr_cart_id = md5("{$fn_p['p_id']}{$fn_p['s_id']}{$fn_p['c_id']}");
-					
-					$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_p['pax'] < $fn_q_check_stock) ? $fn_p['pax'] : $fn_q_check_stock;
+					$_SESSION['cart'][$k]['multimplier'] = (isset($fn_inputs['multimplier']) && $fn_inputs['multimplier'] !== 0) ? $fn_inputs['multimplier'] : 0;
+					$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] > 0) ? $fn_inputs['pax'] : 1;
+					$_SESSION['cart'][$k]['pax'] = ($fn_pax < $fn_q_check_stock) ? $fn_pax : $fn_q_check_stock;
 				}
 			}
 			
-			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
-						
-			if($fn_process_cart)
-			{
-				$fn_result = array(
-					'status' => 200,
-					'message' => getLangItem('add_item_cart'),
-					'data' => $fn_process_cart,
-				);
-			}else{
-				$fn_result = array(
-					'status' => 400,
-					'message' => getLangItem('add_item_cart_error'),
-				);
-			}
-			
-			exit(json_encode($fn_result));
+			exit(json_encode(array(
+				'status' => 200,
+				'message' => getLangItem('add_item_cart'),
+			)));
 		break;
 
 		case "stShippingReloadCart":
@@ -576,220 +538,10 @@ if($fn_ajax !== null)
 			
 			if($u_level !== 200)
 			{
-				//check exist user
-				$fn_get_user_by_mail = $db->FetchValue("
-					SELECT `ID`
-					FROM `users`
-					WHERE `user_email`=:em
-					AND `ID` NOT IN('9999, 9998')
-					AND `user_status`!='3'
-				", array(
-					'em' => $fn_inputs['u_email'],
-				));
-				
-				if(count($fn_get_user_by_mail) !== 0)
-				{
-					//existe user
-					//obtener datos del usuario
-					
-					$fn_get_user = $db->FetchArray("
-						SELECT `ID`, `user_name`, `user_email`, `user_status`
-						FROM `users`
-						WHERE `ID`=:id
-						AND `ID` NOT IN('9999', '9998')
-						LIMIT 1;
-					", array(
-						'id' => $fn_get_user_by_mail,
-					));
-					
-					if($fn_get_user)
-					{
-						$fn_u_data = array(
-							'ID' => $fn_get_user['ID'],
-							'user_name' => $fn_get_user['user_name'],
-							'user_email' => $fn_get_user['user_email'],
-							'user_status' => $fn_get_user['user_status'],
-							'user_level' => 15,
-						);
-						
-						$fn_user_dir = array(
-							'dir_name' => getLangItem('pordefecto'),
-							'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
-							'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
-							'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
-							'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
-							'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
-							'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
-							'dir_default' => 1,
-							'dir_id' => 0,
-						);
-						
-						$fn_user_dir_json = json_encode($fn_user_dir);
-						
-						// check si existe la direccion si no añadir y poner como principal
-						//get user_dirs
-						$fn_q_meta_dirs = $db->FetchValue("
-							SELECT `meta_value`
-							FROM `users_meta`
-							WHERE `user_id`=:uid
-							AND `meta_key`='user_dirs'
-							LIMIT 1;
-						", array(
-							'uid' => $fn_get_user['ID'],
-						));
-
-						$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs, true) : array();
-						
-						$fn_dir_in_db = false;
-						
-						if(count($fn_dir_data) !== 0 && isset($fn_dir_data['dir_id']))
-						{
-							if($fn_dir_data['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
-						}else{
-							foreach($fn_dir_data as $dkm => $dkv)
-							{
-								if($dkv['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
-							}
-						}
-						
-						if($fn_dir_in_db)
-						{
-							//desmarcamos otros defaults y dejamos este como principal
-							foreach($fn_dir_data as $dk => $dv)
-							{
-								if(isset($dv['dir_default'])) unset($fn_dir_data[$dk]['dir_default']);
-							}
-							
-							$fn_user_dir['dir_id'] = count($fn_dir_data); //añadimos nuevo id
-							$fn_dir_data[] = $fn_user_dir;
-							$fn_dir_data = json_encode($fn_dir_data, JSON_UNESCAPED_UNICODE);
-							
-							//save
-							$fn_q = $db->Fetch("
-								INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
-								VALUES (:uid, 'user_dirs', :dt) 
-								ON DUPLICATE KEY UPDATE `meta_value`=:dtr;
-							", array(
-								'uid' => $fn_get_user['ID'],
-								'dt' => $fn_dir_data,
-								'dtr' => $fn_dir_data,
-							));
-						}
-						// check si existe la direccion si no añadir y poner como principal
-						
-						$fn_order_data['user'] = $fn_u_data;
-						$fn_order_data['user_dir'] = $fn_user_dir;
-						$fn_isPayProcess = true;
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => getLangItem('payment_no_redirect'),
-						)));
-					}
-				}else{
-					//no existe creamos registramos
-					$fn_set_new_password = substr(md5(rand()), 8);
-					$fn_new_act_key = md5(microtime());
-					$fn_set_new_name_user = substr(str_replace(array('.', ' '), '', microtime()), 8);
-					$fn_today_date = date('Y-m-d H:i:s');
-					
-					$fn_q = $db->ExecuteSQL("
-						INSERT INTO `users` (`user_name`, `user_email`, `user_pass`, `user_registred`, `user_status`, `user_activation_key`)
-						VALUES (:un, :em, MD5(:ps), :td, '0', :ac);
-					", array(
-						'un' => $fn_set_new_name_user,
-						'em' => $fn_inputs['u_email'],
-						'ps' => $fn_set_new_password,
-						'td' => $fn_today_date,
-						'ac' => $fn_new_act_key,
-					));
-					
-					//mail al cliente con contraseña y activación
-					if($fn_q)
-					{
-						$fn_user_dir = array(
-							'dir_name' => getLangItem('pordefecto'),
-							'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
-							'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
-							'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
-							'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
-							'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
-							'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
-							'dir_default' => 1,
-							'dir_id' => 0,
-						);
-						$fn_user_dir_json = json_encode(array($fn_user_dir), JSON_UNESCAPED_UNICODE);
-						
-						$fn_per_data = json_encode(array(
-							'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
-							'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
-							'u_idd' => (isset($fn_inputs['u_idd'])) ? $fn_inputs['u_idd'] : '',
-							'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
-						), JSON_UNESCAPED_UNICODE);
-						
-						//add metas
-						$db->Fetch("
-							INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`)
-							VALUES (:uid, 'user_level', '15'), (:uid, 'user_dirs', :m), (:uid, 'user_pers_data', :v);
-						", array(
-							'uid' => $fn_q,
-							'm' => $fn_user_dir_json,
-							'v' => $fn_per_data,
-						));
-						
-						//preparamos mail
-						$fn_to = $fn_inputs['u_email'];
-						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_subject_new_client');
-						
-						$fn_html_p = getLangItem('mail_new_client_html');
-						$fn_mail_html = $CONFIG['templates']['standartEmail'];
-						
-						$fn_mail_html = str_replace(array(
-							'%message%',
-							'%regards%', 
-							'%site_name%', 
-							'%copyz%',
-							'%site_dir%', 
-							'%site_logo%',
-							'%site_link%',
-							'%user_name%',
-							'%user_pass%',
-						), array(
-							$fn_html_p,
-							getLangItem('mail_regards'),
-							$CONFIG['site']['sitetitlefull'],
-							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
-							"Client ID: <strong>{$fn_set_new_name_user}</strong>",
-							"<img src=\"{$CONFIG['site']['base']}/m/logo.png?e={$fn_inputs['u_email']}\" alt=\"logotype\" />",
-							"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}", //link
-							$fn_inputs['u_email'],
-							$fn_set_new_password,
-						), $fn_mail_html);
-						
-						$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
-						
-						//envio del mail
-						@mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-					
-						//add user to session
-						$fn_u_data = array(
-							'ID' => $fn_q,
-							'user_name' => $fn_set_new_name_user,
-							'user_email' => $fn_inputs['u_email'],
-							'user_status' => 0,
-							'user_level' => 15,
-						);
-						
-						$fn_order_data['user'] = $fn_u_data;
-						$fn_order_data['user_dir'] = $fn_user_dir;
-						$fn_isPayProcess = true;
-					}else{
-						exit(json_encode(array(
-							'status' => 400,
-							'message' => getLangItem('payment_no_redirect'),
-						)));
-					}
-				}
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('payment_no_redirect'),
+				)));
 			}else{
 				//logueado
 				$getUserData = $too_login->getUserData();
@@ -797,13 +549,18 @@ if($fn_ajax !== null)
 				$fn_order_data['user'] = object_to_array($getUserData);
 				
 				$fn_user_dir = array(
-					'dir_name' => getLangItem('pordefecto'),
-					'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
-					'dir_secundary' => (isset($fn_inputs['dir_secundary'])) ? $fn_inputs['dir_secundary'] : '',
-					'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
-					'dir_region' => (isset($fn_inputs['dir_region'])) ? $fn_inputs['dir_region'] : '',
-					'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
+					'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
+					'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
+					'u_cif' => (isset($fn_inputs['u_cif'])) ? $fn_inputs['u_cif'] : '',
+					'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
+					'u_email' => (isset($fn_inputs['u_email'])) ? $fn_inputs['u_email'] : '',
+					
 					'dir_country' => (isset($fn_inputs['dir_country'])) ? $fn_inputs['dir_country'] : '',
+					'dir_city' => (isset($fn_inputs['dir_city'])) ? $fn_inputs['dir_city'] : '',
+					'dir_primary' => (isset($fn_inputs['dir_primary'])) ? $fn_inputs['dir_primary'] : '',
+					'dir_post' => (isset($fn_inputs['dir_post'])) ? $fn_inputs['dir_post'] : '',
+					
+					'dir_name' => getLangItem('pordefecto'),
 					'dir_default' => 1,
 					'dir_id' => 0,
 				);
@@ -828,25 +585,12 @@ if($fn_ajax !== null)
 				
 				if(count($fn_dir_data) !== 0 && isset($fn_dir_data['dir_id']))
 				{
-					if($fn_dir_data['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
-				}else{
-					foreach($fn_dir_data as $dkm => $dkv)
-					{
-						if($dkv['dir_primary'] !== $fn_user_dir['dir_primary']) $fn_dir_in_db = true;
-					}
+					if($fn_dir_data !== $fn_user_dir) $fn_dir_in_db = true;
 				}
 				
 				if($fn_dir_in_db)
 				{
-					//desmarcamos otros defaults y dejamos este como principal
-					foreach($fn_dir_data as $dk => $dv)
-					{
-						if(isset($dv['dir_default'])) unset($fn_dir_data[$dk]['dir_default']);
-					}
-					
-					$fn_user_dir['dir_id'] = count($fn_dir_data); //añadimos nuevo id
-					$fn_dir_data[] = $fn_user_dir;
-					$fn_dir_data = json_encode($fn_dir_data, JSON_UNESCAPED_UNICODE);
+					$fn_dir_data = json_encode($fn_user_dir, JSON_UNESCAPED_UNICODE);
 					
 					//save
 					$fn_q = $db->Fetch("
@@ -858,7 +602,6 @@ if($fn_ajax !== null)
 						'd' => $fn_dir_data,
 					));
 				}
-				// check si existe la direccion si no añadir y poner como principal
 				
 				$fn_order_data['user_dir'] = $fn_user_dir;
 				$fn_isPayProcess = true;
@@ -985,7 +728,7 @@ if($fn_ajax !== null)
 				$fn_order_data['user_order'] = array(
 					'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
 					'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
-					'u_idd' => (isset($fn_inputs['u_idd'])) ? $fn_inputs['u_idd'] : '',
+					'u_cif' => (isset($fn_inputs['u_cif'])) ? $fn_inputs['u_cif'] : '',
 					'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
 				);
 				

@@ -1,6 +1,9 @@
 {
   "apexskier.eslint.config.fixOnSave" : "Disable",
   "apexskier.typescript.config.isEnabledForJavascript" : "Disable",
+  "prettier.default-config.printWidth" : 80,
+  "prettier.default-config.semi" : "Enable",
+  "prettier.default-config.tabWidth" : 2,
   "prettier.default-config.useTabs" : "Global Default",
   "prettier.format-on-save" : "Disable",
   "workspace.color" : 6,
