@@ -500,25 +500,23 @@ function cartProcessAndCalc($fn_array)
 	$fn_iva = ($fn_q_iva) ? $fn_q_iva : $CONFIG['site']['default_iva_percentage'];
 	
 	//set variables
-	$fn_data_out = array();
-	$fn_data_out['cart_checkout'] = array(
-		'cart_count' => 0,
-		'cart_subtotal' => 0,
-		'cart_iva' => 0,
-		'cart_iva_percent' => $fn_iva,
-		'cart_peso' => 0,
-	);
-	$fn_data_out['cart_wiva_checkout'] = array(
-		'cart_subtotal' => 0,
-		'cart_iva' => 0,
+	$fn_data_out = array(
+		"checkout" => array(
+			'cart_count' => 0,
+			'cart_subtotal' => 0,
+			'cart_total' => 0,
+			'cart_iva' => 0,
+			'cart_iva_percent' => $fn_iva,
+			'cart_peso' => 0,
+			'cart_shipping_type' => 0,
+		),
 	);
 	
-	$fn_loc_type_shipping = (isset($fn_data_out['cart_checkout']) && isset($fn_data_out['cart_checkout']['cart_shipping_type'])) ? $fn_data_out['cart_checkout']['cart_shipping_type'] : 0;
-	
+	//complete cart data
 	foreach($fn_array['cart'] as $k => $v)
 	{
 		$fn_q = $db->FetchArray("
-			SELECT p.`lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`, s.`pax_multimplier` 
+			SELECT p.`id`, p.`cat_id`, p.`lang_data`, p.`subtitle_lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`, s.`pax_multimplier` 
 			FROM `product` p
 			LEFT JOIN `product_stock` s ON(s.`prid`=p.`id`)
 			WHERE p.`id`=:id
@@ -528,57 +526,55 @@ function cartProcessAndCalc($fn_array)
 		));
 		
 		$fn_prod_title = (isset($fn_q['lang_data']) && isJson($fn_q['lang_data'])) ? object_to_array(json_decode($fn_q['lang_data'])) : array();
+		$fn_prod_subtitle = (isset($fn_q['subtitle_lang_data']) && isJson($fn_q['subtitle_lang_data'])) ? object_to_array(json_decode($fn_q['subtitle_lang_data'])) : array();
+		
+		$fn_array['cart'][$k]['cat_id'] = $fn_q['cat_id'];
+		$fn_array['cart'][$k]['p_id'] = $fn_q['id'];
 		
 		$fn_array['cart'][$k]['hash'] = $fn_q['hash'];
 		$fn_array['cart'][$k]['title'] = $fn_prod_title[$st_lang];
+		$fn_array['cart'][$k]['subtitle'] = $fn_prod_subtitle[$st_lang];
 		$fn_array['cart'][$k]['stock_count'] = $fn_q['stock_count'];
 		$fn_array['cart'][$k]['thumb'] = getThumbFromGallery($fn_q['gallery_id']);
 		$fn_array['cart'][$k]['pax_multimplier'] = $fn_q['pax_multimplier'];
 		
-		$fn_array['cart'][$k]['price'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? 
-			round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : 
-			$fn_q['precio_venta'];
+		$fn_array['cart'][$k]['price_unit'] = $fn_q['precio_venta'];
+		$fn_array['cart'][$k]['price_unit_total'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : $fn_q['precio_venta'];
+		
+		$fn_array['cart'][$k]['price_total'] = $fn_array['cart'][$k]['price_unit_total'];
+		$fn_array['cart'][$k]['price_multimplier'] = 0;
 		
 		//cajas
-		if(isset($fn_array['cart'][$k]['multimplier']) && $fn_array['cart'][$k]['multimplier'] !== 0) $fn_array['cart'][$k]['price'] = round($fn_array['cart'][$k]['price'] + (($fn_array['cart'][$k]['multimplier'] * $fn_q['pax_multimplier']) * $fn_q['precio_venta']), 2);
+		if(isset($fn_array['cart'][$k]['multimplier']) && $fn_array['cart'][$k]['multimplier'] !== 0)
+		{
+			$fn_array['cart'][$k]['price_multimplier'] = round(($fn_array['cart'][$k]['multimplier'] * ($fn_q['pax_multimplier'] * $fn_q['precio_venta'])), 2);
+			
+			
+			$fn_array['cart'][$k]['price_total'] += $fn_array['cart'][$k]['price_multimplier'];
+		}
+		
+		//----------
 		
 		$fn_data_out['cart'][] = $fn_array['cart'][$k];
 		
 		//calculos
-		$fn_data_out['cart_checkout']['cart_subtotal'] += $fn_array['cart'][$k]['price'];
+		$fn_data_out['checkout']['cart_total'] = $fn_array['cart'][$k]['price_total'];
 		
 		//peso
-		if(isset($fn_q['peso'])) $fn_data_out['cart_checkout']['cart_peso'] += $fn_q['peso'];
+		if(isset($fn_q['peso'])) $fn_data_out['checkout']['cart_peso'] += $fn_q['peso'];
 	}
 	
-	//cart without iva
-	//cart_iva en este punto es 0 se calcula por primera vez
-	$fn_data_out['cart_wiva_checkout'] = array(
-		'cart_subtotal' => round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2),
-		'cart_iva' => round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2),
-	);
+	$fn_data_out['checkout']['cart_count'] = getCartCount($_SESSION['cart']);
+	$fn_data_out['checkout']['cart_iva'] = round(($fn_data_out['checkout']['cart_total'] * $fn_data_out['checkout']['cart_iva_percent'] / 100), 2);
 	
-	//no hay envio ni dir
-	$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-	$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-	$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
+	//subtotal sin iva
+	$fn_data_out['checkout']['cart_subtotal'] = round(($fn_data_out['checkout']['cart_total'] - $fn_data_out['checkout']['cart_iva']), 2);
+
 	
 	if(isset($_SESSION['cart'])) $_SESSION['cart'] = $fn_array['cart'];
 	
-	$_SESSION['cart_wiva_checkout'] = $fn_data_out['cart_wiva_checkout'];
-	
 	//write all to session
-	$_SESSION['cart_checkout'] = $fn_data_out['cart_checkout'];
-	
-	//mantenemos shipping seleccionado
-	$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_loc_type_shipping;
-	
-	$fn_data_out['lang'] = array(
-		'lang_iva' => $lang_items[$st_lang]['lang_iva'],
-		'lang_no_iva' => $lang_items[$st_lang]['lang_no_iva'],
-		'lang_envio' => $lang_items[$st_lang]['lang_envio'],
-		'cart_shipping_included' => $lang_items[$st_lang]['cart_shipping_included'],
-	);
+	$_SESSION['checkout'] = $fn_data_out['checkout'];
 	
 	return $fn_data_out;
 }

@@ -173,7 +173,7 @@ if($fn_ajax !== null)
 			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
 			{
 				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
+				unset($_SESSION['checkout']);
 			}
 			
 			if(!is_numeric($fn_inputs['p_id']) || !is_numeric($fn_inputs['cat_id'])) exit(json_encode(array(
@@ -181,15 +181,6 @@ if($fn_ajax !== null)
 				'message' => getLangItem('msg_error_param'),
 			)));
 						
-			$fn_var = '';
-			$fn_isVars = false;
-			
-			$fn_q_check_stock_array = array(
-				'pid' => $fn_inputs['p_id'],
-			);
-			
-			//id del producto en el carrito
-			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
 			
 			//añadimos al carrito
 			$fn_q_check_stock = $db->FetchArray("
@@ -197,10 +188,15 @@ if($fn_ajax !== null)
 				FROM `product_stock` 
 				WHERE `prid`=:pid
 				LIMIT 1;
-			", $fn_q_check_stock_array);
+			", array(
+				'pid' => $fn_inputs['p_id'],
+			));
 			
 			$fn_updated = false;
-
+			
+			//id del producto en el carrito
+			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
+			
 			//vacio añadimos uno nuevo
 			if(!isset($_SESSION['cart']) && $fn_q_check_stock >= 1)
 			{
@@ -223,7 +219,13 @@ if($fn_ajax !== null)
 				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
 				{
 					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
-					if($fn_pax+1 < $fn_q_check_stock) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
+					if($fn_pax+1 < $fn_q_check_stock['stock_count']) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
+					
+					$fn_pax_mult = (int) $_SESSION['cart'][$fn_pr_cart_id]['multimplier'];
+					$fn_multiplier_to_unit = ($fn_pax_mult+1) * $fn_q_check_stock['pax_multimplier'];
+					
+					if($fn_multiplier_to_unit < $fn_q_check_stock['stock_count']) $_SESSION['cart'][$fn_pr_cart_id]['multimplier'] = round($fn_pax_mult+1);
+					
 				}else{
 					$_SESSION['cart'][$fn_pr_cart_id] = array(
 						'cat_id' => $fn_inputs['cat_id'],
@@ -237,8 +239,6 @@ if($fn_ajax !== null)
 			}
 			
 			$fn_process_cart = cartProcessAndCalc($_SESSION);
-			
-			$fn_process_cart['cart_wiva_checkout']['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'], 2);
 			
 			if($fn_process_cart)
 			{
@@ -288,7 +288,7 @@ if($fn_ajax !== null)
 			if(sizeof($_SESSION['cart']) == 0)
 			{
 				unset($_SESSION['cart']);
-				unset($_SESSION['cart_checkout']);
+				unset($_SESSION['checkout']);
 				
 				exit(json_encode(array(
 					'status' => 400,
@@ -324,19 +324,28 @@ if($fn_ajax !== null)
 				'prid' => $fn_inputs['p_id'],
 			));
 			
-			foreach($_SESSION['cart'] as $k => $v)
+			if($fn_q_check_stock == 0 || !$fn_q_check_stock) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('tienda_no_items'),
+			)));
+			
+			//add
+			if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
 			{
-				if($v['p_id'] == $fn_inputs['p_id'] && $v['cat_id'] == $fn_inputs['cat_id'])
-				{
-					$_SESSION['cart'][$k]['multimplier'] = (isset($fn_inputs['multimplier']) && $fn_inputs['multimplier'] !== 0) ? $fn_inputs['multimplier'] : 0;
-					$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] > 0) ? $fn_inputs['pax'] : 1;
-					$_SESSION['cart'][$k]['pax'] = ($fn_pax < $fn_q_check_stock) ? $fn_pax : $fn_q_check_stock;
-				}
+				//modificamos
+				$_SESSION['cart'][$fn_pr_cart_id]['multimplier'] = isset($fn_inputs['multimplier']) ? $fn_inputs['multimplier'] : "0";
+				
+				//sum client pax or add existing on stock
+				$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] == 0) ? "1" : $fn_inputs['pax'];
+				$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_pax < $fn_q_check_stock) ? $fn_pax : $fn_q_check_stock;	
 			}
+			
+			$fn_process_cart = cartProcessAndCalc($_SESSION);
 			
 			exit(json_encode(array(
 				'status' => 200,
 				'message' => getLangItem('add_item_cart'),
+				'data' => $fn_process_cart,
 			)));
 		break;
 

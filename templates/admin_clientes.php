@@ -33,13 +33,11 @@ $fn_xtemplate_parse['parse'][] = '';
 
 //select pag inicial
 $fn_q = $db->FetchAll("
-	SELECT u.*, md.`meta_value` as 'user_data'
+	SELECT u.*, ml.`meta_value` as 'user_level'
 	FROM `users` u
-	LEFT JOIN `users_meta` m ON(m.`user_id`=u.`ID`)
-	LEFT JOIN `users_meta` md ON(md.`user_id`=u.`ID`)
-	WHERE m.`meta_key`='user_level'
-	AND m.`meta_value`='15'
-	OR md.`meta_key`='user_pers_data'
+	INNER JOIN `users_meta` ml ON(ml.`user_id`=u.`ID`)
+	WHERE ml.`meta_value`='15'
+	AND ml.`meta_key`='user_level'
 ");
 
 if($fn_q) 
@@ -51,8 +49,17 @@ if($fn_q)
 		
 		$fn_for_data = object_to_array($uv);
 		
-		if(isset($fn_for_data['user_data']) && isJson($fn_for_data['user_data'])) $fn_for_data = array_merge($fn_for_data, json_decode($fn_for_data['user_data'], true));
+		$fn_q_user_data = $db->FetchValue("
+			SELECT `meta_value`
+			FROM `users_meta`
+			WHERE `meta_key`='user_pers_data'
+			AND `user_id`=:uid
+		", array(
+			"uid" => $uv->ID
+		));
 				
+		if($fn_q_user_data && isJson($fn_q_user_data)) $fn_for_data = array_merge($fn_for_data, json_decode($fn_q_user_data, true));
+			
 		$fn_q_userstatus = $db->FetchValue("
 			SELECT `status_value`
 			FROM `users_status`
