@@ -3736,24 +3736,23 @@ html.openCart {
   z-index: 100;
 }
 
-html.openCart .cart-wrap {
-  display: block;
-}
-
 .cart-wrap [data-cart-container] {
   position: absolute;
   top: 0;
-  right: 100%;
+  right: 0%;
   display: block;
   width: 440px;
   max-width: 440px;
   height: 100%;
   background-color: #fff;
+  overflow: auto;
+}
+
+html.openCart .cart-wrap {
+  display: block;
 }
 
 html.openCart [data-cart-container] {
-  right: 0;
-  overflow: auto;
 }
 
 .cart-container {
@@ -3771,6 +3770,10 @@ html.openCart [data-cart-container] {
 
 .header-logged [data-action="openCart"] {
   margin-right: 7px;
+}
+
+.header-logged .cart a {
+  margin-right: 5px;
 }
 
 .header-logged .cart-not {
@@ -4227,6 +4230,10 @@ a.secundary {
   background-color: #b99219;
 }
 
+.admin-menu li.active a:hover {
+  color: #fff;
+}
+
 .txt-org {
   color: #b99219;
 }
@@ -4323,6 +4330,7 @@ a.secundary {
 }
 
 @media (max-width: 768px) {
+  
   [data-hash="home"] main {
     padding-top: 0;
   }

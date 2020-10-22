@@ -515,74 +515,10 @@ function cartProcessAndCalc($fn_array)
 	
 	$fn_loc_type_shipping = (isset($fn_data_out['cart_checkout']) && isset($fn_data_out['cart_checkout']['cart_shipping_type'])) ? $fn_data_out['cart_checkout']['cart_shipping_type'] : 0;
 	
-	//user
-	$fn_nodir = true;
-	$fn_noshipping = true;
-	$fn_dir_data = array();
-	$fn_shipping_data = array();
-	$fn_oferta_product = 0;
-	
-	if($too_login->isLogged() == 200)
-	{
-		$fn_login_user_data = $too_login->getUserData();
-		
-		$fn_user_meta = $db->FetchValue("
-			SELECT `meta_value`
-			FROM `users_meta`
-			WHERE `user_id`=:uid
-			AND `meta_key`='user_dirs'
-			LIMIT 1;
-		", array(
-			'uid' => $fn_login_user_data->ID,
-		));
-		
-		//check default dir
-		if($fn_user_meta)
-		{
-			$fn_d = (!empty($fn_user_meta) && isJson($fn_user_meta)) ? object_to_array(json_decode($fn_user_meta)) : false;
-			
-			if($fn_d) foreach($fn_d as $mk => $mv)
-			{
-				if(isset($mv['dir_default']) && $mv['dir_default'] == 1)
-				{
-					$fn_nodir = false;
-					$fn_dir_data = $mv;
-					break;
-				}
-			}
-		}
-	}
-	//user
-	
-	//check shipping
-	$fn_q_shipping = $db->FetchAll("
-		SELECT *
-		FROM `shipping_companies`
-		WHERE `active`='1'
-	");
-	
-	if(count($fn_q_shipping) !== 0) $fn_noshipping = false;
-	//check shipping
-	
-	/*
-		//var_dump($fn_dir_data);
-		
-		array (size=9)
-		  'dir_name' => string 'espa&ntilde;a' (length=13)
-		  'dir_primary' => string '' (length=0)
-		  'dir_secundary' => string '' (length=0)
-		  'dir_city' => string '' (length=0)
-		  'dir_region' => string '' (length=0)
-		  'dir_post' => string '' (length=0)
-		  'dir_country' => string 'es' (length=2)
-		  'id' => string '0' (length=1)
-		  'dir_default' => int 1
-	*/
-	
 	foreach($fn_array['cart'] as $k => $v)
 	{
 		$fn_q = $db->FetchArray("
-			SELECT p.`lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`
+			SELECT p.`lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`, s.`pax_multimplier` 
 			FROM `product` p
 			LEFT JOIN `product_stock` s ON(s.`prid`=p.`id`)
 			WHERE p.`id`=:id
@@ -597,33 +533,14 @@ function cartProcessAndCalc($fn_array)
 		$fn_array['cart'][$k]['title'] = $fn_prod_title[$st_lang];
 		$fn_array['cart'][$k]['stock_count'] = $fn_q['stock_count'];
 		$fn_array['cart'][$k]['thumb'] = getThumbFromGallery($fn_q['gallery_id']);
+		$fn_array['cart'][$k]['pax_multimplier'] = $fn_q['pax_multimplier'];
 		
-		//oferta solo un item
-		if(isset($fn_array['promote']) && $fn_array['promote']['id'] == $v['p_id'] && $fn_oferta_product == 0)
-		{
-			//off
-			if(isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0)
-			{
-				if($fn_array['promote']['used'] <= $fn_array['promote']['max'])
-				{
-					//oferta sobre 1 producto
-					$fn_loc_of = round(($fn_q['precio_venta'] * $fn_array['promote']['oferta_value'] / 100), 2);
-					$fn_loc_calc_total_price_per_pax = round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2);
-					
-					//restamos descuento de un solo producto del total
-					$fn_price_loc = round(($fn_loc_calc_total_price_per_pax - $fn_loc_of), 2);
-					
-					$fn_oferta_product++;
-				}else{
-					$fn_price_loc = round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2);
-				}
-			}else{
-				$fn_price_loc =  $fn_q['precio_venta'];
-			}
-		}else{
-			//sin oferta
-			$fn_array['cart'][$k]['price'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : $fn_q['precio_venta'];
-		}
+		$fn_array['cart'][$k]['price'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? 
+			round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : 
+			$fn_q['precio_venta'];
+		
+		//cajas
+		if(isset($fn_array['cart'][$k]['multimplier']) && $fn_array['cart'][$k]['multimplier'] !== 0) $fn_array['cart'][$k]['price'] = round($fn_array['cart'][$k]['price'] + (($fn_array['cart'][$k]['multimplier'] * $fn_q['pax_multimplier']) * $fn_q['precio_venta']), 2);
 		
 		$fn_data_out['cart'][] = $fn_array['cart'][$k];
 		
@@ -634,55 +551,6 @@ function cartProcessAndCalc($fn_array)
 		if(isset($fn_q['peso'])) $fn_data_out['cart_checkout']['cart_peso'] += $fn_q['peso'];
 	}
 	
-	//oferta global
-	if(isset($fn_array['promote']) && $fn_array['promote']['id'] == 0 && !isset($_SESSION['promote']['global_userd']))
-	{
-		if($fn_array['promote']['used'] <= $fn_array['promote']['max'] && $fn_array['promote']['p_id'] == 0)
-		{
-			//cart_checkout
-			$fn_sub_of = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_array['promote']['oferta_value'] / 100), 2);
-			//subtotal
-			$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] - $fn_sub_of), 2);
-			
-			//iva del sobtotal
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			
-			//dejamos una marca de que ya esta aplicada la oferta general
-			$_SESSION['promote']['global_userd'] = $fn_array['promote']['global_userd'] = 1;
-		}
-	}
-	
-	//envio
-	//primero hay que mirar que compañia ha seleccionado el cliente
-	/*
-		var_dump($_SESSION);
-	
-		array (size=3)
-		  'lang' => string 'es' (length=2)
-		  'glunt_login_session' => 
-		    object(stdClass)[1]
-		      public 'ID' => string '1' (length=1)
-		      public 'user_name' => string '211' (length=3)
-		      public 'user_email' => string 'admin@211.com' (length=13)
-		      public 'user_status' => string '1' (length=1)
-		      public 'user_add_date' => string '2017-02-25 17:22:14' (length=19)
-		      public 'status_value' => string 'Activo' (length=6)
-		      public 'user_level' => string '100' (length=3)
-		      public 'time_stamp' => int 1488800019
-		  'cart' => 
-		    array (size=2)
-		      0 => 
-		        array (size=3)
-		          'cat_id' => string '1' (length=1)
-		          'p_id' => string '4' (length=1)
-		          'pax' => string '1' (length=1)
-		      1 => 
-		        array (size=3)
-		          'cat_id' => string '1' (length=1)
-		          'p_id' => string '7' (length=1)
-		          'pax' => string '1' (length=1)
-    */
-	
 	//cart without iva
 	//cart_iva en este punto es 0 se calcula por primera vez
 	$fn_data_out['cart_wiva_checkout'] = array(
@@ -690,88 +558,10 @@ function cartProcessAndCalc($fn_array)
 		'cart_iva' => round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2),
 	);
 	
-	//tiene dir & hay compañias de envio
-	if((!$fn_nodir && !$fn_noshipping))
-	{
-		$fn_data_out['cart_checkout']['cart_total'] = 0;
-		$fn_data_out['cart_checkout']['cart_shipping_type'] = 0;
-		$fn_data_out['cart_checkout']['cart_shipping_cost'] = 0;
-		
-		//cliente no ha seleccionado envio calculamos con la primera opcion
-		$fn_get_tid = false;
-		
-		$fn_q_shipping = $db->FetchAll("
-		  SELECT *
-		  FROM `shipping_companies`
-		  WHERE `active`='1'
-		  LIMIT 1;
-		");
-		
-		if($fn_q_shipping)
-		{
-			$fn_q_tid = $db->FetchAll("
-				SELECT t.`id`
-				FROM `shipping_types` t
-				LEFT JOIN `shipping_types_rel` r ON(r.`t_id`=t.`id`)
-				WHERE r.`s_id`=:sid
-			", array(
-				'sid' => $fn_q_shipping[0]->id
-			));
-			
-			if($fn_q_tid) foreach($fn_q_tid as $tk => $tv)
-			{
-				$fn_tid = (!empty($fn_array['cart_checkout']['cart_shipping_type']) && $fn_array['cart_checkout']['cart_shipping_type'] !== 0) ? $fn_array['cart_checkout']['cart_shipping_type'] : $tv->id;
-				
-				$fn_peso = $fn_data_out['cart_checkout']['cart_peso'];
-				
-				//asignamos el tipo de envio si no esta asignado
-				$fn_data_out['cart_checkout']['cart_shipping_type'] = $fn_tid;
-				
-				//cliente habia seleccionado antes una opcion de envio
-				$fn_get_tarifa = $db->FetchArray("
-					SELECT t.*, c.`country_name`, c.`country_code`
-					FROM `shipping_tarifas` t
-					LEFT JOIN `apps_countries` c ON(c.`id`=t.`c_id`)
-					WHERE c.`country_code`=UPPER('{$fn_dir_data['dir_country']}')
-					AND t.`s_id`='{$fn_q_shipping[0]->id}'
-					AND t.`t_id`='{$fn_tid}'
-					AND t.`kg`>='{$fn_peso}'
-					LIMIT 1;
-				");
-				
-				if($fn_get_tarifa) $fn_shipping_data[] = $fn_get_tarifa;
-			}
-		}
-		
-		if(count($fn_shipping_data) !== 0)
-		{
-			$fn_data_out['cart_checkout']['cart_shipping_type'] = $fn_shipping_data[0]['t_id'];
-			
-			$fn_ship_iva = round(($fn_shipping_data[0]['precio'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_shipping_cost'] = round(($fn_shipping_data[0]['precio'] - $fn_ship_iva), 2);
-			
-			$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-			
-			$fn_cart_iva = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_cart_iva + $fn_ship_iva), 2);  //productos + envio
-			
-			$fn_calc_subtotal = round(($fn_data_out['cart_checkout']['cart_subtotal'] - $fn_cart_iva), 2); //solo productos sin iva
-			$fn_data_out['cart_checkout']['cart_subtotal'] = $fn_calc_subtotal;
-			
-			$fn_data_out['cart_checkout']['cart_total'] = round(($fn_calc_subtotal + $fn_data_out['cart_checkout']['cart_iva'] + $fn_data_out['cart_checkout']['cart_shipping_cost']), 2); //se suman envio + iva + subtotal
-		}else{
-			//no hay envio ni dir
-			$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
-		}
-	}else{
-		//no hay envio ni dir
-		$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-		$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-		$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
-	}
-	//envio
+	//no hay envio ni dir
+	$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
+	$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
+	$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
 	
 	if(isset($_SESSION['cart'])) $_SESSION['cart'] = $fn_array['cart'];
 	

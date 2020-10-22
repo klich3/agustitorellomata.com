@@ -25,32 +25,6 @@ if(getCartCount() == '0')
 	}
 	//end selector año
 	
-	//paises
-	$fn_q_country = $db->FetchAll("
-		SELECT `country_code` AS 'c', `country_name` AS 'n'
-		FROM `apps_countries`
-		WHERE `active`='1'
-		ORDER BY `order` DESC, `country_code` ASC;
-	");
-	
-	if($fn_q_country)
-	{
-		foreach($fn_q_country as $ck => $cv)
-		{
-			$fn_for_data = object_to_array($cv);
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = 'checkout.cart.contry_list_row';
-		}
-	}else{
-		$fn_xtemplate_parse['assign'][] = array(
-			'c' => null,
-			'n' => getLangItem('country_list_error'),
-		);
-		$fn_xtemplate_parse['parse'][] = 'checkout.cart.contry_list_row';
-	}
-	//end paises
-	
 	//carrito lleno o no
 	if($fn_process_cart)
 	{
@@ -68,21 +42,8 @@ if(getCartCount() == '0')
 			$fn_xtemplate_parse['parse'][] = 'checkout.cart.pay_rd';
 		}
 		
-		$fn_paypal = $db->FetchValue("
-			SELECT `options_value`
-			FROM `options`
-			WHERE `options_key`='paypal_active'
-			LIMIT 1;
-		");
-		
-		if($fn_paypal)
-		{
-			$fn_xtemplate_parse['assign'][] = '';
-			$fn_xtemplate_parse['parse'][] = 'checkout.cart.pay_pp';
-		}
-		
 		//activamos boton de pago
-		if($fn_paypal || $fn_redsys)
+		if($fn_redsys)
 		{
 			$fn_xtemplate_parse['assign'][] = '';
 			$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.pay_button';
@@ -94,6 +55,19 @@ if(getCartCount() == '0')
 		//procesamos carrito
 		foreach($fn_process_cart['cart'] as $ck => $cv)
 		{
+			$fn_price_total_row = 0;
+			$fn_price_total_row = $cv['pax'] * $cv['precio_venta'];
+			
+			if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1)
+			{
+				if(isset($cv['pax_multimplier']) && isset($cv['multimplier']) ) $fn_price_total_row += $fn_price_total_row + (($cv['multimplier'] * $cv['pax_multimplier']) * $cv['precio_venta']);
+				
+				$fn_xtemplate_parse['assign'][] = $cv;
+				$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.cart_row.cajas';
+			}
+			
+			$cv['price'] = $fn_price_total_row;
+				
 			$fn_xtemplate_parse['assign'][] = $cv;
 			$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.cart_row';
 		}
@@ -167,15 +141,6 @@ if(getCartCount() == '0')
 		if($fn_user_meta)
 		{
 			$fn_u_dir = (!empty($fn_user_meta) && isJson($fn_user_meta)) ? json_decode($fn_user_meta, true) : false;
-			
-			if($fn_u_dir) foreach($fn_u_dir as $udk => $udv)
-			{
-				if($udv['dir_default'] == 1)
-				{
-					$fn_u_dir = $udv;
-					break;
-				}
-			}
 			
 			$fn_xtemplate_parse['assign'][] = $fn_u_dir;
 			$fn_xtemplate_parse['parse'][] = '';

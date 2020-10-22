@@ -14,7 +14,6 @@
           <a
             href="{base}{user_lang}/productos"
             class="button"
-            data-event="cart/tienda"
             >{but_ir_a_la_tienda}</a
           >
         </div>
@@ -50,8 +49,8 @@
           class="g item"
           data-pid="{p_id}"
           data-cid="{cat_id}"
-          data-szid="{s_id}"
-          data-clid="{c_id}"
+          data-price-u="{precio_venta}"
+          data-multiplier="{pax_multimplier}"
         >
           <div class="ws-4-10 wm-2-10 wl-2-10 wxl-2-10">
             <div class="thumb">
@@ -68,8 +67,12 @@
           <div class="ws-6-10 wm-8-10 wl-8-10 wxl-8-10">
             <div class="g w-1-1">
               <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10">
-                <div class="title txt@u"><strong>{title}</strong></div>
-                <div class="subtitle txt@u"><strong>{subtitle}</strong></div>
+                <div class="title txt@u">
+                  <strong>{title}</strong>
+                </div>
+                <div class="subtitle txt@u">
+                  <strong>{subtitle}</strong>
+                </div>
               </div>
 
               <div class="hl w-1-1 pt-4 pb-5">
@@ -84,7 +87,7 @@
                       <strong>{lang_box} {pax_multimplier} {lang_bot}</strong>
                     </div>
                     <div class="bot-price txt-org">
-                      <strong>{precio_caja} €</strong>
+                      <strong>{precio_caja}</strong>
                     </div>
                     <!-- END: multiplier -->
                     <div class="price">
@@ -102,7 +105,7 @@
                 <div class="g">
                   <div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10">
                     <!-- BEGIN: multiplier_selector -->
-                    <div class="g gc">
+                    <div class="g gc" data-group="control">
                       <div class="w-1-1 pb-2">
                         <strong>{cart_cant_cajas}</strong>
                       </div>
@@ -110,12 +113,11 @@
                         <div class="w-1-1">
                           <input
                             type="number"
-                            name="item[{cat_id}][{p_id}][multimplier]"
+                            name="multimplier"
                             min="1"
                             max="{stock_count}"
                             value="{multimplier}"
-                            data-pax
-                            {only_read}
+                            data-multimplier
                             class="w-1-1 txt@c"
                           />
                         </div>
@@ -124,8 +126,7 @@
                         <a
                           href="javascript:void(0);"
                           class="fr"
-                          data-action="upCart"
-                          data-event="cart/del-cart"
+                          data-action="cartDelItem"
                         >
                           <img
                             src="{base_script}images/icon-trash.svg"
@@ -136,14 +137,17 @@
                       </div>
                       <div class="w-1-1 pt-4"></div>
                       <div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
-                        <a href="javascript:void(0);" data-action="upCart">
+                        <a
+                          href="javascript:void(0);"
+                          data-action="cartDownItem"
+                        >
                           <img
                             src="{base_script}images/icon-minus.svg"
                             width="25px"
                             height="25px"
                           />
                         </a>
-                        <a href="javascript:void(0);" data-action="upCart">
+                        <a href="javascript:void(0);" data-action="cartUpItem">
                           <img
                             src="{base_script}images/icon-plus.svg"
                             width="25px"
@@ -152,11 +156,13 @@
                         </a>
                       </div>
                       <div class="w-2-10"></div>
+                      
+                      <div class="w-1-1 txt-org txt@r pt-9"><strong>{precio_current_cajas}</strong></div>
                     </div>
 
-                    <div class="w-1-1 sep pt-2 pb-2 mt-5@s pb-5@s"></div>
+                    <div class="w-1-1 sep pt-1 pb-1 mt-5@s pb-5@s"></div>
                     <!-- END: multiplier_selector -->
-                    <div class="g gc">
+                    <div class="g gc" data-group="control">
                       <div class="w-1-1 pb-2">
                         <strong>{cart_cant_bot}</strong>
                       </div>
@@ -164,12 +170,11 @@
                         <div class="w-1-1">
                           <input
                             type="number"
-                            name="item[{cat_id}][{p_id}][pax]"
+                            name="pax"
                             min="1"
                             max="{stock_count}"
                             value="{pax}"
                             data-pax
-                            {only_read}
                             class="w-1-1 txt@c"
                           />
                         </div>
@@ -178,8 +183,7 @@
                         <a
                           href="javascript:void(0);"
                           class="fr"
-                          data-action="upCart"
-                          data-event="cart/del-cart"
+                          data-action="cartDelItem"
                         >
                           <img
                             src="{base_script}images/icon-trash.svg"
@@ -190,14 +194,17 @@
                       </div>
                       <div class="w-1-1 pt-4"></div>
                       <div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
-                        <a href="javascript:void(0);" data-action="upCart">
+                        <a
+                          href="javascript:void(0);"
+                          data-action="cartDownItem"
+                        >
                           <img
                             src="{base_script}images/icon-minus.svg"
                             width="25px"
                             height="25px"
                           />
                         </a>
-                        <a href="javascript:void(0);" data-action="upCart">
+                        <a href="javascript:void(0);" data-action="cartUpItem">
                           <img
                             src="{base_script}images/icon-plus.svg"
                             width="25px"
@@ -206,6 +213,7 @@
                         </a>
                       </div>
                       <div class="w-2-10"></div>
+                      <div class="w-1-1 txt-org txt@r pt-9"><strong>{price_bot}</strong></div>
                     </div>
                   </div>
                 </div>
@@ -216,8 +224,8 @@
               </div>
             </div>
           </div>
+        <div class="w-1-1 sep mb-4"></div>
         </div>
-        <div class="w-1-1 sep"></div>
       </div>
       <!-- END: row -->
 
@@ -235,7 +243,9 @@
                 <strong class="txt@u txt-org">{cart_iva} &euro;</strong>
               </div>
 
-              <div class="w-1-2 txt@u"><strong>subtotal</strong></div>
+              <div class="w-1-2 txt@u">
+                <strong>subtotal</strong>
+              </div>
               <div class="w-1-2 txt@r">
                 <strong class="txt@u txt-org">{cart_subtotal} &euro;</strong>
               </div>
@@ -249,7 +259,6 @@
                 href="{base}{user_lang}/checkout"
                 rel="nofollow"
                 class="ws-1-1 button small fr"
-                data-event="cart/checkout"
                 data-source="check"
                 >{cart_checkout_but}</a
               >
