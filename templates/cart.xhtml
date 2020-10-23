@@ -11,9 +11,7 @@
         <div class="w-1-1 txt@c">{message}</div>
 
         <div class="w-1-1 mt-2 txt@c">
-          <a
-            href="{base}{user_lang}/productos"
-            class="button"
+          <a href="{base}{user_lang}/productos" class="button"
             >{but_ir_a_la_tienda}</a
           >
         </div>
@@ -87,11 +85,11 @@
                       <strong>{lang_box} {pax_multimplier} {lang_bot}</strong>
                     </div>
                     <div class="bot-price txt-org">
-                      <strong>{precio_caja} €</strong>
+                      <strong>{precio_caja}&euro;</strong>
                     </div>
                     <!-- END: multiplier -->
                     <div class="price">
-                      <strong>{price_unit} € {lang_ud}</strong>
+                      <strong>{price_unit}&euro; {lang_ud}</strong>
                     </div>
                   </div>
                 </div>
@@ -156,8 +154,10 @@
                         </a>
                       </div>
                       <div class="w-2-10"></div>
-                      
-                      <div class="w-1-1 txt-org txt@r pt-9"><strong>{price_multimplier} €</strong></div>
+
+                      <div class="w-1-1 txt-org txt@r pt-9">
+                        <strong>{price_multimplier}&euro;</strong>
+                      </div>
                     </div>
 
                     <div class="w-1-1 sep pt-1 pb-1 mt-5@s pb-5@s"></div>
@@ -213,18 +213,20 @@
                         </a>
                       </div>
                       <div class="w-2-10"></div>
-                      <div class="w-1-1 txt-org txt@r pt-9"><strong>{price_unit_total} €</strong></div>
+                      <div class="w-1-1 txt-org txt@r pt-9">
+                        <strong>{price_unit_total}&euro;</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="ws-1-1 wm-1-10 wl-1-10 wxl-1-10 txt@r pt-10@s">
                 <strong class="price hl txt@u pr-8">{lang_cart_price}</strong>
-                <strong class="txt-org price">{price_total} &euro;</strong>
+                <strong class="txt-org price">{price_total}&euro;</strong>
               </div>
             </div>
           </div>
-        <div class="w-1-1 sep mb-4"></div>
+          <div class="w-1-1 sep mb-4"></div>
         </div>
       </div>
       <!-- END: row -->
@@ -240,14 +242,14 @@
                 <strong>{lang_iva} ({cart_iva_percent}%)</strong>
               </div>
               <div class="w-1-2 txt@r">
-                <strong class="txt@u txt-org">{cart_iva} &euro;</strong>
+                <strong class="txt@u txt-org">{cart_iva}&euro;</strong>
               </div>
 
               <div class="w-1-2 txt@u">
                 <strong>subtotal</strong>
               </div>
               <div class="w-1-2 txt@r">
-                <strong class="txt@u txt-org">{cart_subtotal} &euro;</strong>
+                <strong class="txt@u txt-org">{cart_subtotal}&euro;</strong>
               </div>
             </div>
 

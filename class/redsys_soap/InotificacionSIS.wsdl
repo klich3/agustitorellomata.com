@@ -53,7 +53,7 @@
 	
 	<wsdl:service name="SerClsWSConsultaService">
 		<wsdl:port binding="intf:SerClsWSConsultaSoapBinding" name="SerClsWSConsulta">
-			<wsdlsoap:address location="https://glunt.es/class/redsys_soap/InotificacionSIS.php"/>
+			<wsdlsoap:address location="InotificacionSIS.php"/>
         </wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

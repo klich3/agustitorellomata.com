@@ -399,6 +399,7 @@ class WIDGET_jsonToTmpl {
 	 */
 	private function parseByPageContent($fn_args, $fn_hash)
 	{
+		
 		//idioma por defecto
 		$fn_def_lang = $this->db->FetchArray("
 			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` AS 'pageContent'
@@ -427,11 +428,28 @@ class WIDGET_jsonToTmpl {
 			'lang' => $fn_args['lang'],
 			'pid' => $fn_def_lang['id'],
 		));
-
+		
 		$fn_translate_unbase = base64_decode($fn_translate);
 		$fn_json = (isset($fn_translate) && $fn_translate_unbase !== 'false' && $fn_args['lang'] !== $this->CONFIG['site']['defaultLang']) ? $fn_translate : $fn_def_lang['pageContent'];
 		
 		return $fn_json;
+	}
+	
+	private function loadRelContent($fn_rel_id)
+	{
+		$fn_q = $this->db->FetchArray("
+			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` as 'pageContent'
+			FROM `pages_lang_rel` r
+			LEFT JOIN `pages` p ON(p.`id`=r.`page_translate_id`)
+			LEFT JOIN `pages_meta` m ON(m.`p_id`=r.`page_translate_id`)
+			WHERE r.`page_id`=:id
+			AND m.`meta_key`='page_content'
+			LIMIT 1;
+		", array(
+			'id' => $fn_rel_id
+		));
+		
+		return ($fn_q) ? $fn_q : false;
 	}
 	
 	/**

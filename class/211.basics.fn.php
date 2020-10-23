@@ -558,7 +558,7 @@ function cartProcessAndCalc($fn_array)
 		$fn_data_out['cart'][] = $fn_array['cart'][$k];
 		
 		//calculos
-		$fn_data_out['checkout']['cart_total'] = $fn_array['cart'][$k]['price_total'];
+		$fn_data_out['checkout']['cart_total'] += $fn_array['cart'][$k]['price_total'];
 		
 		//peso
 		if(isset($fn_q['peso'])) $fn_data_out['checkout']['cart_peso'] += $fn_q['peso'];
@@ -593,12 +593,13 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 	global $st_lang, $CONFIG, $lang_items;
 	
 	//html y content del mail
-	$fn_mail_html = $CONFIG['templates']['standartEmail'];
+	$fn_mail_html = $CONFIG['site']['standartEmail'];
 	
 	//------- mail cliente + resumen
 	
 	//mails
-	$fn_subject = "[{$lang_items[$st_lang]['mail_order_confirm']}] - {$CONFIG['site']['sitetitlefull']}";
+	$fn_s = getLangItem('mail_order_confirm');
+	$fn_subject = "{$fn_s} - {$CONFIG['site']['sitetitlefull']}";
 	
 	$fn_message = $lang_items[$st_lang]['mail_order_confirm_text'];
 	$fn_message .= createCartCheckoutHtml($fn_order_html);
@@ -627,18 +628,6 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 	
 	//envio del mail
 	$fn_send_user = @mail($fn_user_mail, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-	
-	/*
-	if($CONFIG['status']['debug'])
-	{
-		var_dump($fn_send_user);
-		var_dump($fn_user_mail);
-		var_dump($fn_subject);
-		var_dump($fn_mail_html);
-		var_dump($fn_content['multipart']);
-		var_dump($fn_content['headers']);
-	}
-	*/
 }
 
 /**
@@ -653,7 +642,7 @@ function sendAdminNotice($fn_order_num)
 	global $st_lang, $CONFIG, $lang_items;
 	
 	//html y content del mail
-	$fn_mail_html = $CONFIG['templates']['standartEmail'];
+	$fn_mail_html = $CONFIG['site']['standartEmail'];
 	
 	//email de aviso al administrador
 	$fn_subject = "[Nueva compra] - {$fn_order_num} - {$CONFIG['site']['sitetitlefull']}";
@@ -676,19 +665,7 @@ function sendAdminNotice($fn_order_num)
 	
 	$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
 	
-	$fn_send_admin = @mail($CONFIG['site']['mailinfo'], $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-
-	/*
-	if($CONFIG['status']['debug'])
-	{
-		var_dump($fn_send_admin);
-		var_dump($CONFIG['site']['mailinfo']);
-		var_dump($fn_subject);
-		var_dump($fn_mail_html);
-		var_dump($fn_content['multipart']);
-		var_dump($fn_content['headers']);
-	}
-	*/
+	$fn_send_admin = @mail($CONFIG['site']['mailpedidos'], $fn_subject, $fn_content['multipart'], $fn_content['headers']);
 }
 
 /**
@@ -704,24 +681,38 @@ function createCartCheckoutHtml($fn_cart_array)
 	global $lang_items, $st_lang, $db;
 	
 	//gen order html
-	$fn_order_html = '<table width="100%" style="display:block; width:100%"><thead><tr style="width: 50%"><th>'.strtoupper($lang_items[$st_lang]['lang_cart_producto_title']).'</th><th style="width: 30%">'.strtoupper($lang_items[$st_lang]['lang_cart_cantidad_title']).'</th><th style="width: 20%">TOTAL</th></tr></thead><tbody>';
+	$fn_order_html = '<table width="100%" style="display:block; width:100%">
+		<thead>
+			<tr style="width: 50%">
+				<th style="text-align:left;">'.strtoupper(getLangItem('lang_cart_producto_title')).'</th>
+				<th style="width: 30%">'.strtoupper(getLangItem('lang_cart_cantidad_title')).'</th>
+				<th style="width: 30%">'.strtoupper(getLangItem('cart_cant_cajas')).'</th>
+				<th style="width: 20%">TOTAL</th>
+			</tr>
+		</thead><tbody>';
 	
 	if(count($fn_cart_array) !== 0) foreach($fn_cart_array['cart'] as $ck => $cv)
 	{
-		$fn_order_html .= '<tr><td style="text-transform: uppercase; style="width: 50%"">'.$cv['title'].'</td><td style="text-transform: uppercase; style="width: 30%"">'.$cv['pax'].'</td><td style="text-transform: uppercase; style="width: 20%"">'.$cv['price'].'</td></tr>';
-		
-		//oferta
-		if(isset($fn_cart_array['promote']) && $fn_cart_array['promote']['p_id'] == $cv['p_id']) $fn_order_html .= '<tr><td colspan="3" style="text-transform: uppercase;" >'.$lang_items[$st_lang]['cart_item_apply_promocode'].' ('.$fn_cart_array['promote']['oferta_value'].'%)</td><td>'.$lang_items[$st_lang]['lang_cart_promote_code'].' (<i>'.$fn_cart_array['promote']['code'].'</i>)</td></tr>';
+		$fn_order_html .= '<tr>
+			<td style="text-transform: uppercase;width: 50%;text-align:left;">'.$cv['title'].' '.$cv['subtitle'].'</td>
+			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['pax'].'</td>
+			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['multimplier'].'</td>
+			<td style="text-transform: uppercase;width: 20%;text-align:right;">'.$cv['price_unit'].'</td>
+		</tr>';
 	}
 	
-	$fn_calc_total = $fn_cart_array['cart_wiva_checkout']['cart_subtotal'];
-	$fn_calc_subtotal = round($fn_calc_total - $fn_cart_array['cart_wiva_checkout']['cart_iva'] , 2);
-	
-	$fn_oferta_general = '';
-	
-	if(isset($fn_cart_array['promote']) && $fn_cart_array['promote']['p_id'] == 0) $fn_oferta_general = '<strong>'.$lang_items[$st_lang]['cart_descuento'].':</strong> '.$fn_cart_array['promote']['oferta_value'].'% (<i>'.$fn_cart_array['promote']['code'].'</i>)<br/>';
-	
-	$fn_order_html .= '<tr><td></td><td></td><td></td></tr><tr><td>'.$fn_oferta_general.'<strong>'.$lang_items[$st_lang]['lang_iva'].' ('.$fn_cart_array['cart_checkout']['cart_iva_percent'].'%):</strong> '.$fn_cart_array['cart_wiva_checkout']['cart_iva'].'&euro;<br/><strong>Subtotal:</strong> '.$fn_calc_subtotal.'&euro;<br/><strong>'.$lang_items[$st_lang]['lang_envio'].':</strong> '.$lang_items[$st_lang]['cart_shipping_included'].'<br/><strong>Total:</strong> '.$fn_calc_total.'&euro;<br/></td><td></td><td></td></tr></tbody></table>';
+	$fn_order_html .= '<tr>
+			<td colspan="4" style="height:40px;"></td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align: right">
+				<strong>'.getLangItem('lang_iva').' ('.$fn_cart_array['checkout']['cart_iva_percent'].'%):</strong> '.$fn_cart_array['checkout']['cart_iva'].'&euro;<br/>
+				<strong>Subtotal:</strong> '.$fn_cart_array['checkout']['cart_subtotal'].'&euro;<br/>
+				<strong>'.getLangItem('lang_envio').':</strong> '.getLangItem('cart_shipping_included').'<br/>
+				<strong>Total:</strong> '.$fn_cart_array['checkout']['cart_total'].'&euro;<br/>
+			</td>
+		</tr>
+		</tbody></table>';
 	
 	return $fn_order_html;
 }
@@ -752,30 +743,9 @@ function getCartCount()
 }
 
 /**
- * shopium_assignCheckoutId function.
  * genera checkout_id si no existe 
  *
  *
- 
-	$_SESSION
-	
-	array (size=5)
-	  'lang' => string 'es' (length=2)
-	  'cart_wiva_checkout' => 
-	    array (size=2)
-	      'cart_subtotal' => float 100
-	      'cart_iva' => float 21
-	  'cart_checkout' => 
-	    array (size=8)
-	      'cart_count' => int 3
-	      'cart_subtotal' => float 79
-	      'cart_iva' => float 24.69
-	      'cart_iva_percent' => string '21' (length=2)
-	      'cart_peso' => float 0.3
-	      'cart_total' => float 117.56
-	      'cart_shipping_type' => string '9' (length=1)
-	      'cart_shipping_cost' => float 13.87
- 
  * @access public
  * @return void
  */
@@ -784,23 +754,6 @@ function assignCheckoutId()
 	//global $db, $CONFIG;
 	
 	$fn_checkout_id = date('ymd')."0".substr(time(), 6, 4);
-	
-	/*
-	if(!isset($_SESSION)) @session_start();
-	
-	if(isset($_SESSION) && isset($_SESSION['cart_checkout']) && isset($_SESSION['cart_checkout']['checkout_id']))
-	{
-		$db->Fetch("
-			UPDATE `orders`
-			SET `order_id`='{$fn_checkout_id}'
-			WHERE `order_id`='{$_SESSION['cart_checkout']['checkout_id']}'
-		");
-		
-		//aqui puede haber un problema
-		//deberia comprobar si existe si si update si no false y mostrar que hay un problema que lo intente otra vez
-	}
-	*/
-	
 	return $fn_checkout_id;
 }
 

@@ -55,41 +55,17 @@ if(getCartCount() == '0')
 		//procesamos carrito
 		foreach($fn_process_cart['cart'] as $ck => $cv)
 		{
-			$fn_price_total_row = 0;
-			$fn_price_total_row = $cv['pax'] * $cv['precio_venta'];
-			
 			if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1)
 			{
-				if(isset($cv['pax_multimplier']) && isset($cv['multimplier']) ) $fn_price_total_row += $fn_price_total_row + (($cv['multimplier'] * $cv['pax_multimplier']) * $cv['precio_venta']);
-				
 				$fn_xtemplate_parse['assign'][] = $cv;
 				$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.cart_row.cajas';
 			}
 			
-			$cv['price'] = $fn_price_total_row;
-				
 			$fn_xtemplate_parse['assign'][] = $cv;
 			$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.cart_row';
 		}
 		
-		$fn_data_out = $cv;
-		
-		if(isset($fn_process_cart['cart_checkout']) && isset($fn_process_cart['cart_wiva_checkout']))
-		{
-			$fn_data_out['cart_iva_percent'] = $fn_process_cart['cart_checkout']['cart_iva_percent'];
-			/*
-			$fn_data_out['cart_iva'] = $fn_process_cart['cart_checkout']['cart_iva'];
-			$fn_data_out['cart_subtotal'] = $fn_process_cart['cart_checkout']['cart_subtotal'];
-			*/
-			$fn_data_out['cart_shipping_cost'] = (isset($fn_process_cart['cart_checkout']['cart_shipping_cost'])) ?  $fn_process_cart['cart_checkout']['cart_shipping_cost'] : 0;
-			
-			$fn_data_out['cart_iva'] = $fn_process_cart['cart_wiva_checkout']['cart_iva'];
-			$fn_data_out['cart_subtotal'] = round($fn_process_cart['cart_wiva_checkout']['cart_subtotal']-$fn_process_cart['cart_wiva_checkout']['cart_iva'] , 2);
-			
-			$fn_data_out['cart_total'] = $fn_process_cart['cart_wiva_checkout']['cart_subtotal'];
-		}
-		
-		$fn_xtemplate_parse['assign'][] = $fn_data_out;
+		$fn_xtemplate_parse['assign'][] = $fn_process_cart;
 		$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart';
 	}else{
 		$fn_xtemplate_parse['assign'][] = array(
@@ -144,9 +120,6 @@ if(getCartCount() == '0')
 			
 			$fn_xtemplate_parse['assign'][] = $fn_u_dir;
 			$fn_xtemplate_parse['parse'][] = '';
-		}else{
-			$fn_xtemplate_parse['assign'][] = '';
-			$fn_xtemplate_parse['parse'][] = 'checkout.cart.no_dir';
 		}
 	}else{
 		$fn_xtemplate_parse['assign'][] = '';

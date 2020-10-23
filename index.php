@@ -220,7 +220,7 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
    	", array(
 	   	'hash' => $fn_parse_hash_name
    	));
-   	
+	   
    	/*
    	$fn_search_pages = searchBy($fn_parse_hash_name);
    	$fn_search_cat = searchBy($fn_url['url'], 'category', true);

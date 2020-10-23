@@ -71,7 +71,7 @@ function get_header($fn_args)
 		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
 		
 		'cart_hide' => (isset($_SESSION['cart'])) ? false : true,
-		'cart_items' => (isset($_SESSION['cart']) && isset($_SESSION['cart_checkout'])) ? $_SESSION['cart_checkout']['cart_count'] : 0,
+		'cart_items' => (isset($_SESSION['cart']) && isset($_SESSION['checkout'])) ? $_SESSION['checkout']['cart_count'] : 0,
 	));
 	
 	//custom settings

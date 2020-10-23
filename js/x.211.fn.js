@@ -150,6 +150,7 @@ $(function()
 			    break;
 		    	
 				case "cart":
+					$('[data-multiplier] input').on("change", e_updateCart);
 				break;
 			}
 		});
@@ -182,6 +183,12 @@ $(function()
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
 		$(window).on('resize', e_resize).trigger('resize');
+	}
+	
+	e_updateCart = function(e) 
+	{
+		e_action_handler(e, 'upCart');
+		return;
 	}
 	
 	//validador de checkout
@@ -329,7 +336,9 @@ $(function()
 			e.stopImmediatePropagation();
 			e.stopPropagation();
 			
-			ele.find('span').removeClass('h');
+			ele.attr("disabled", true);
+			
+			ele.parents('[data-cc-container]').find('[data-message]').show().html('<img src="'+fn_base_script+'images/preloader-gray-small.gif"/>');
 		}
 				
 		fn_call_ajax(dom_type, 
@@ -354,6 +363,8 @@ $(function()
 				if(dom_type == 'recUpPass') window.location.href = "/login";
 				if(/(reclamacionSend|clientUpInvoiceDir|clientUpShippingDir|clientPersonalData|clientUpPass)/gim.test(dom_type)) ele.parents('form').find('[data-message]').show();
 				
+				if(dom_type == "checkoutPayment") ele.parents('[data-cc-container]').find('[data-message]').show();
+				
 				//clean form
 				if(/(reclamacionSend)/gim.test(dom_type))
 				{
@@ -363,6 +374,8 @@ $(function()
 				
 				if(/checkoutPayment/gim.test(dom_type))
 				{
+					ele.attr("disabled", false);
+					
 					//si hay algun fallo redireccionamos a la pagina de tienda o home
 					if(d.data && d.data.redirect) window.location.href = d.data.redirect;
 					
@@ -383,6 +396,7 @@ $(function()
 				
 				if(/checkoutPayment/gim.test(dom_type))
 				{
+					ele.attr("disabled", false);
 					$('[data-message]').html(d.message);
 				}
 			}
