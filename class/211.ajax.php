@@ -48,68 +48,64 @@ if($fn_ajax !== null)
 			var_dump($_SESSION);
 			exit;
 		break;
+			
+		case "amdin-test-mailsendsimple":
+			$cabeceras = 'From: webmaster@example.com' . "\r\n" .
+						'Reply-To: webmaster@example.com' . "\r\n" .
+						'X-Mailer: PHP/' . phpversion();
+	
+			$fn_email = @mail($CONFIG['site']['mailinfo'], 'test', 'test', $cabeceras);
+			var_dump($fn_email);
+			exit;
+		break;
+		
+		case "amdin-test-mailsend":
+			//asignamos el pago y respuesta
+			//creamos mails de aviso de pagos
+			$fn_get_order_data_based = $db->FetchValue("
+				SELECT `data_cart`
+				FROM `orders`
+				WHERE `order_id`=:oid
+			", array(
+				'oid' => $fn_g['o'],
+			));
+			
+			if($fn_get_order_data_based)
+			{
+			
+				$fn_order_data = base64_decode($fn_get_order_data_based);
+				$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
+				
+				//mails
+				sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_data);
+				sendAdminNotice($fn_g['o']);
+			}
+			exit;
+		break;
 		
 		case "amdin-test-mailhtml":
-				$u_level = $too_login->isAuth(100, false);
-				
-				if($u_level !== 200) exit(json_encode(array(
-					'status' => 400,
-					'message' => 'No puede hacer esto, no tiene autorización!.',
-				)));
-				
-				$fn_json_compras = array(
-					'oneproduct' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"promote":{"id":"1","active":"1","p_id":"4","title":"test","lang_data":null,"oferta_value":"10","desc":"\u00f3\u00e9","code":"dg10","max":"1","used":"0","date_update":"2017-07-05 22:51:46"},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":170.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:09:18"},"cart_wiva_checkout":{"cart_subtotal":260.85,"cart_iva":54.78}}',
-					
-					'global' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"promote":{"id":"2","active":"1","p_id":"0","title":"test","lang_data":null,"oferta_value":"10","desc":"\u00f3\u00e9","code":"g10","max":"10","used":"1","date_update":"2017-07-05 22:52:23","global_userd":1},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":179.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:09:31"},"cart_wiva_checkout":{"cart_subtotal":242.86,"cart_iva":51}}',
-					
-					'normal' => '{"user":{"ID":"9999","user_name":"211","user_email":"hello@dm211.com","user_status":"1","user_add_date":"2017-05-23 16:56:51","status_value":"Activo","user_level":"100","time_stamp":1499378696,"user_payment_method":"redsys"},"user_dir":{"dir_name":"Por defecto","dir_primary":"lluis domenech i muntaner","dir_secundary":"3a 1ro B","dir_city":"canet de mar","dir_region":"barcelona","dir_post":"08360","dir_country":"ES","dir_default":1,"dir_id":0},"cart":[{"cat_id":"1","p_id":"3","pax":1,"hash":"friesian-gold","title":"FRIESIAN GOLD","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.14809700-1493145564a8aa0b139527fa5b05458d85133fee20w_450h_.jpg","price":89.95,"peso":0.1,"size_x":"10","size_y":"10"},{"cat_id":"1","p_id":"4","pax":"2","hash":"daple-grey","title":"DAPLE GREY","stock_count":"90","thumb":"http:\/\/too:8888\/glunt.com\/content\/0.41275800-1489261422dbd7e3dd598511d52048983bf4542bd6w_450h_.jpg","price":179.9,"peso":0.2,"size_x":"10","size_y":"10"}],"cart_checkout":{"cart_count":3,"cart_subtotal":213.18,"cart_iva":57.49,"cart_iva_percent":"21","cart_peso":0.2,"cart_total":273.75,"cart_shipping_type":0,"cart_shipping_cost":3.08,"cart_checkout_date":"2017-07-07 01:08:59"},"cart_wiva_checkout":{"cart_subtotal":269.85,"cart_iva":56.67}}',
-				);
-				
-				echo "oferta 1 producto<br/><hr/>";
-				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['oneproduct'])));
-				echo "<br/><br/><hr/><br/><br/>";
-				echo "oferta global<br/><hr/>";
-				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['global'])));
-				echo "<br/><br/><hr/><br/><br/>";
-				echo "normal<br/><hr/>";
-				echo createCartCheckoutHtml(object_to_array(json_decode($fn_json_compras['normal'])));
-				
-				exit;
-			break;
+			//asignamos el pago y respuesta
+			//creamos mails de aviso de pagos
+			$fn_get_order_data_based = $db->FetchValue("
+				SELECT `data_cart`
+				FROM `orders`
+				WHERE `order_id`=:oid
+			", array(
+				'oid' => $fn_g['o'],
+			));
 			
-			case "amdin-test-mailsendsimple":
-				$cabeceras = 'From: webmaster@example.com' . "\r\n" .
-							'Reply-To: webmaster@example.com' . "\r\n" .
-							'X-Mailer: PHP/' . phpversion();
-		
-				$fn_email = @mail($CONFIG['site']['mailinfo'], 'test', 'test', $cabeceras);
-				var_dump($fn_email);
-				exit;
-			break;
+			if($fn_get_order_data_based)
+			{
 			
-			case "amdin-test-mailsend":
-				//asignamos el pago y respuesta
-				//creamos mails de aviso de pagos
-				$fn_get_order_data_based = $db->FetchValue("
-					SELECT `data_cart`
-					FROM `orders`
-					WHERE `order_id`=:oid
-				", array(
-					'oid' => $fn_g['o'],
-				));
+				$fn_order_data = base64_decode($fn_get_order_data_based);
+				$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
 				
-				if($fn_get_order_data_based)
-				{
-				
-					$fn_order_data = base64_decode($fn_get_order_data_based);
-					$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
-					
-					//mails
-					sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_data);
-					sendAdminNotice($fn_g['o']);
-				}
-				exit;
-			break;
+				echo createCartCheckoutHtml($fn_order_data);
+			}
+			
+			
+			exit;
+		break;
 		
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
@@ -471,7 +467,7 @@ if($fn_ajax !== null)
 			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
 			
 			//html y content del mail
-			$fn_mail_html = $CONFIG['templates']['standartEmail'];
+			$fn_mail_html = $CONFIG['site']['standartEmail'];
 			
 			$fn_mail_html = str_replace(array(
 				'%message%',
@@ -543,7 +539,6 @@ if($fn_ajax !== null)
 			
 			$fn_isPayProcess = false;
 			$fn_order_data = array();
-			$fn_oferta_product = 0;
 			
 			if($u_level !== 200)
 			{
@@ -558,6 +553,7 @@ if($fn_ajax !== null)
 				$fn_order_data['user'] = object_to_array($getUserData);
 				
 				$fn_user_dir = array(
+					'u_id' => $getUserData->ID,
 					'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
 					'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
 					'u_cif' => (isset($fn_inputs['u_cif'])) ? $fn_inputs['u_cif'] : '',
@@ -576,41 +572,15 @@ if($fn_ajax !== null)
 				
 				$fn_user_dir_json = json_encode($fn_user_dir, JSON_UNESCAPED_UNICODE);
 				
-				// check si existe la direccion si no añadir y poner como principal
-				//get user_dirs
-				$fn_q_meta_dirs = $db->FetchValue("
-					SELECT `meta_value`
-					FROM `users_meta`
-					WHERE `user_id`=:uid
-					AND `meta_key`='user_dirs'
-					LIMIT 1;
+				//save
+				$fn_q = $db->Fetch("
+					INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
+					VALUES (:uid, 'user_dirs', :d) 
+					ON DUPLICATE KEY UPDATE `meta_value`=:d;
 				", array(
 					'uid' => $getUserData->ID,
+					'd' => $fn_user_dir_json,
 				));
-
-				$fn_dir_data = ($fn_q_meta_dirs && isJson($fn_q_meta_dirs)) ? json_decode($fn_q_meta_dirs, true) : array();
-				
-				$fn_dir_in_db = false;
-				
-				if(count($fn_dir_data) !== 0 && isset($fn_dir_data['dir_id']))
-				{
-					if($fn_dir_data !== $fn_user_dir) $fn_dir_in_db = true;
-				}
-				
-				if($fn_dir_in_db)
-				{
-					$fn_dir_data = json_encode($fn_user_dir, JSON_UNESCAPED_UNICODE);
-					
-					//save
-					$fn_q = $db->Fetch("
-						INSERT INTO `users_meta` (`user_id`, `meta_key`, `meta_value`) 
-						VALUES (:uid, 'user_dirs', :d) 
-						ON DUPLICATE KEY UPDATE `meta_value`=:d;
-					", array(
-						'uid' => $getUserData->ID,
-						'd' => $fn_dir_data,
-					));
-				}
 				
 				$fn_order_data['user_dir'] = $fn_user_dir;
 				$fn_isPayProcess = true;
@@ -646,164 +616,39 @@ if($fn_ajax !== null)
 				$fn_order_num = assignCheckoutId(); //cada compra es unico
 				
 				//recuperamos el id anterior de order anterior
-				$fn_checkout_id_loc = (isset($_SESSION) && isset($_SESSION['cart_checkout']) && isset($_SESSION['cart_checkout']['checkout_id'])) ? $_SESSION['cart_checkout']['checkout_id'] : $fn_order_num;
+				$fn_checkout_id_loc = (isset($_SESSION) && isset($_SESSION['checkout']) && isset($_SESSION['checkout']['checkout_id'])) ? $_SESSION['checkout']['checkout_id'] : $fn_order_num;
 				
-				//añadimos oferta a la session
-				if(isset($_SESSION) && isset($fn_order_data['promote']))
-				{
-					$_SESSION['promote'] = $fn_order_data['promote'];
-
-					//quitamos el global oferta
-					if(isset($_SESSION['promote']['global_userd']) && $fn_order_data['promote']['p_id'] !== 0) unset($_SESSION['promote']['global_userd']);
-				}
+				$fn_now_date = date('Y-m-d H:i:s');
 				
-				//recalculamos todo el cart
-				if(!isset($_SESSION['cart_checkout']['cart_total']) && (empty($_SESSION['cart_checkout']['cart_total']) || $_SESSION['cart_checkout']['cart_total'] == 0)) cartProcessAndCalc($_SESSION);
+				$fn_order_data = cartProcessAndCalc($_SESSION);
+				$fn_order_data['checkout']['checkout_date'] = $fn_now_date;
+				$fn_order_data['user_order'] = $fn_user_dir;
 				
-				//cart calc
-				if(count($_SESSION['cart']) !== 0) foreach($_SESSION['cart'] as $ck => $cv)
-				{
-					$fn_for_data = $cv;
-					
-					$fn_q_p_title = $db->FetchValue("
-						SELECT `menu_title`
-						FROM `product`
-						WHERE `id`=:id
-						LIMIT 1;
-					", array(
-						'id' => $fn_for_data['p_id'],
-					));
-					
-					$fn_q_prod = $db->FetchArray("
-						SELECT `precio_venta`, `peso`, `size_x`, `size_y`
-						FROM `product_stock`
-						WHERE `prid`=:pid
-						LIMIT 1;
-					", array(
-						'pid' => $fn_for_data['p_id'],
-					));
-					
-					$fn_for_data['title'] = ($fn_q_p_title) ? $fn_q_p_title : '';
-					
-					//oferta sobre un producto
-					if(isset($fn_order_data['promote']) && $fn_order_data['promote']['p_id'] == $fn_for_data['p_id'] && $fn_oferta_product == 0)
-					{
-						//off
-						if(isset($fn_for_data['pax']) && $fn_for_data['pax'] !== 0)
-						{
-							if($fn_order_data['promote']['used'] <= $fn_order_data['promote']['max'])
-							{
-								//oferta sobre 1 producto
-								$fn_loc_of = round(($fn_q_prod['precio_venta'] * $fn_order_data['promote']['oferta_value'] / 100), 2);
-								$fn_loc_calc_total_price_per_pax = round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2);
-								
-								//restamos descuento de un solo producto del total
-								$fn_for_data['price'] = round(($fn_loc_calc_total_price_per_pax - $fn_loc_of), 2);
-								
-								$fn_oferta_product++;
-							}else{
-								$fn_price_loc = round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2);
-							}
-						}else{
-							$fn_for_data['price'] = $fn_q_prod['precio_venta'];
-						}
-					}else{
-						//sin oferta
-						$fn_for_data['price'] = ($fn_q_prod) ? round(($fn_q_prod['precio_venta'] * $fn_for_data['pax']), 2) : $fn_q_prod['precio_venta'];
-					}
-					
-					$fn_for_data['peso'] = ($fn_q_prod) ? ($fn_q_prod['peso'] * $fn_for_data['pax']) : 0;
-					$fn_for_data['size_x'] = ($fn_q_prod) ? $fn_q_prod['size_x'] : 0;
-					$fn_for_data['size_y'] = ($fn_q_prod) ? $fn_q_prod['size_y'] : 0;
-					
-					//html
-					$fn_get_p = $db->FetchValue("
-						SELECT `lang_data`
-						FROM `product`
-						WHERE `id`=:pid
-						LIMIT 1;
-					", array(
-						'pid' => $cv['p_id'],
-					));
-					
-					$fn_title = (isset($fn_get_p) && isJson($fn_get_p)) ? object_to_array(json_decode($fn_get_p)) : '';
-					$fn_cart_out_final[] = $fn_for_data;
-					
-					//calculo de subtotal
-					$fn_cart_calcs_subtotal += $fn_for_data['price'];
-				}
-				
-				
-				$fn_order_data['user_order'] = array(
-					'u_name' => (isset($fn_inputs['u_name'])) ? $fn_inputs['u_name'] : '',
-					'u_surname' => (isset($fn_inputs['u_surname'])) ? $fn_inputs['u_surname'] : '',
-					'u_cif' => (isset($fn_inputs['u_cif'])) ? $fn_inputs['u_cif'] : '',
-					'u_tel' => (isset($fn_inputs['u_tel'])) ? $fn_inputs['u_tel'] : '',
-				);
-				
-				$fn_order_data['cart'] = $fn_cart_out_final;
-				$fn_order_data['cart_checkout'] = $_SESSION['cart_checkout'];
-				$fn_order_data['cart_checkout']['cart_checkout_date'] = date('Y-m-d H:i:s');
-				//$fn_order_data['cart_wiva_checkout'] = $_SESSION['cart_wiva_checkout'];
-				
-				$fn_cart_calcs_iva = round(($fn_cart_calcs_subtotal * $fn_order_data['cart_checkout']['cart_iva_percent'] / 100), 2);
-				$fn_importe = $fn_cart_calcs_subtotal;
-				
-				$fn_order_data['cart_wiva_checkout'] = array(
-					'cart_subtotal' => $fn_cart_calcs_subtotal,
-					'cart_iva' => $fn_cart_calcs_iva,
-				);
-				
-				//oferta global
-				if(isset($fn_order_data['promote']) && !isset($_SESSION['promote']['global_userd']))
-				{
-					if($fn_order_data['promote']['used'] <= $fn_order_data['promote']['max'] && $fn_order_data['promote']['p_id'] == 0)
-					{
-						$fn_sub_of = round(($fn_cart_calcs_subtotal * $fn_order_data['promote']['oferta_value'] / 100), 2);
-						
-						//redsys / paypal
-						$fn_order_data['cart_wiva_checkout']['cart_subtotal'] = $fn_importe = round(($fn_cart_calcs_subtotal - $fn_sub_of), 2);
-						$fn_order_data['cart_wiva_checkout']['cart_iva'] = round(($fn_importe * $fn_order_data['cart_checkout']['cart_iva_percent'] / 100), 2);
-						
-						//dejamos una marca de que ya esta aplicada la oferta general
-						$_SESSION['promote']['global_userd'] = $fn_order_data['promote']['global_userd'] = 1;
-					}
-				}
-				
-				$fn_order_data['user']['user_payment_method'] = ($fn_inputs['p_pay_type'] == 'rd') ? 'redsys' : 'paypal';
-				
-				//gen order html
-				$fn_calc_total = $fn_order_data['cart_wiva_checkout']['cart_subtotal'];
-				$fn_calc_subtotal = round(($fn_calc_total - $fn_order_data['cart_wiva_checkout']['cart_iva']) , 2);
+				$fn_user_payment_method = ($fn_inputs['p_pay_type'] == 'rd') ? 'redsys' : 'paypal';
 				
 				//guardamos todo en db
 				$fn_order_data_based = base64_encode(json_encode($fn_order_data, JSON_UNESCAPED_UNICODE));
-				$fn_now_date = date('Y-m-d H:i:s');
-				
-				//insert order
-				//si $fn_checkout_id_loc es el mismo del order anterior se reescribe por uno nuevo
-				//asi no hay fallos en redsys
 				
 				$fn_insert = $db->Fetch("
 					INSERT INTO `orders` (`user_id`, `order_id`, `date`, `lang`, `data_cart`, `payment_type`)
 					VALUES (:uid, :ck, :dt, :ln, :dc, :pt) 
 					ON DUPLICATE KEY UPDATE `order_id`=:oid, `data_cart`=:dc, `date`=:dt;
 				", array(
-					'uid' => $fn_order_data['user']['ID'],
+					'uid' => $getUserData->ID,
 					'ck' => $fn_checkout_id_loc,
 					'dt' => $fn_now_date,
 					'ln' => $st_lang,
 					'dc' => $fn_order_data_based,
-					'pt' => $fn_order_data['user']['user_payment_method'],
+					'pt' => $fn_user_payment_method,
 					'oid' => $fn_order_num,
 				));
 				
 				if($fn_insert)
 				{
 					//creamos peticion de pago
-					$_SESSION['cart_checkout']['checkout_id'] = $fn_order_num;
+					$_SESSION['checkout']['checkout_id'] = $fn_order_num;
 
-					switch($fn_order_data['user']['user_payment_method'])
+					switch($fn_user_payment_method)
 					{
 						case "redsys":
 							require_once('redsys_soap/Messages.php');
@@ -823,17 +668,13 @@ if($fn_ajax !== null)
 								$fn_pass = $CONFIG['site']['redsys_pass'];
 							}
 							
-							$fn_terminal = '001';
-							$fn_moneda = '978';
-							
 							try {
-								
 								$redsys = new \Buuum\Redsys($fn_sha);
 								$redsys->setMerchantcode($fn_merchant);
-								$redsys->setAmount($fn_importe);
+								$redsys->setAmount($fn_order_data['checkout']['cart_total']);
 								$redsys->setOrder($fn_order_num);
-								$redsys->setTerminal($fn_terminal);
-								$redsys->setCurrency($fn_moneda);
+								$redsys->setTerminal('001');
+								$redsys->setCurrency('978');
 								$redsys->setLang($st_lang);
 								 
 								if($CONFIG['site']['redsys_service'] == 'soap')
@@ -893,10 +734,8 @@ if($fn_ajax !== null)
 										//todo correcto borramos el cart y detalles
 										//----------------> 
 										//----------------> 
-										unset($_SESSION['cart_wiva_checkout']);
-										unset($_SESSION['cart_checkout']);
+										unset($_SESSION['checkout']);
 										unset($_SESSION['cart']);
-										unset($_SESSION['promote']);
 										//----------------> 
 										//----------------> 
 													
@@ -921,7 +760,7 @@ if($fn_ajax !== null)
 									$redsys->setUrlKo("{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}{$st_lang}/pago-error");
 									
 									$result = $redsys->createForm($fn_redsys_mode, array(
-										'form_name' => 'glunt_pay_redsys',
+										'form_name' => "{$CONFIG['site']['dm_nws']}pay_redsys",
 										//'submit_value' => 'Pay',
 									));
 									
@@ -1057,7 +896,7 @@ if($fn_ajax !== null)
 			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
 			
 			//html y content del mail
-			$fn_mail_html = $CONFIG['templates']['standartEmail'];
+			$fn_mail_html = $CONFIG['site']['standartEmail'];
 			
 			$fn_mail_html = str_replace(array(
 				'%message%',
@@ -1719,7 +1558,7 @@ if($fn_ajax !== null)
 				$fn_def_lang = $CONFIG['site']['defaultLang'];
 				
 				$fn_html_p = $lang_items[$fn_def_lang]['mail_recpassword_html'];
-				$fn_mail_html = $CONFIG['templates']['standartEmail'];
+				$fn_mail_html = $CONFIG['site']['standartEmail'];
 				
 				$fn_html_p = str_replace(array(
 					"%first_name%",
@@ -3403,7 +3242,7 @@ if($fn_ajax !== null)
 						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_invitacion');
 						
 						$fn_html_p = $lang_items[$fn_def_lang]['mail_invitacion_html'];
-						$fn_mail_html = $CONFIG['templates']['standartEmail'];
+						$fn_mail_html = $CONFIG['site']['standartEmail'];
 						
 						$link_admin_or_cliente = (preg_match("/upUsuarios/", $fn_ajax)) ? "admin" : "mi-cuenta";
 						
@@ -3593,7 +3432,7 @@ if($fn_ajax !== null)
 						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_restablecerpass');
 						
 						$fn_html_p = $lang_items[$fn_def_lang]['mail_restablecerpass_html'];
-						$fn_mail_html = $CONFIG['templates']['standartEmail'];
+						$fn_mail_html = $CONFIG['site']['standartEmail'];
 						
 						$fn_mail_html = str_replace(array(
 							'%message%',
@@ -4610,7 +4449,7 @@ if($fn_ajax !== null)
 					$fn_subject = getLangItem('mail_subject_new_client');
 					
 					$fn_html_p = getLangItem('mail_new_client_html');
-					$fn_mail_html = $CONFIG['templates']['standartEmail'];
+					$fn_mail_html = $CONFIG['site']['standartEmail'];
 					
 					$fn_mail_html = str_replace(array(
 						'%message%',

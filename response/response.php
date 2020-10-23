@@ -70,15 +70,8 @@ try{
 
     if(!isset($result['Ds_ErrorCode']) && (isset($result['Ds_AuthorisationCode']) && !empty($result['Ds_AuthorisationCode']) && !preg_match('/(\+)/', $result['Ds_AuthorisationCode']) ))
     {
-	    //todo correcto borramos el cart y detalles
-		//----------------> 
-		//----------------> 
-		unset($_SESSION['cart_wiva_checkout']);
-		unset($_SESSION['cart_checkout']);
+		unset($_SESSION['checkout']);
 		unset($_SESSION['cart']);
-		unset($_SESSION['promote']);
-		//----------------> 
-		//---------------->
 		
 		//pago ok
 	    $fn_response_data = base64_encode(json_encode($result));
