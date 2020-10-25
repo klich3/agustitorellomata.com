@@ -272,6 +272,11 @@ function page($fn_id, $fn_args = null)
 	//first load php view controller
 	if(file_exists($CONFIG['site']['template'].$fn_id.'.php')) include("{$CONFIG['site']['template']}{$fn_id}.php");
 	
+	if(preg_match("/sitemap/", $fn_args['url'])) return;
+	
+	/*
+	if($fn_args)*/
+	
 	//construct stage view
 	get_header($fn_args);
 
