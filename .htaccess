@@ -105,6 +105,8 @@ ErrorDocument 500 /error.html
 	#prevent htaccess cgi-bin + cets
 	RewriteCond $1 ^(response)
 	RewriteRule ^(.*)$ $1 [L]
+	
+	RewriteRule ^sitemap\.xml$ index.php?url=sitemap [L]
 		
 	RewriteCond %{REQUEST_URI} !/cgi-bin [NC]
 	RewriteRule ^([a-z]{2})/([0-9a-z-_]+)/([0-9a-zA-Z-_]+)/([0-9a-zA-Z-_]+)$ index.php?lang=$1&url=$2/$3/$4&%{QUERY_STRING} [L]

@@ -400,39 +400,33 @@ class WIDGET_jsonToTmpl {
 	private function parseByPageContent($fn_args, $fn_hash)
 	{
 		
-		//idioma por defecto
-		$fn_def_lang = $this->db->FetchArray("
-			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` AS 'pageContent'
-			FROM `pages` p
-			LEFT JOIN `pages_meta` m ON(m.`p_id`=p.`id`)
-			WHERE p.`obj_hash`=:hash
-			AND p.`lang`=:l
-			AND m.`meta_key`='page_content'
-			AND p.`active`='1'
-			LIMIT 1;
+		if(!isset($fn_args['hash'])) return;
+		
+		$fn_get_normal = $this->db->FetchArray("
+			SELECT *
+			FROM `pages`
+			WHERE `obj_hash`=:h
+			OR `obj_hash`=:hpa
+			AND `lang`=:l
 		", array(
-			'hash' => $fn_hash,
-			'l' => $this->CONFIG['site']['defaultLang'],
+			"h" => $fn_args['hash'],
+			"hpa" => $fn_hash,
+			"l" => $fn_args['lang']
 		));
 		
-		if(!$fn_def_lang) return false;
-		
-		$fn_translate = $this->db->FetchValue("
-			SELECT m.`meta_value` AS 'pageContent'
-			FROM `pages_lang_rel` pr
-			LEFT JOIN `pages_meta` m ON(m.`p_id`=pr.`page_translate_id`)
-			WHERE m.`meta_key`='page_content'
-			AND pr.`lang_type`=:lang
-			AND pr.`page_id`=:pid
-		", array(
-			'lang' => $fn_args['lang'],
-			'pid' => $fn_def_lang['id'],
-		));
-		
-		$fn_translate_unbase = base64_decode($fn_translate);
-		$fn_json = (isset($fn_translate) && $fn_translate_unbase !== 'false' && $fn_args['lang'] !== $this->CONFIG['site']['defaultLang']) ? $fn_translate : $fn_def_lang['pageContent'];
-		
-		return $fn_json;
+		if($fn_get_normal)
+		{
+			//normal page with lang
+			$fn_q_metas = self::getPageMetas($fn_args['hash']);
+			
+			return $fn_q_metas['page_content'];
+		}else{
+			//no lang look for rel
+			//redirect to correct one
+			if(preg_match('/(admin)/', $fn_args['url'])) return false;
+			
+			header("Location: {$this->CONFIG['site']['base']}error");	
+		}
 	}
 	
 	private function loadRelContent($fn_rel_id)

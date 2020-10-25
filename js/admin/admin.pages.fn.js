@@ -889,7 +889,6 @@ $(function()
 			}
 			
 			dom_rid = $('[name="a_rel"]').val();
-			dom_data_ser = 'vice='+$('[name="a_vice"]').val();
 		}
 		
 		//fn_call_ajax = function(fn_hash, fn_data, fn_before, fn_success)

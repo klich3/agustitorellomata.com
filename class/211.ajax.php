@@ -1743,7 +1743,8 @@ if($fn_ajax !== null)
 			
 			$fn_q = $db->ExecuteSQL("
 				INSERT INTO `pages_lang_rel` (`page_id`, `lang_type`, `page_translate_id`)
-				VALUES (:id, :ln, :rid);
+				VALUES (:id, :ln, :rid)
+				ON DUPLICATE KEY UPDATE `page_translate_id`=:rid, `lang_type`=:ln;
 			", array(
 				'id' => $fn_p['id'],
 				'ln' => $fn_rel_page['lang'],
@@ -1752,29 +1753,25 @@ if($fn_ajax !== null)
 			
 			if($fn_q)
 			{
-				if(isset($fn_p['data'])) parse_str($fn_p['data'], $fn_inputs);
-				
 				//traduccion viceversa
-				if(isset($fn_p['data']) && isset($fn_inputs['vice']))
-				{
-					$fn_q_page_lang = $db->FetchValue("
-						SELECT `lang`
-						FROM `pages`
-						WHERE `id`=:i
-						LIMIT 1;
-					", array(
-						'i' => $fn_p['id'],
-					));
-					
-					 $fn_q = $db->ExecuteSQL("
-						INSERT INTO `pages_lang_rel` (`page_id`, `lang_type`, `page_translate_id`)
-						VALUES (:id, :ln, :rid);
-					", array(
-						'id' => $fn_p['rid'],
-						'ln' => $fn_q_page_lang,
-						'rid' => $fn_p['id'],
-					));
-				}
+				$fn_q_page_lang = $db->FetchValue("
+					SELECT `lang`
+					FROM `pages`
+					WHERE `id`=:i
+					LIMIT 1;
+				", array(
+					'i' => $fn_p['id'],
+				));
+				
+				 $fn_q = $db->Fetch("
+				 	INSERT INTO `pages_lang_rel` (`page_id`, `lang_type`, `page_translate_id`) 
+					VALUES (:id, :ln, :rid)
+					ON DUPLICATE KEY UPDATE `page_translate_id`=:rid, `lang_type`=:ln;
+				", array(
+					'id' => $fn_p['rid'],
+					'ln' => $fn_q_page_lang,
+					'rid' => $fn_p['id'],
+				));
 				
 				exit(json_encode(array(
 					'status' => 200,
