@@ -56,17 +56,7 @@ class WIDGET_jsonToTmpl {
 	 */
 	public function wPage($fn_args)
 	{
-		/*
-		var_dump($fn_args);
-		
-		array(5) { ["header_type"]=> string(6) "select" ["url"]=> string(4) "home" ["stage_id"]=> string(4) "home" ["plugins_templates"]=> array(3) { ["header_slider"]=> string(35) "plugins/header_slider/header_slider" ["jsonToTmpl"]=> string(29) "plugins/jsonToTmpl/jsonToTmpl" ["productos_destacados_footer"]=> string(63) "plugins/productos_destacados_footer/productos_destacados_footer" } ["st_lang"]=> string(2) "es" }
-		*/
-		
 		if(empty($fn_args['url'])) return;
-		
-		//hash de paginas
-		//$fn_arg_url = (preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
-		$fn_hash = (isset($fn_args['stage_id']) && $fn_args['stage_id'] !== 'pages_details') ? $fn_args['stage_id'] : $fn_args['hash'];
 		
 		//excepcion
 		if(isset($fn_args['stage_tmpl']) && isset($fn_args['stage_id']) && $fn_args['stage_tmpl'] == $fn_args['stage_id']) $fn_hash = $fn_args['hash'];
@@ -75,13 +65,15 @@ class WIDGET_jsonToTmpl {
 		if(preg_match('/(admin)/', $fn_args['url'])) $fn_args['lang'] = 'es';
 		if(!isset($fn_args['lang'])) $fn_args['lang'] = $this->CONFIG['site']['defaultLang'];
 		
-		$fn_json = self::parseByPageContent($fn_args, $fn_hash);
-				
+		if(!isset($fn_args['hash']) && isset($fn_args['stage_id'])) $fn_args['hash'] = $fn_args['stage_id'];
+		
+		$fn_json = self::parseByPageContent($fn_args);
+		
 		if(!$fn_json)
 		{
-			$fn_hash = preg_replace("/\_/", "-", $fn_hash);
+			$fn_args['hash'] = preg_replace("/\_/", "-", $fn_args['hash']);
 			
-			$fn_json = self::parseByPageContent($fn_args, $fn_hash);
+			$fn_json = self::parseByPageContent($fn_args);
 			if(!$fn_json) return;
 		}
 		
@@ -397,20 +389,15 @@ class WIDGET_jsonToTmpl {
 	 * @param mixed $fn_hash
 	 * @return void
 	 */
-	private function parseByPageContent($fn_args, $fn_hash)
+	private function parseByPageContent($fn_args)
 	{
-		
-		if(!isset($fn_args['hash'])) return;
-		
 		$fn_get_normal = $this->db->FetchArray("
 			SELECT *
 			FROM `pages`
 			WHERE `obj_hash`=:h
-			OR `obj_hash`=:hpa
 			AND `lang`=:l
 		", array(
 			"h" => $fn_args['hash'],
-			"hpa" => $fn_hash,
 			"l" => $fn_args['lang']
 		));
 		
@@ -424,8 +411,6 @@ class WIDGET_jsonToTmpl {
 			//no lang look for rel
 			//redirect to correct one
 			if(preg_match('/(admin)/', $fn_args['url'])) return false;
-			
-			header("Location: {$this->CONFIG['site']['base']}error");	
 		}
 	}
 	
