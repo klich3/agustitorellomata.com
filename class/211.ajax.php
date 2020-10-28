@@ -668,12 +668,18 @@ if($fn_ajax !== null)
 								$fn_pass = $CONFIG['site']['redsys_pass'];
 							}
 							
+							//correct ammount
+							$fn_amount = preg_replace("/\,/", ".", $fn_order_data['checkout']['cart_total']);
+							
+							/*
+							DOCS: https://www.bbva.es/content/dam/public-web/bbvaes/documents/legal/psd2/TPV%20VIRTUAL_Manual%20Redirecci%C3%B3n_3DS%202.2.pdf
+							*/
 							try {
 								$redsys = new \Buuum\Redsys($fn_sha);
 								$redsys->setMerchantcode($fn_merchant);
-								$redsys->setAmount($fn_order_data['checkout']['cart_total']);
+								$redsys->setAmount($fn_amount);
 								$redsys->setOrder($fn_order_num);
-								$redsys->setTerminal('001');
+								$redsys->setTerminal('1');
 								$redsys->setCurrency('978');
 								$redsys->setLang($st_lang);
 								 

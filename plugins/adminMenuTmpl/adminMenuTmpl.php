@@ -64,9 +64,11 @@ class WIDGET_adminMenuTmpl {
 			FROM `menus_types` t 
 			LEFT JOIN `menus` m ON(m.`m_type`=t.`id`)
 			WHERE t.`id`=:id
+			AND m.`lang`=:l
 			LIMIT 1;
 		", array(
-			'id' => '4',
+			"id" => '4',
+			"l" => $fn_args['st_lang']
 		));
 		
 		$fn_count_w = 0;
