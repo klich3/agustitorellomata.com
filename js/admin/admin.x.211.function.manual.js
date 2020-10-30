@@ -66,6 +66,7 @@ $(function()
 			{
 				case "admin-pay":
 				case "admin-options":
+				case "admin-options-lang":
 					fn_itmToLoad.push(fn_base_script+'js/admin/admin.options.fn.js');
 				break;
 				
