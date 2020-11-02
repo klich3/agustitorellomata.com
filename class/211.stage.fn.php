@@ -42,7 +42,7 @@ function get_header($fn_args)
 	
 	$b = new XTemplate ("{$CONFIG['site']['template']}{$tmpl_header}.xhtml");
 	
-	$fn_h_hash = (preg_match('/(product_grid|pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
+	$fn_h_hash = (preg_match('/(product_grid|pages_details|pedidos)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 	
 	$fn_dir_prop = (isset($CONFIG['site']['dir']) && isJson($CONFIG['site']['dir'])) ? object_to_array(json_decode($CONFIG['site']['dir'])) : '';
 	
@@ -278,7 +278,7 @@ function page($fn_id, $fn_args = null)
 	if($fn_args)*/
 	
 	//construct stage view
-	get_header($fn_args);
+	if(!isset($fn_args['isIframe']) || !$fn_args['isIframe']) get_header($fn_args);
 
 	//get hash
 	$fn_hash = ($fn_args['url'] == '/') ? 'home' : $fn_args['url'];
@@ -289,7 +289,7 @@ function page($fn_id, $fn_args = null)
 	$b->assign(array(
 		'user_lang' => $st_lang,
 		'hash' => $fn_hash,
-		'current_hash' => $CONFIG['site']['current_hash'],
+		'current_hash' => (isset($CONFIG['site']['current_hash'])) ? $CONFIG['site']['current_hash'] : $fn_hash,
 		'user_name' => (isset($CONFIG['user'])) ? $CONFIG['user']['user_name']:'',
 		'dataNow' => date('Y-m-d'),
 	));
@@ -324,7 +324,7 @@ function page($fn_id, $fn_args = null)
 	$b->parse(strtolower($fn_id));
 	$b->out(strtolower($fn_id));
 	
-	get_footer($fn_args);
+	if(!isset($fn_args['isIframe']) || !$fn_args['isIframe']) get_footer($fn_args);
 }
 
 /**

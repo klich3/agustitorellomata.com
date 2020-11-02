@@ -43,6 +43,14 @@ class WIDGET_header_lang {
 		
 		$fn_lng = (isset($this->CONFIG['site']['lang']) && isJson($this->CONFIG['site']['lang'])) ? json_decode($this->CONFIG['site']['lang'], true) : false;
 		
+		//lang ignore
+		$fn_lng_ignore = (isset($this->CONFIG['site']['langIgnore']) && isJson($this->CONFIG['site']['langIgnore'])) ? json_decode($this->CONFIG['site']['langIgnore'], true) : false;
+		
+		if($fn_lng_ignore)
+		{
+			$fn_lng = array_diff($fn_lng, $fn_lng_ignore);
+		}
+		
 		$fn_rels = self::getAllLangsRels($fn_args);
 		
 		if($fn_lng && sizeof($fn_lng) > 1)

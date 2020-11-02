@@ -93,16 +93,62 @@ $(function()
 			<div class="container"> \
 				{{if data.status == 400}} \
 					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}} \
-				{{else}} \
-					status 200 ${status} \
-				{{/if}} \
+				{{else}}'+
+					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}} \
+						El carrito esta vacío \
+					{{else}}'+
+
+						//items
+						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}} \
+							{{tmpl(v) "cart_item"}} \
+						{{/each}}{{/if}}'+
+						
+						//total
+						'{{if data.data && data.data.checkout}}<div class="w-1-1 pb-10"></div> \
+						<div class="g gc"> \
+							<div class="w-1-2"></div> \
+							<div class="w-1-2"> \
+								<div class="g gc"> \
+									<div class="w-1-2"> \
+										<strong class="label txt@u">IVA(${data.data.checkout.cart_iva_percent}%)</strong> \
+									</div> \
+									<div class="w-1-2 txt@r"> \
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}€</strong> \
+									</div> \
+									<div class="w-1-2"> \
+										<strong class="label txt@u">SUBTOTAL</strong> \
+									</div> \
+									<div class="w-1-2 txt@r"> \
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}€</strong> \
+									</div> \
+								</div> \
+							</div> \
+						</div> \
+						<div class="w-1-1 pb-10"></div>{{/if}}'+
+						
+						//botones final					
+						'{{if data.data && data.data.cart}}{{tmpl(data.data.checkout) "cart_botones_final"}}{{/if}}'+
+						
+					'{{/if}}'+
+				'{{/if}} \
 				{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}} \
 			</div> \
 		</div> \
 	');
 	
-	/*
-	array(2) { ["product_id"]=> int(9) ["category_id"]=> int(0) } {"status":200,"message":"Producto a\u00f1adido al carrito","data":{"cart_checkout":{"cart_count":1,"cart_subtotal":64.35,"cart_iva":11.17,"cart_iva_percent":"21","cart_peso":0},"cart_wiva_checkout":{"cart_subtotal":42.01,"cart_iva":11.17},"cart":[{"cat_id":0,"p_id":9,"s_id":"8","c_id":"12","pax":"1","hash":"kripta-gran-reserva","title":"Kripta gran reserva","stock_count":"0","thumb":"\/\/too:8888\/agustitorellomata.com\/content\/0.49509100-155410494179da4c33caee614887ef6aac01b192ddw_450h_.jpg","price":53.18}],"lang":{"lang_iva":"IVA","lang_no_iva":"No hay iva","lang_envio":"Env\u00edo","cart_shipping_included":"Incluido en el precio"}}}*/
+	$.template('cart_item', '<div class="g gc"> \
+		<div class="w-1-2"> \
+			<img src="'+fn_base_script+'images/blank.gif" data-image="${thumb}" data-preloadimages class="e"  /> \
+		</div> \
+		<div class="w-1-2"> \
+		</div> \
+	</div>');
+	
+	$.template('cart_botones_final', '<div class="w-1-1 pb-4"> \
+		<div class="w-1-1 pb-2"><a href="javascript:void(0);" class="w-1-1 secundary button" data-action="closeCart">Seguir comprando</a></div> \
+		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">Ver Carrito</a></div> \
+		<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">Finalizar compra</a></div> \
+	</div>');
 	
 	//_G vars
 	var _G = {
@@ -183,6 +229,15 @@ $(function()
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
 		$(window).on('resize', e_resize).trigger('resize');
+		
+		if($('[data-fancybox]').length !== 0) //load script
+		window.loadJS(
+		{
+			items:[
+				fn_base_script+'js/jquery.fancybox.min.js'
+			],
+			callback: fn_init_fancybox()		
+		});
 	}
 	
 	e_updateCart = function(e) 
@@ -304,12 +359,14 @@ $(function()
 			return;
 		}
 		
-		if(/openCart/gim.test(dom_type))
+		if(/(repeat|add|open)Cart/gim.test(dom_type))
 		{
 			//quitamos el mob menu
 			$('html').removeClass('menu-open').addClass('openCart');
 			$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:"preload"}));
 		}
+		
+		if(/repeatCart/gim.test(dom_type)) dom_data_ser = ele.attr('data-id');
 		
 		if(/addCart/gim.test(dom_type))
 		{
@@ -348,15 +405,18 @@ $(function()
 		{
 			if(debug) console.log(d);
 			
-			if(/(add|open)Cart/gim.test(dom_type)) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
-			
+			if(/(add|open|repeatCart)Cart/gim.test(dom_type))
+			{
+				$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+				fn_page_preload_images();
+			}
 			//reload add cart / del
 			if(/(up|del)Cart/gim.test(dom_type)) window.location.reload();
 			
 			if(d.status == 200)
 			{
 				//update header cart counter
-				if(/(up|add|open)Cart/gim.test(dom_type)) $('.cart-not').text(d.data.cart.length).removeClass('h');
+				if(/(up|add|open|repeatCart)Cart/gim.test(dom_type)) $('.cart-not').text(d.data.cart.length).removeClass('h');
 				
 				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
@@ -526,7 +586,7 @@ $(function()
 	//init fancybox
 	fn_init_fancybox = function()
 	{
-		if(typeof $.fn.fancybox == 'function')
+		if(typeof $.fancybox == 'function')
 		{
 			var dom_gid = $.parseJSON($('body[data-popup]').attr('data-popup'));
 		
@@ -547,10 +607,12 @@ $(function()
 				});
 			});
 			
+			$('a[data-fancybox="iframe"]') 
+			
    			clearTimeout($.data(this, 'data-fancybox'));
 		}else{
 			clearTimeout($.data(this, 'data-fancybox'));
-		    $.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
+			$.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
 		}
 	}
 	

@@ -82,22 +82,28 @@ if($fn_q_cat_list)
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.multiplier";
 				}
 				
-				if($fn_stock && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+				if($too_login->isLogged() !== 200)
 				{
-					$fn_xtemplate_parse['assign'][] = $fn_stock;
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_price";
+					$fn_xtemplate_parse['assign'][] = array();
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.login_but";
+				}else{
+					if($fn_stock && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+					{
+						$fn_xtemplate_parse['assign'][] = $fn_stock;
+						$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_price";
+						
+						$fn_xtemplate_parse['assign'][] = array(
+							'id' => $vi->id,
+							'cat_id' => $vi->cat_id,
+						);
+						$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_but";
+					}
 					
-					$fn_xtemplate_parse['assign'][] = array(
-						'id' => $vi->id,
-						'cat_id' => $vi->cat_id,
-					);
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_but";
-				}
-				
-				if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier > 1 && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
-				{
-					$fn_xtemplate_parse['assign'][] = "";
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.title_sep";
+					if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier > 1 && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+					{
+						$fn_xtemplate_parse['assign'][] = "";
+						$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.title_sep";
+					}
 				}
 				
 				//subtitle
@@ -108,7 +114,6 @@ if($fn_q_cat_list)
 					);
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.subtitle";
 				}
-				
 				
 				//interios del grupos
 				$fn_xtemplate_parse['assign'][] = array(

@@ -42,9 +42,7 @@
 								<li class="txt@u@c"><strong>{order_pago}</strong></li>
 								<li class="txt@u@c"><strong>{order_estado}</strong></li>
 								<li class="txt@u@c"><strong>{order_tracking_num}</strong></li>
-								<!-- BEGIN: h -->
-								<li class="tc tu">{order_actions}</li>
-								<!-- END: h -->
+								<li class="tc tu"></li>
 							</ul>
 							
 							<div class="brd-b"></div>
@@ -60,12 +58,10 @@
 									<div class="ws-1-3 wm-1-6 wl-1-6 wxl-1-6 txt@c"><div class="hl"><strong>{order_estado}</strong>:</div> {entrega_status}</div>	
 									<div class="ws-1-3 wm-1-6 wl-1-6 wxl-1-6 txt@c"><div class="hl"><strong>{order_tracking_num}</strong>:</div> {num_seg}</div>	
 									<div></div>
-									<!-- BEGIN: h -->
 									<div>
-										<a href="{base}{user_lang}/mis-pedidos/{order_id}" rel="nofollow" data-event="order/details">{order_show_details}</a>
+										<a href="{base}{user_lang}/mis-pedidos/{order_id}" rel="nofollow" data-event="order/details" class="button small">{button_ver}</a>
 										<div class="w-1-1 pb-5 hl clearfix">&nbsp;</div>
 									</div>
-									<!-- END: h -->
 									<div class="w-1-1 pb-2 brd-b"></div>
 								</div>
 								<div class="w-1-1 pb-2"></div>
