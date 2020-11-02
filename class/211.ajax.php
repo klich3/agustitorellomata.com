@@ -234,7 +234,6 @@ if($fn_ajax !== null)
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
 			)));
-						
 			
 			//añadimos al carrito
 			$fn_q_check_stock = $db->FetchArray("
@@ -246,16 +245,12 @@ if($fn_ajax !== null)
 				'pid' => $fn_inputs['p_id'],
 			));
 			
-			$fn_updated = false;
-			
 			//id del producto en el carrito
-			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
+			$fn_pr_cart_id = "{$fn_inputs['p_id']}{$fn_inputs['cat_id']}";
 			
 			//vacio añadimos uno nuevo
-			if(!isset($_SESSION['cart']) && $fn_q_check_stock >= 1)
+			if($fn_q_check_stock >= 1 && !array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
 			{
-				$fn_updated = true;
-				
 				$_SESSION['cart'][$fn_pr_cart_id] = array(
 					'cat_id' => $fn_inputs['cat_id'],
 					'p_id' => $fn_inputs['p_id'],
@@ -264,32 +259,6 @@ if($fn_ajax !== null)
 					'multimplier' => '0',
 					'precio_venta' => $fn_q_check_stock['precio_venta'],
 				);
-			}
-			
-			//añadimos a la lista
-			if(isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0 && !$fn_updated)
-			{
-				//existe sumamos un pax
-				if(array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
-				{
-					$fn_pax = (int) $_SESSION['cart'][$fn_pr_cart_id]['pax'];
-					if($fn_pax+1 < $fn_q_check_stock['stock_count']) $_SESSION['cart'][$fn_pr_cart_id]['pax'] = round($fn_pax+1);
-					
-					$fn_pax_mult = (int) $_SESSION['cart'][$fn_pr_cart_id]['multimplier'];
-					$fn_multiplier_to_unit = ($fn_pax_mult+1) * $fn_q_check_stock['pax_multimplier'];
-					
-					if($fn_multiplier_to_unit < $fn_q_check_stock['stock_count']) $_SESSION['cart'][$fn_pr_cart_id]['multimplier'] = round($fn_pax_mult+1);
-					
-				}else{
-					$_SESSION['cart'][$fn_pr_cart_id] = array(
-						'cat_id' => $fn_inputs['cat_id'],
-						'p_id' => $fn_inputs['p_id'],
-						'pax' => '1',
-						'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
-						'multimplier' => '0',
-						'precio_venta' => $fn_q_check_stock['precio_venta'],
-					);
-				}
 			}
 			
 			$fn_process_cart = cartProcessAndCalc($_SESSION);
@@ -351,7 +320,7 @@ if($fn_ajax !== null)
 			}
 			
 			//id del item en el cart
-			$fn_pr_cart_id = md5("{$fn_inputs['p_id']}~{$fn_inputs['cat_id']}");
+			$fn_pr_cart_id = "{$fn_inputs['p_id']}{$fn_inputs['cat_id']}";
 			
 			//del cart
 			if($fn_ajax == 'delCart')
