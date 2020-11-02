@@ -3838,6 +3838,10 @@ html.openCart [data-cart-container] {
   -moz-transform:		  translateX(0%);
 }
 
+.cart-wrap [data-cart-container] img {
+  max-height: 330px;
+}
+
 .cart-container {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -3845,17 +3849,6 @@ html.openCart [data-cart-container] {
 
 .cart-container .button {
   width: 100%;
-}
-
-.button.secundary {
-  border: 1px solid #000;
-  background-color: #fff;
-  color: #000 !important;
-}
-
-.button.secundary:hover {
-  border: 1px solid transparent;
-  background-color: #000;
 }
 
 /*  -------  */
@@ -4299,6 +4292,17 @@ button[disabled],
   background-color: #ccc !important;
 }
 
+.button.secundary {
+  border: 1px solid #000;
+  background-color: #fff;
+  color: #000 !important;
+}
+
+.button.secundary:hover {
+  border: 1px solid transparent;
+  background-color: #000;
+}
+
 .activity_list .title {
   color: #b99219;
   text-transform: uppercase;
@@ -4389,6 +4393,7 @@ a.secundary {
   background-color: #808080;
 }
 
+
 .sep-b:after {
   content: "";
   position: absolute;
@@ -4426,11 +4431,17 @@ a.secundary {
   max-height: 324px;
 }
 
+html.openCart [data-cart-container] .sep,
 [data-cc-container] .sep {
   position: relative;
   padding: 23px 0;
 }
 
+html.openCart [data-cart-container] .sep {
+  padding: 0 !important;
+}
+
+html.openCart [data-cart-container] .sep:after,
 [data-cc-container] .sep::after {
   content:"";
   position: absolute;

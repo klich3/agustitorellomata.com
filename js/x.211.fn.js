@@ -85,64 +85,142 @@ $(function()
 	'</div>');
 	
 	//cart
-	$.template('cart', '<div class="cart-container"> \
-			<div class="w-1-1"> \
-			<a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a> \
-			</div> \
-			<div class="w-1-1 pt-2"></div> \
-			<div class="container"> \
-				{{if data.status == 400}} \
-					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}} \
+	$.template('cart', '<div class="cart-container">\
+			<div class="w-1-1">\
+			<a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a>\
+			</div>\
+			<div class="w-1-1 pt-2"></div>\
+			<div class="container">\
+				{{if data.status == 400}}\
+					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}}\
 				{{else}}'+
-					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}} \
-						El carrito esta vacío \
+					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}}\
+						El carrito esta vacío\
 					{{else}}'+
 
 						//items
-						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}} \
-							{{tmpl(v) "cart_item"}} \
+						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}}\
+							{{tmpl(v) "cart_item"}}\
 						{{/each}}{{/if}}'+
 						
 						//total
-						'{{if data.data && data.data.checkout}}<div class="w-1-1 pb-10"></div> \
-						<div class="g gc"> \
-							<div class="w-1-2"></div> \
-							<div class="w-1-2"> \
-								<div class="g gc"> \
-									<div class="w-1-2"> \
-										<strong class="label txt@u">IVA(${data.data.checkout.cart_iva_percent}%)</strong> \
-									</div> \
-									<div class="w-1-2 txt@r"> \
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}€</strong> \
-									</div> \
-									<div class="w-1-2"> \
-										<strong class="label txt@u">SUBTOTAL</strong> \
-									</div> \
-									<div class="w-1-2 txt@r"> \
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}€</strong> \
-									</div> \
-								</div> \
-							</div> \
-						</div> \
-						<div class="w-1-1 pb-10"></div>{{/if}}'+
+						'{{if data.data && data.data.checkout}}<div class="w-1-1"></div>\
+						<div class="g gc">\
+							<div class="w-1-2"></div>\
+							<div class="w-1-2">\
+								<div class="g gc">\
+									<div class="w-1-2">\
+										<strong class="label txt@u">IVA(${data.data.checkout.cart_iva_percent}%)</strong>\
+									</div>\
+									<div class="w-1-2 txt@r">\
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}€</strong>\
+									</div>\
+									<div class="w-1-2">\
+										<strong class="label txt@u">SUBTOTAL</strong>\
+									</div>\
+									<div class="w-1-2 txt@r">\
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}€</strong>\
+									</div>\
+								</div>\
+							</div>\
+						</div>\
+						<div class="w-1-1 pb-5"></div>{{/if}}'+
 						
 						//botones final					
 						'{{if data.data && data.data.cart}}{{tmpl(data.data.checkout) "cart_botones_final"}}{{/if}}'+
 						
 					'{{/if}}'+
-				'{{/if}} \
-				{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}} \
-			</div> \
-		</div> \
+				'{{/if}}\
+				{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}}\
+			</div>\
+		</div>\
 	');
 	
-	$.template('cart_item', '<div class="g gc"> \
-		<div class="w-1-2"> \
-			<img src="'+fn_base_script+'images/blank.gif" data-image="${thumb}" data-preloadimages class="e"  /> \
-		</div> \
-		<div class="w-1-2"> \
-		</div> \
-	</div>');
+	$.template('cart_item', '<div class="item" data-cid="${cat_id}" data-pid="${p_id}"><div class="g gc">\
+		<div class="w-1-2">\
+			<img src="${thumb}" class="e" />\
+		</div>\
+		<div class="w-1-2">\
+			<div class="w-1-1 txt@u txt-org">\
+				{{if title}}<div class="w-1-1"><strong class="label">${title}</strong></div>{{/if}}\
+				{{if subtitle}}<div class="w-1-1">${subtitle}</div>{{/if}}\
+			</div>\
+			<div class="w-1-1 sep"></div>\
+			{{if pax_multimplier > "1"}}\
+			<div class="w-1-1"><strong>CAJAS ${pax_multimplier} BOT</strong></div>\
+			<div class="w-1-1 txt-org"><strong>${pax_multimplier * price_unit}€</strong></div>\
+			<div class="w-1-1"><strong>${price_unit_total}€ unidad</strong></div>\
+			<div class="w-1-1 sep"></div>'+
+//cajas			
+'<div class="w-1-1">\
+	<div class="g gc" data-group="control">\
+	  <div class="w-1-1 pb-2">\
+		<strong>Cantidad Cajas</strong>\
+	  </div>\
+	  <div class="w-6-10">\
+		<div class="w-1-1">\
+		  <input type="number" name="multimplier" min="1" max="${stock_count / multimplier}" value="${multimplier}" data-multimplier class="w-1-1 txt@c"/>\
+		</div>\
+	  </div>\
+	  <div class="w-4-10">\
+		<a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side">\
+		  <img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" />\
+		</a>\
+	  </div>\
+	  <div class="w-1-1 pt-4"></div>\
+	  <div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c">\
+		<a href="javascript:void(0);"  data-action="cartDownItem-side">\
+		  <img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" />\
+		</a>\
+		<a href="javascript:void(0);" data-action="cartUpItem-side">\
+		  <img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" />\
+		</a>\
+	  </div>\
+	  <div class="w-4-10"></div>\
+	  <div class="w-1-1 txt-org txt@r pt-9">\
+		<strong>${price_multimplier}&euro;</strong>\
+	  </div>\
+  </div>\
+</div>'+			
+			
+			'<div class="w-1-1 sep"></div>\
+			{{/if}}'+
+		
+//botones botellas
+'<div class="w-1-1">\
+	<div class="g gc" data-group="control">\
+	  <div class="w-1-1 pb-2">\
+		<strong>Cantidad Botellas</strong>\
+	  </div>\
+	  <div class="w-6-10">\
+		<div class="w-1-1">\
+			<input type="number" name="pax" min="1" max="${stock_count}" value="${pax}" data-pax class="w-1-1 txt@c">\
+		</div>\
+	  </div>\
+	  <div class="w-4-10">\
+		<a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side">\
+		  <img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" />\
+		</a>\
+	  </div>\
+	  <div class="w-1-1 pt-4"></div>\
+	  <div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c">\
+		<a href="javascript:void(0);"  data-action="cartDownItem-side">\
+		  <img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" />\
+		</a>\
+		<a href="javascript:void(0);" data-action="cartUpItem-side">\
+		  <img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" />\
+		</a>\
+	  </div>\
+	  <div class="w-4-10"></div>\
+	  <div class="w-1-1 txt-org txt@r pt-9">\
+		<strong>${price_unit_total}&euro;</strong>\
+	  </div>\
+  </div>\
+</div>'+	
+		
+		'</div> \
+		<div class="w-1-1 pt-1"></div><div class="w-1-1 sep"></div><div class="w-1-1 pt-1"></div> \
+	</div></div>');
 	
 	$.template('cart_botones_final', '<div class="w-1-1 pb-4"> \
 		<div class="w-1-1 pb-2"><a href="javascript:void(0);" class="w-1-1 secundary button" data-action="closeCart">Seguir comprando</a></div> \
@@ -282,7 +360,7 @@ $(function()
 		dom_data_ser = (ele.parents('form').length !== 0) ? ele.parents('form').serialize() : null;
 		
 		//cart buttons
-		if(/cartUpItem/gim.test(dom_type))
+		if(/cartUpItem|cartUpItem-side/gim.test(dom_type))
 		{
 			var itm = ele.parents('[data-group="control"]').find(':input');
 			if(itm.val() == undefined || itm.val() == "")
@@ -296,7 +374,7 @@ $(function()
 			return;
 		}
 		
-		if(/cartDownItem/gim.test(dom_type))
+		if(/cartDownItem|cartDownItem-side/gim.test(dom_type))
 		{
 			var itm = ele.parents('[data-group="control"]').find(':input');
 			itm.val(parseFloat((itm.val() == 0) ? 0 : itm.val() - 1));
@@ -304,7 +382,7 @@ $(function()
 			return;
 		}
 		
-		if(/cartDelItem/gim.test(dom_type))
+		if(/cartDelItem|carDelItem-side/gim.test(dom_type))
 		{
 			var itm = ele.parents('[data-group="control"]').find(':input');
 			itm.val(0);
@@ -405,13 +483,16 @@ $(function()
 		{
 			if(debug) console.log(d);
 			
-			if(/(add|open|repeatCart)Cart/gim.test(dom_type))
+			if(/cart(Del|Down|Up)Item-side/gim.test(dom_type))
 			{
 				$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
-				fn_page_preload_images();
+				return;
 			}
+				
+			if(/(add|open|repeatCart)Cart/gim.test(dom_type) || (/(up|del)Cart/gim.test(dom_type) && $('html').hasClass('openCart'))) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+			
 			//reload add cart / del
-			if(/(up|del)Cart/gim.test(dom_type)) window.location.reload();
+			if(/(up|del)Cart/gim.test(dom_type) && !$('html').hasClass('openCart')) window.location.reload();
 			
 			if(d.status == 200)
 			{
