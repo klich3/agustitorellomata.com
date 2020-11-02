@@ -52,12 +52,12 @@ class WIDGET_adminMenuTmpl {
 		if($this->too_login->isLogged() !== 200) return;
 		
 		//hash de paginas
-		$fn_arg_url = (preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
+		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 		
 		//prevent exec on admin stage
 		if(preg_match('/admin/', $fn_arg_url)) return;
 		
-		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
+		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details|pedidos|devoluciones)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
 				
 		$fn_q_menus = $this->db->FetchArray("
 			SELECT m.*

@@ -116,18 +116,24 @@ switch($g_action)
 							
 							if($fn_sv_page_id)
 							{
-								$fn_p_data_l1 = $db->FetchArray("
-									SELECT *
-									FROM `pages`
-									WHERE `active`='1'
-									AND `id`=:i
-									LIMIT 1;
-								", array(
-									'i' => $fn_sv_page_id,
-								));
+								try{
+									$fn_p_data_l1 = $db->FetchArray("
+										SELECT *
+										FROM `pages`
+										WHERE `active`='1'
+										AND `id`=:i
+										LIMIT 1;
+									", array(
+										'i' => $fn_sv_page_id,
+									));
+									
+									if(isset($sv['title']) && empty($sv['title'])) $sv['title'] = $fn_p_data_l1['obj_title'];
+									if(isset($sv['url']) && empty($sv['url'])) $sv['url'] = "{$CONFIG['site']['base_script']}{$st_lang}/{$fn_p_data_l1['obj_hash']}";
+								}catch(Exception $e)
+								{
+									
+								}
 								
-								if(isset($sv['title']) && empty($sv['title'])) $sv['title'] = $fn_p_data_l1['obj_title'];
-								if(isset($sv['url']) && empty($sv['url'])) $sv['url'] = "{$CONFIG['site']['base_script']}{$st_lang}/{$fn_p_data_l1['obj_hash']}";
 							}
 							
 							$sv['active_class'] = ($sv['active']) ? '' : 'bg-grey';

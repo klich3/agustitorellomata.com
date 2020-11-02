@@ -112,6 +112,64 @@ if($fn_ajax !== null)
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		
+		//solo admin 
+		case "repeatCart":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('error_db'),
+			)));
+			
+			$u_level = $too_login->isAuth(15, false);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('no_level_msg'),
+			)));
+			
+			$fn_login_user_data = $too_login->getUserData();
+			
+			$fn_q = $db->FetchObject("
+				SELECT `order_id`, `date`, `payment_status`, `entrega_status`, `num_seg`, `lang`, `data_cart`
+				FROM `orders`
+				WHERE `user_id`=:uid
+				AND `order_id`=:oid
+				ORDER BY `date` DESC;
+			", array(
+				"uid" => $fn_login_user_data->ID,
+				"oid" => $fn_p['data'],
+			));
+			
+			try{
+				$fn_cart = base64_decode($fn_q->data_cart);
+				$fn_cart = (isJson($fn_cart)) ? json_decode($fn_cart, true) : $fn_cart;
+				
+				$_SESSION['cart'] = $fn_cart['cart'];
+				$_SESSION['checkout'] = $fn_cart['checkout'];
+				
+				$fn_process_cart = cartProcessAndCalc($_SESSION);
+				
+				
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => "ok",
+					'data' => $fn_process_cart
+				)));
+			}catch(Exception $e)
+			{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => getLangItem('error_db'),
+				)));
+			}
+			
+			exit;
+		break;
+		
 		case "openCart":
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
@@ -2109,7 +2167,7 @@ if($fn_ajax !== null)
 			", array(
 				'tk' => $fn_p['k'],
 				'lk' => $fn_p['l'],
-				'lv' => (isset($fn_p['v'])) ? htmlize($fn_p['v']) : '',
+				'lv' => (isset($fn_p['v'])) ? $fn_p['v'] : '',
 			));
 			
 			if($fn_q)
@@ -2126,6 +2184,59 @@ if($fn_ajax !== null)
 			}
 						
 			exit;
+		break;
+		
+		//langs
+		case "addLangIgnore":
+		case "delLangIgnore":
+		case "delLang":
+		case "addLang":
+		case "orLang":
+			if(IsHotlink()) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'Ajax Fraud cached!',
+			)));
+			
+			$u_level = $too_login->isAuth(100, false, $CONFIG['site']['tooSType']);
+			
+			if($u_level !== 200) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No puede hacer esto, no tiene autorización!.',
+			)));
+			
+			if(!isset($fn_p['data'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => 'No hay nada que hacer!.',
+			)));
+			
+			$lang = [];
+			
+			foreach($fn_p['data'] as $k => $v)
+			{
+				$lang[] = $v;
+			}
+			
+			$fn_q = $db->Fetch("
+				UPDATE `options` 
+				SET `options_value`=:pv
+				WHERE `options_key`=:pk;
+			", array(
+				"pv" => json_encode($lang),
+				"pk" => (preg_match("/Ignore/", $fn_ajax)) ? "langIgnore" : "lang",
+			));
+			
+			if($fn_q)
+			{
+				exit(json_encode(array(
+					'status' => 200,
+					'message' => 'Actualizado',
+				)));
+			}else{
+				exit(json_encode(array(
+					'status' => 400,
+					'message' => 'No hay nada que actualizar',
+				)));
+			}
 		break;
 		
 		case "upConfig":

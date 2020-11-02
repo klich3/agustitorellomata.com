@@ -11,6 +11,7 @@ $fn_q = $db->FetchAll("
 	SELECT `order_id`, `date`, `payment_status`, `entrega_status`, `num_seg`, `lang`, `data_cart`
 	FROM `orders`
 	WHERE `user_id`=:uid
+	AND `payment_status`='1'
 	ORDER BY `date` DESC;
 ", array(
 	'uid' => $fn_login_user_data->ID,
@@ -22,6 +23,7 @@ if($fn_q)
 	{
 		$fn_xtemplate_parse['assign'][] = array(
 			'order_id' => $pv->order_id,
+			'sel' => (isset($fn_page_args['pedido_id']) && $fn_page_args['pedido_id'] === $pv->order_id) ? "selected" : "", 
 		);
 		$fn_xtemplate_parse['parse'][] = 'mis_devoluciones.pedidos.sel_row';
 	}

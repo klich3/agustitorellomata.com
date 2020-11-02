@@ -13,6 +13,28 @@ $g_action = (isset($fn_g['action'])) ? $fn_g['action'] : null;
 
 //lang row
 $fn_lang = (isset($CONFIG['site']['lang']) && isJson($CONFIG['site']['lang'])) ? json_decode($CONFIG['site']['lang']) : false;
+$fn_lang_ignore = (isset($CONFIG['site']['langIgnore']) && isJson($CONFIG['site']['langIgnore'])) ? json_decode($CONFIG['site']['langIgnore']) : false;
+
+//ignore list
+if($fn_lang_ignore) foreach($fn_lang_ignore as $lngi)
+{
+	$fn_xtemplate_parse['assign'][] = array(
+		'lang' => $lngi,
+	);
+	$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.lang_ignore_row";
+}
+
+$fn_lang_ignore_list = array_diff($fn_lang, $fn_lang_ignore);
+
+foreach($fn_lang_ignore_list as $lngisel)
+{
+	
+	$fn_xtemplate_parse['assign'][] = array(
+		'code' => $lngisel,
+	);
+	$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.lang_ignore_sel";
+}
+//ignore list
 
 if($fn_lang) foreach($fn_lang as $tpk)
 {
@@ -33,6 +55,12 @@ if($fn_lang) foreach($fn_lang as $tpk)
 		'selected' => ($tpk == $CONFIG['site']['defaultLang']) ? 'selected' : '',
 	);
 	$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.sel_def_lang";
+	
+	//order
+	$fn_xtemplate_parse['assign'][] = array(
+		'code' => $tpk,
+	);
+	$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.lang_order_row";
 }
 
 $fn_lang_sel_q = $db->FetchAll("
