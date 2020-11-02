@@ -359,7 +359,7 @@ if($fn_ajax !== null)
 				$_SESSION['cart'][$fn_pr_cart_id]['multimplier'] = isset($fn_inputs['multimplier']) ? $fn_inputs['multimplier'] : "0";
 				
 				//sum client pax or add existing on stock
-				$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] == 0) ? "1" : $fn_inputs['pax'];
+				$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] == 0) ? "0" : $fn_inputs['pax'];
 				$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_pax < $fn_q_check_stock) ? $fn_pax : $fn_q_check_stock;	
 			}
 			
