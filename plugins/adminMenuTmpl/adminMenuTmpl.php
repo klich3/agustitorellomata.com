@@ -51,6 +51,8 @@ class WIDGET_adminMenuTmpl {
 		if(empty($fn_args['url'])) return;
 		if($this->too_login->isLogged() !== 200) return;
 		
+		//hacer un array con admin hashes
+		
 		//hash de paginas
 		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 		

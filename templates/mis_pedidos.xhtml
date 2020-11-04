@@ -18,19 +18,6 @@
 				<div class="pl-2 pl-n@s">
 					<div class="g">
 					<!--////-->
-						<!-- BEGIN: no_pedidos -->
-						<div class="w-1-1 txt@c">
-							<div class="w-1-1">
-								{msg_no_hay_pedidos}
-							</div>
-							
-							<div class="w-1-1 mt-2">
-								<a href="{base}{user_lang}/productos" class="button" data-event="mi-devoluciones/tienda">{but_ir_a_la_tienda}</a>
-							</div>
-						</div>	
-						<!-- END: no_pedidos -->
-						
-						
 						<div class="w-1-1 pb-3 pb-5@s">
 							<h2 class="txt@u"><strong>{lang_admin_pedidos_realizados}</strong></h2>
 						</div>
@@ -72,7 +59,18 @@
 					<!--////-->
 					</div>
 				</div>
-			</div>
+			
+			<!-- BEGIN: no_pedidos -->
+			<div class="w-1-1 txt@c pt-4">
+				<div class="w-1-1">
+					{msg_no_hay_pedidos}
+				</div>
+				
+				<div class="w-1-1 mt-2">
+					<a href="{base}{user_lang}/atm-club-shop" class="button" data-event="mi-devoluciones/tienda">{but_ir_a_la_tienda}</a>
+				</div>
+			</div>	
+			<!-- END: no_pedidos -->
 		</div>
 	</div>
 </div>

@@ -69,7 +69,7 @@ ErrorDocument 500 /error.html
 	RequestHeader unset Range env=bad-range
 	
 	# Don't allow any pages to be framed - Defends against CSRF
-	Header set X-Frame-Options DENY
+	Header set X-Frame-Options SAMEORIGIN
 	
 	# prevent mime based attacks
 	Header set X-Content-Type-Options "nosniff"

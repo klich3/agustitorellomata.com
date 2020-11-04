@@ -25,7 +25,7 @@
 	<link type="text/plain" rel="author" href="{base_script}humans.txt" />
 
 	<link type="text/plain" rel="author" href="{base}humans.txt" />
-	<link rel="stylesheet" type="text/css" media="all" href="{base_script}style{production_minimization}.css?r={rand}" />
+	<link rel="stylesheet" type="text/css" media="all" href="{base_script}style.css?r={rand}" />
 	
 	<link rel="shortcut icon" type="image/x-icon" href="{base}images/favicon.ico" />
 	<link rel="apple-touch-icon" type="image/png" href="{base}images/favicon.png" />
@@ -46,7 +46,7 @@
 					   fn_base_script+'js/jquery.easing.1.3.js',
 					   fn_base_script+'js/jquery.imagesloaded.min.js',
 					   fn_base_script+'js/jquery.tmpl.min.js',
-					   fn_base_script+'js/x.211.fn'+min+'.js']
+					   fn_base_script+'js/x.211.fn.js']
 			};
 	</script>
 	
@@ -55,8 +55,8 @@
 {FILE "templates/_header_svg.xhtml"}
 
 <div class="cart-wrap">
+	<div class="cart-close-outside"></div>
 	<div class="cp-1" data-cart-container>
-		
 	</div>
 </div>
 
@@ -106,9 +106,11 @@
 					</div>
 					<!-- END: header_lang_list_mob -->
 					
+					<!-- BEGIN: only_not_logged -->
 					<div class="h-100">
-						<a href="{base_script}{user_lang}/mi-cuenta"><img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" /></a>
+						<a href="{base_script}{user_lang}/login"><img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" /></a>
 					</div>
+					<!-- END: only_not_logged -->
 				</div>
 			</div>
 			

@@ -37,9 +37,6 @@ if($too_login->isLogged() == 400)
 				
 				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1)
 				{
-					//precio por una caja
-					$cv['precio_caja'] = round($cv['pax_multimplier'] * $cv['price_unit'] , 2);
-					
 					$fn_xtemplate_parse['assign'][] = $cv;
 					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.multiplier';
 					

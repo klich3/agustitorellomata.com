@@ -71,6 +71,18 @@ class WIDGET_header_lang {
 				if(isset($fn_rels[$fv]))
 				{
 					$fn_hash = self::getPageHashById($fn_rels[$fv]);
+				}else{
+					$fn_hash_n = self::getTransHash($fn_arg_url, $fv);
+					
+					if(!$fn_hash_n)
+					{
+						$fn_hash_correct = preg_replace("/\_/", "-", $fn_arg_url);
+						$fn_hash_nn = self::getTransHash($fn_hash_correct, $fv);
+						
+						if($fn_hash_nn) $fn_hash = $fn_hash_nn;
+					}else{
+						$fn_hash = $fn_hash_n; 
+					}
 				}
 				
 				self::$fn_xtemplate_parse['assign'][] = array(
@@ -87,6 +99,24 @@ class WIDGET_header_lang {
 		}
 		
 		return self::$fn_xtemplate_parse;
+	}
+	
+	private function getTransHash($fn_original_hash, $fn_trans_lang)
+	{
+		$fn_trans = $this->db->FetchValue("
+			SELECT ph.`obj_hash`
+			FROM `pages` p
+			LEFT JOIN `pages_lang_rel` r ON(r.`page_id`=p.`id`)
+			LEFT JOIN `pages` ph ON(ph.`id`=r.`page_translate_id`)
+			WHERE p.`obj_hash`=:h
+			AND r.`lang_type`=:l
+			LIMIT 1;
+		", array(
+			"h" => $fn_original_hash,
+			"l" => $fn_trans_lang,
+		));
+		
+		return ($fn_trans) ? $fn_trans : false; 
 	}
 	
 	private function getAllLangsRels($fn_args)

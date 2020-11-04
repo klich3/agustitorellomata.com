@@ -532,12 +532,13 @@ function cartProcessAndCalc($fn_array)
 		$fn_array['cart'][$k]['p_id'] = $fn_q['id'];
 		
 		$fn_array['cart'][$k]['hash'] = $fn_q['hash'];
-		$fn_array['cart'][$k]['title'] = $fn_prod_title[$st_lang];
-		$fn_array['cart'][$k]['subtitle'] = $fn_prod_subtitle[$st_lang];
+		$fn_array['cart'][$k]['title'] = html_entity_decode($fn_prod_title[$st_lang]);
+		$fn_array['cart'][$k]['subtitle'] = html_entity_decode($fn_prod_subtitle[$st_lang]);
 		$fn_array['cart'][$k]['stock_count'] = $fn_q['stock_count'];
 		$fn_array['cart'][$k]['thumb'] = getThumbFromGallery($fn_q['gallery_id']);
 		$fn_array['cart'][$k]['pax_multimplier'] = $fn_q['pax_multimplier'];
 		
+		$fn_array['cart'][$k]['price_caja'] = round($fn_q['pax_multimplier'] * $fn_q['precio_venta'] , 2);
 		$fn_array['cart'][$k]['price_unit'] = $fn_q['precio_venta'];
 		$fn_array['cart'][$k]['price_unit_total'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : $fn_q['precio_venta'];
 		
@@ -601,8 +602,8 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 	$fn_s = getLangItem('mail_order_confirm');
 	$fn_subject = "{$fn_s} - {$CONFIG['site']['sitetitlefull']}";
 	
-	$fn_message = $lang_items[$st_lang]['mail_order_confirm_text'];
-	$fn_message .= createCartCheckoutHtml($fn_order_html);
+	$fn_message = getLangItem('mail_order_confirm_text');
+	$fn_message .= $fn_order_html;
 	
 	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
 	
@@ -615,11 +616,11 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 		'%site_logo%', 
 	), array(
 		$fn_message,
-		$lang_items[$st_lang]['regards'],
+		getLangItem('regards'),
 		$CONFIG['site']['sitetitlefull'],
 		$CONFIG['site']['sitecopyz'],
 		'',
-		'<img src="'.$CONFIG['site']['base'].'m/logo.png?e='.urlencode($fn_user_mail).'" alt="logotype" />',
+		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png?e='.urlencode($fn_user_mail).'" alt="logotype" />',
 	), $fn_mail_html);
 	
 	$fn_content = preparehtmlmailBase64($CONFIG['site']['mailinfo'], $fn_mail_html);
@@ -637,7 +638,7 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
  * @param mixed $fn_order_num
  * @return void
  */
-function sendAdminNotice($fn_order_num)
+function sendAdminNotice($fn_order_num, $fn_cart_html = false)
 {
 	global $st_lang, $CONFIG, $lang_items;
 	
@@ -647,6 +648,9 @@ function sendAdminNotice($fn_order_num)
 	//email de aviso al administrador
 	$fn_subject = "[Nueva compra] - {$fn_order_num} - {$CONFIG['site']['sitetitlefull']}";
 	
+	$fn_message = '<p>Aviso de una nueva compra con siguiente referencia: <strong>'.$fn_order_num.'</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p><br/><br/><br/><br/><br/>';
+	if($fn_cart_html) $fn_message .= $fn_cart_html;
+	
 	$fn_mail_html = str_replace(array(
 		'%message%',
 		'%regards%', 
@@ -655,12 +659,12 @@ function sendAdminNotice($fn_order_num)
 		'%site_dir%', 
 		'%site_logo%', 
 	), array(
-		'<p>Aviso de una nueva compra con siguiente referencia: <strong>'.$fn_order_num.'</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p>',
-		$lang_items[$st_lang]['regards'],
+		$fn_message,
+		getLangItem('regards'),
 		$CONFIG['site']['sitetitlefull'],
 		$CONFIG['site']['sitecopyz'],
 		'',
-		'<img src="'.$CONFIG['site']['base'].'m/logo.png" alt="logotype" />',
+		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 	), $fn_mail_html);
 	
 	$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);

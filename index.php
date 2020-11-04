@@ -13,9 +13,9 @@ ini_set("session.cookie_lifetime", "3600");
 
 //x-xss config
 header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: SAMEORIGIN");
+//header("X-Frame-Options: SAMEORIGIN");
 //header("X-XSS-Protection: 1;mode=block");
-header("X-Content-Security-Policy: allow 'self'; frame-ancestors 'none'");
+//header("X-Content-Security-Policy: allow 'self'; frame-ancestors 'none'");
 //header("Strict-Transport-Security: max-age=31536000; preload"); //HSTS Header
 
 global $CONFIG, $db, $fn_url, $fn_hash, $st_lang, $lang_items, $too_login, $cl_m;
@@ -244,7 +244,26 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
 		
 		$fn_url['url'] = 'admin';
 		
-	}else if(preg_match('/pedidos/', $fn_url['url']))
+	}else if(preg_match('/cuenta|compte|account/', $fn_url['url']))
+	{
+		$fn_sep = explode('/', $fn_url['url']);
+		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = "mi_cuenta";
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'mi-cuenta',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
+	}else if(preg_match('/pedidos|orders/', $fn_url['url']))
 	{
 		$fn_sep = explode('/', $fn_url['url']);
 		
@@ -264,7 +283,7 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
 			'isIframe' => (isset($fn_g['iframe'])) ? true : false
 		));
 		exit;
-	}else if(preg_match('/devolucion/', $fn_url['url']))
+	}else if(preg_match('/devolucion|return/', $fn_url['url']))
 	{
 		$fn_sep = explode('/', $fn_url['url']);
 		

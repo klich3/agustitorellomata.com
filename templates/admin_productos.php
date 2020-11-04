@@ -74,8 +74,8 @@ switch($g_action)
 			
 			$fn_for_data = array(
 				'lang' => $lv,
-				'lang_title' => (isset($fn_meta_title[$lv])) ? $fn_meta_title[$lv] : '',
-				'lang_subtitle' => (isset($fn_meta_subtitle[$lv])) ? $fn_meta_subtitle[$lv] : '',
+				'lang_title' => (isset($fn_meta_title[$lv])) ? html_entity_decode($fn_meta_title[$lv]) : '',
+				'lang_subtitle' => (isset($fn_meta_subtitle[$lv])) ? html_entity_decode($fn_meta_subtitle[$lv]) : '',
 				'lang_content' => $fn_lang_content,
 				'lang_envio_extra' => $fn_lang_envio_extre,
 			);
@@ -138,7 +138,7 @@ switch($g_action)
 			$fn_for_data = object_to_array($pv);
 			
 			//title
-			$fn_for_data['item_title'] = langTitleJsonToStringJointer($pv->lang_data);
+			$fn_for_data['item_title'] = html_entity_decode(langTitleJsonToStringJointer($pv->lang_data));
 			
 			//thumb
 			if($pv->gallery_id == NULL || $pv->gallery_id == 0)
@@ -171,7 +171,7 @@ switch($g_action)
 			
 			if(sizeof($fn_cat_lang_data) !== 0) foreach($fn_lang as $cak)
 			{
-				$fn_cat_title_out[] = (isset($fn_cat_lang_data[$cak])) ? $fn_cat_lang_data[$cak] : '';
+				$fn_cat_title_out[] = (isset($fn_cat_lang_data[$cak])) ? html_entity_decode($fn_cat_lang_data[$cak]) : '';
 			}
 			
 			//title
@@ -193,7 +193,7 @@ switch($g_action)
 			{
 				$fn_foritem_data = object_to_array($iv);
 				
-				$fn_foritem_data['item_title'] = langTitleJsonToStringJointer($iv->lang_data);
+				$fn_foritem_data['item_title'] = html_entity_decode(langTitleJsonToStringJointer($iv->lang_data));
 				
 				//thumb
 				if($iv->gallery_id == NULL || $iv->gallery_id == 0)
