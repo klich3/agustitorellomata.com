@@ -3616,6 +3616,10 @@ textarea {
   background-color: rgba(255, 0, 0, 0.35);
 }
 
+[data-message]:not(.h) {
+  display: inline-block;
+}
+
 /*  MENU -----  */
 
 .menu-container {
@@ -3804,6 +3808,16 @@ html.openCart [data-cart-container],
   -moz-transition:	all 0.25s ease-out;
   -o-transition: 		all 0.25s ease-out;
   transition: 		all 0.25s ease-out;
+}
+
+html.openCart .cart-wrap .cart-close-outside {
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+  display: block;
+  height: 100%;
+  width: calc(100% - 440px);
 }
 
 .cart-wrap [data-cart-container] {
@@ -4149,6 +4163,7 @@ main .product-grid .item .sep-h::after {
   background-color: #CCC;
 }
 
+
 html[data-hash="cart"] .button,
 html[data-hash="cart"] button,
 main .product-grid .item button,
@@ -4267,7 +4282,6 @@ button.button {
 
 .button {
   display: inline-block;
-  width: auto;
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
@@ -4301,6 +4315,7 @@ button[disabled],
 .button.secundary:hover {
   border: 1px solid transparent;
   background-color: #000;
+  color: #fff !important;
 }
 
 .activity_list .title {
@@ -4421,7 +4436,7 @@ a.secundary {
 [data-cc-container] .item .bot,
 [data-cc-container] .price,
 [data-cc-container] .item .price {
-  font-size: 1.38rem;
+  font-size: 1.18rem;
   font-weight: bold;
 }
 

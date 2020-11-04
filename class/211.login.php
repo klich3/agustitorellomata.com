@@ -55,9 +55,9 @@ class tooLogin {
 		$this->fn_now_date = date('Y-m-d H:i:s');
 		
 		//redirects
-		$this->redirLoggedin = "{$cfg['site']['base_script']}{$cfg['site']['lang']}/admin/dashboard";
-		$this->redirLoggedout = "{$cfg['site']['base_script']}{$cfg['site']['lang']}/admin/login";
-		$this->redirRestrictedArea = "{$cfg['site']['base_script']}{$cfg['site']['lang']}/admin/restricted-area";
+		$this->redirLoggedin = "{$cfg['site']['base_script']}{$cfg['site']['defaultLang']}/admin/dashboard";
+		$this->redirLoggedout = "{$cfg['site']['base_script']}{$cfg['site']['defaultLang']}/admin/login";
+		$this->redirRestrictedArea = "{$cfg['site']['base_script']}{$cfg['site']['defaultLang']}/admin/restricted-area";
 		
 		//check if apache get so APC cache
 		/*
@@ -486,7 +486,7 @@ class tooLogin {
 		{
 			$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_pass, $this->cfg_hash) : hash_hmac('sha512', "{$fn_user}~{$fn_pass}", $this->cfg_hash, false);
 		}else{
-			$fn_pass = md5("{$fn_user}~{$fn_pass}");
+			$fn_pass = md5($fn_pass);
 		}
 		return $fn_pass;
 	}

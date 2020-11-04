@@ -19,22 +19,6 @@
       <div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
         <div class="pl-2 pl-n@s">
           <div class="g">
-            <!--////-->
-            <!-- BEGIN: no_pedidos -->
-            <div class="w-1-1 txt@c">
-              <div class="w-1-1">{msg_no_hay_pedidos}</div>
-
-              <div class="w-1-1 mt-2">
-                <a
-                  href="{base}{user_lang}/productos"
-                  class="button"
-                  data-event="mi-devoluciones/tienda"
-                  >{but_ir_a_la_tienda}</a
-                >
-              </div>
-            </div>
-            <!-- END: no_pedidos -->
-
             <div class="w-1-1 pb-3 pb-5@s">
               <h2 class="txt@u">
                 <strong>{lang_admin_pedidos_realizados}</strong>
@@ -59,7 +43,7 @@
                 <li class="txt@u@c"><strong>{cart_count}</strong></li>
                 <li class="txt@u@c"><strong>{checkout_date}</strong></li>
                 <li class="txt@u@r">
-                  <strong class="txt-org">{cart_total}€</strong>
+                  <strong class="txt-org">{cart_total}&euro;</strong>
                 </li>
               </ul>
 
@@ -308,7 +292,7 @@
                    href="javascript:void(0);"
                    data-id="{checkout_id}"
                    data-action="repeatCart"
-                   class="button fr"
+                   class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10 button fr"
                    >{but_buy_again}
                    </a>
                </div>
@@ -316,7 +300,7 @@
                <div class="pt-3 w-1-1">
                  <a
                   href="{base_script}{user_lang}/mis-devoluciones/{checkout_id}"
-                  class="button fr"
+                  class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10 button fr"
                   >{but_devolver}</a>
                </div>
                
@@ -327,6 +311,21 @@
         </div>
       </div>
     </div>
+      
+      <!-- BEGIN: no_pedidos -->
+      <div class="w-1-1 txt@c">
+        <div class="w-1-1">{msg_no_hay_pedidos}</div>
+
+        <div class="w-1-1 mt-2">
+          <a
+            href="{base}{user_lang}/atm-club-shop"
+            class="button"
+            data-event="mi-devoluciones/tienda"
+            >{but_ir_a_la_tienda}</a
+          >
+        </div>
+      </div>
+      <!-- END: no_pedidos -->
   </div>
 </div>
 

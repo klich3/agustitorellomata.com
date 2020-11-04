@@ -11,7 +11,7 @@
         <div class="w-1-1 txt@c">{message}</div>
 
         <div class="w-1-1 mt-2 txt@c">
-          <a href="{base}{user_lang}/productos" class="button"
+          <a href="{base}{user_lang}/atm-club-shop" class="button"
             >{but_ir_a_la_tienda}</a
           >
         </div>
@@ -20,29 +20,34 @@
 
       <!-- BEGIN: cart -->
       <div class="w-1-1 cp-2 pb-3 hs">
-        <div class="g gc">
-          <div class="hs w-2-10">&nbsp;</div>
-
-          <div class="hs w-2-10 brd-b pb-1">
-            <strong class="txt@u label">{lang_cart_producto_title}</strong>
+        <div class="g ">
+          <div class="ws-4-10 wm-2-10 wl-2-10 wxl-2-10">
           </div>
-
-          <div class="hs w-2-10 brd-b pb-1 txt@c">
-            <strong class="txt@u label">{lang_cart_precio_title}</strong>
+          
+          <div class="ws-6-10 wm-8-10 wl-8-10 wxl-8-10">
+            <div class="g">
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_producto_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_precio_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_cantidad_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1 txt@r">
+                  <strong class="txt@u label">total</strong>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div class="hs w-2-10 brd-b pb-1 txt@c">
-            <strong class="txt@u label">{lang_cart_cantidad_title}</strong>
-          </div>
-
-          <div class="w-2-10 brd-b pb-1 txt@r">
-            <strong class="txt@u label">total</strong>
-          </div>
-        </div>
       </div>
 
       <!-- BEGIN: row -->
-      <div class="w-1-1">
+      <div class="w-1-1 cp-2">
         <div
           class="g item"
           data-pid="{p_id}"
@@ -63,13 +68,13 @@
           </div>
 
           <div class="ws-6-10 wm-8-10 wl-8-10 wxl-8-10">
-            <div class="g w-1-1">
-              <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10">
+            <div class="g">
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
                 <div class="title txt@u">
                   <strong>{title}</strong>
                 </div>
                 <div class="subtitle txt@u">
-                  <strong>{subtitle}</strong>
+                  {subtitle}
                 </div>
               </div>
 
@@ -77,7 +82,7 @@
                 <hr />
               </div>
 
-              <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10">
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
                 <div class="g">
                   <div class="w-1-1">
                     <!-- BEGIN: multiplier -->
@@ -85,7 +90,7 @@
                       <strong>{lang_box} {pax_multimplier} {lang_bot}</strong>
                     </div>
                     <div class="bot-price txt-org">
-                      <strong>{precio_caja}&euro;</strong>
+                      <strong>{price_caja}&euro;</strong>
                     </div>
                     <!-- END: multiplier -->
                     <div class="price">
@@ -99,9 +104,9 @@
                 <hr />
               </div>
 
-              <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10">
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
                 <div class="g">
-                  <div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10">
+                  <div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
                     <!-- BEGIN: multiplier_selector -->
                     <div class="g gc" data-group="control">
                       <div class="w-1-1 pb-2">
@@ -220,12 +225,14 @@
                   </div>
                 </div>
               </div>
-              <div class="ws-1-1 wm-1-10 wl-1-10 wxl-1-10 txt@r pt-10@s">
-                <strong class="price hl txt@u pr-8">{lang_cart_price}</strong>
-                <strong class="txt-org price">{price_total}&euro;</strong>
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4 txt@r pt-10@s">
+                <strong class="w-1-1 price hl txt@u pr-8">{lang_cart_price}</strong>
+                <strong class="w-1-1 txt-org price">{price_total}&euro;</strong>
               </div>
             </div>
           </div>
+        </div>
+        <div class="pl-2">
           <div class="w-1-1 sep mb-4"></div>
         </div>
       </div>

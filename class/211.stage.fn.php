@@ -70,8 +70,8 @@ function get_header($fn_args)
 		
 		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
 		
-		'cart_hide' => (isset($_SESSION['cart'])) ? false : true,
-		'cart_items' => (isset($_SESSION['cart']) && isset($_SESSION['checkout'])) ? $_SESSION['checkout']['cart_count'] : 0,
+		'cart_hide' => (isset($_SESSION) && isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0) ? "" : "h",
+		'cart_items' => (isset($_SESSION) && isset($_SESSION['cart']) && isset($_SESSION['checkout'])) ? $_SESSION['checkout']['cart_count'] : 0,
 	));
 	
 	//custom settings
@@ -84,6 +84,7 @@ function get_header($fn_args)
 		$b->parse("{$tmpl_header}.header_logged");
 	}else{
 		$b->parse("{$tmpl_header}.login_but_not_logged");
+		$b->parse("{$tmpl_header}.only_not_logged"); //but header login
 	}
 	
 	//widgets load template
@@ -106,7 +107,7 @@ function get_header($fn_args)
 	{
 		if(class_exists('tooLogin'))
 		{
-			if($too_login->isLogged() == 200)
+			if($too_login->isLogged() == 200 && $too_login->isAuth(100, false) == 200)
 			{
 				//user data from session
 				$fn_user_data_array = object_to_array($_SESSION[$too_login->sessionName]);

@@ -42,40 +42,8 @@ $(function()
 		'{{/each}}{{/if}}</ul></div>'+
 	'</div></div></div>{{/if}}');
 	
-	
-	//lista de productos del grid
-	$.template('productItemTMPL', '{{if status=="200" && data.length!=="0"}}{{each(i, v) data}}<li><div class="img-cnt" data-bgfrom-img="${v.image}"><a href="javascript:void(0);" rel="nofollow" data-type="getProductDetails" data-pid="${v.id}"><span class="h">{{if lang}}${lang.lang_details}{{else}}+{{/if}}</span></a></div></li>{{/each}}{{/if}}');
-	
 	//preloader del grid productos
 	$.template('preloaderTMPL', '<img src="'+fn_base_script+'images/preloader-big.gif" alt="preloader spinning animation" />');
-	
-	//modal detalles del producto
-	$.template('prodDetailsTMPL', '<div class="w-1-1 mt-3"></div><div class="g"><div class="pt-2 ws-1-1 wm-2-3 wl-2-3 wxl-2-3">'+
-		//slider
-		'{{if data.slider}} <div class="slider-area h" data-slider-id="slider_product"><noscript id="sliderData">{{parsejson data.slider}}</noscript></div>{{/if}}'+
-		
-		'</div><div class="pt-2 ws-1-1 wm-1-3 wl-1-3 wxl-1-3">'+
-		
-		//data content
-		'<div class="w-1-1 pt-3 hl">&nbsp;</div>'+
-		'{{if data.lang_data}}<div class="w-1-1 txt@c pt-3 pb-3 border@t@b title">${data.lang_data}</div>{{/if}}'+
-		'{{if data.lang_content}}<div class="w-1-1 pt-3 pb-3 border@b desc">{{html data.lang_content}}</div>{{/if}}'+
-		'<div class="w-1-1 pt-3 pb-3 border@b">'+
-			'<div class="g">'+
-				'<div class="w-1-2 price">125 €</div>'+
-				'<div class="w-1-2">'+
-					'<ul class="ln g gc gw-1-3 txt@c w-1-1">'+
-						'<li><a href="javascript:void(0);" rel="nofollow" class="arrow l"><svg width="40" height="40" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-l"></use></svg></a></li>'+
-						'<li class="qty">1</li>'+
-						'<li><a href="javascript:void(0);" rel="nofollow" class="arrow r"><svg width="40" height="40" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-r"></use></svg></a></li>'+
-					'</ul>'+
-				'</div>'+
-			'</div>'+
-		'</div>'+
-		'<div class="w-1-1 font@lr pt-3 pb-2"><a href="" class="button">añadir al cesta</a></div>'+
-		'<div class="w-1-1 font@lr pt-2 pb-3"><a href="" class="button">comprar ahora</a></div>'+
-		
-	'</div></div>');
 	
 	//cookies
 	$.template('smallCookie', '<div class="cookies-policy">'+
@@ -95,12 +63,12 @@ $(function()
 					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}}\
 				{{else}}'+
 					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}}\
-						El carrito esta vacío\
+						<div class="txt@c">${data.lang.cart_empty}</div>\
 					{{else}}'+
 
 						//items
 						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}}\
-							{{tmpl(v) "cart_item"}}\
+							{{tmpl({data:v, lang:data.lang}) "cart_item"}}\
 						{{/each}}{{/if}}'+
 						
 						//total
@@ -110,16 +78,16 @@ $(function()
 							<div class="w-1-2">\
 								<div class="g gc">\
 									<div class="w-1-2">\
-										<strong class="label txt@u">IVA(${data.data.checkout.cart_iva_percent}%)</strong>\
+										<strong class="label txt@u">${data.lang.lang_iva}(${data.data.checkout.cart_iva_percent}%)</strong>\
 									</div>\
 									<div class="w-1-2 txt@r">\
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}€</strong>\
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}&euro;</strong>\
 									</div>\
 									<div class="w-1-2">\
 										<strong class="label txt@u">SUBTOTAL</strong>\
 									</div>\
 									<div class="w-1-2 txt@r">\
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}€</strong>\
+										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}&euro;</strong>\
 									</div>\
 								</div>\
 							</div>\
@@ -127,7 +95,7 @@ $(function()
 						<div class="w-1-1 pb-5"></div>{{/if}}'+
 						
 						//botones final					
-						'{{if data.data && data.data.cart}}{{tmpl(data.data.checkout) "cart_botones_final"}}{{/if}}'+
+						'{{if data.data && data.data.cart}}{{tmpl() "cart_botones_final"}}{{/if}}'+
 						
 					'{{/if}}'+
 				'{{/if}}\
@@ -136,30 +104,30 @@ $(function()
 		</div>\
 	');
 	
-	$.template('cart_item', '<div class="item" data-cid="${cat_id}" data-pid="${p_id}"><div class="g gc">\
+	$.template('cart_item', '<div class="item" data-cid="${data.cat_id}" data-pid="${data.p_id}"><div class="g gc">\
 		<div class="w-1-2">\
-			<img src="${thumb}" class="e" />\
+			<img src="${data.thumb}" class="e" />\
 		</div>\
 		<div class="w-1-2">\
 			<div class="w-1-1 txt@u txt-org">\
-				{{if title}}<div class="w-1-1"><strong class="label">${title}</strong></div>{{/if}}\
-				{{if subtitle}}<div class="w-1-1">${subtitle}</div>{{/if}}\
+				{{if data.title}}<div class="w-1-1"><strong class="label">{{html data.title}}</strong></div>{{/if}}\
+				{{if data.subtitle}}<div class="w-1-1">{{html data.subtitle}}</div>{{/if}}\
 			</div>\
 			<div class="w-1-1 sep"></div>\
-			{{if pax_multimplier > "1"}}\
-			<div class="w-1-1"><strong>CAJAS ${pax_multimplier} BOT</strong></div>\
-			<div class="w-1-1 txt-org"><strong>${pax_multimplier * price_unit}€</strong></div>\
-			<div class="w-1-1"><strong>${price_unit_total}€ unidad</strong></div>\
+			{{if data.pax_multimplier > "1"}}\
+			<div class="w-1-1"><strong>${lang.lang_box} ${data.pax_multimplier} ${lang.lang_bot}</strong></div>\
+			<div class="w-1-1 txt-org"><strong>${data.price_caja}&euro;</strong></div>\
+			<div class="w-1-1"><strong>${data.price_unit_total}&euro; ${lang.lang_ud}</strong></div>\
 			<div class="w-1-1 sep"></div>'+
 //cajas			
 '<div class="w-1-1">\
 	<div class="g gc" data-group="control">\
 	  <div class="w-1-1 pb-2">\
-		<strong>Cantidad Cajas</strong>\
+		<strong>${lang.cart_cant_cajas}</strong>\
 	  </div>\
 	  <div class="w-6-10">\
 		<div class="w-1-1">\
-		  <input type="number" name="multimplier" min="1" max="${stock_count / multimplier}" value="${multimplier}" data-multimplier class="w-1-1 txt@c"/>\
+		  <input type="number" name="multimplier" min="1" max="${data.stock_count / data.multimplier}" value="${data.multimplier}" data-multimplier class="w-1-1 txt@c"/>\
 		</div>\
 	  </div>\
 	  <div class="w-4-10">\
@@ -178,7 +146,7 @@ $(function()
 	  </div>\
 	  <div class="w-4-10"></div>\
 	  <div class="w-1-1 txt-org txt@r pt-9">\
-		<strong>${price_multimplier}&euro;</strong>\
+		<strong>${data.price_multimplier}&euro;</strong>\
 	  </div>\
   </div>\
 </div>'+			
@@ -190,11 +158,11 @@ $(function()
 '<div class="w-1-1">\
 	<div class="g gc" data-group="control">\
 	  <div class="w-1-1 pb-2">\
-		<strong>Cantidad Botellas</strong>\
+		<strong>${lang.cart_cant_bot}</strong>\
 	  </div>\
 	  <div class="w-6-10">\
 		<div class="w-1-1">\
-			<input type="number" name="pax" min="1" max="${stock_count}" value="${pax}" data-pax class="w-1-1 txt@c">\
+			<input type="number" name="pax" min="1" max="${data.stock_count}" value="${data.pax}" data-pax class="w-1-1 txt@c">\
 		</div>\
 	  </div>\
 	  <div class="w-4-10">\
@@ -213,7 +181,7 @@ $(function()
 	  </div>\
 	  <div class="w-4-10"></div>\
 	  <div class="w-1-1 txt-org txt@r pt-9">\
-		<strong>${price_unit_total}&euro;</strong>\
+		<strong>${data.price_unit_total}&euro;</strong>\
 	  </div>\
   </div>\
 </div>'+	
@@ -223,9 +191,9 @@ $(function()
 	</div></div>');
 	
 	$.template('cart_botones_final', '<div class="w-1-1 pb-4"> \
-		<div class="w-1-1 pb-2"><a href="javascript:void(0);" class="w-1-1 secundary button" data-action="closeCart">Seguir comprando</a></div> \
-		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">Ver Carrito</a></div> \
-		<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">Finalizar compra</a></div> \
+		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'atm-club-shop" class="w-1-1 secundary button" data-action="closeCart">${data.lang.cart_seguircomprando_but}</a></div> \
+		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">${data.lang.cart_vercarrito_but}</a></div> \
+		<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">${data.lang.cart_checkout_but}</a></div> \
 	</div>');
 	
 	//_G vars
@@ -306,6 +274,8 @@ $(function()
 		
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
+		$(document).on('click', '.cart-close-outside', e_closeCartOutDom);
+				
 		$(window).on('resize', e_resize).trigger('resize');
 		
 		if($('[data-fancybox]').length !== 0) //load script
@@ -316,6 +286,13 @@ $(function()
 			],
 			callback: fn_init_fancybox()		
 		});
+	}
+	
+	e_closeCartOutDom = function(e){
+		e.stopPropagation();
+		e.preventDefault();
+		e_action_handler(null, "closeCart")
+		return;
 	}
 	
 	e_updateCart = function(e) 
@@ -428,7 +405,7 @@ $(function()
 		
 		if(/closeCart/gim.test(dom_type))
 		{
-			$('html').removeClass('menu-open').removeClass('openCart');;
+			$('html').removeClass('menu-open').removeClass('openCart');
 			$('[data-cart-container]').empty();
 			
 			//recargamos la pagina en checkout
@@ -481,7 +458,7 @@ $(function()
 			data:dom_data_ser
 		}, null, function(d)
 		{
-			if(debug) console.log(d);
+			if(debug) console.log(dom_type, d);
 			
 			if(/cart(Del|Down|Up)Item-side/gim.test(dom_type))
 			{
@@ -489,16 +466,26 @@ $(function()
 				return;
 			}
 				
-			if(/(add|open|repeatCart)Cart/gim.test(dom_type) || (/(up|del)Cart/gim.test(dom_type) && $('html').hasClass('openCart'))) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+			if(/(add|open|repeat)Cart/gim.test(dom_type) || (/(up|del)Cart/gim.test(dom_type) && $('html').hasClass('openCart'))) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
 			
-			//reload add cart / del
-			if(/(up|del)Cart/gim.test(dom_type) && !$('html').hasClass('openCart')) window.location.reload();
 			
 			if(d.status == 200)
 			{
 				//update header cart counter
-				if(/(up|add|open|repeatCart)Cart/gim.test(dom_type)) $('.cart-not').text(d.data.cart.length).removeClass('h');
+				if(/(up|add|open|repeat|del)Cart/gim.test(dom_type))
+				{
+					if(!d.data.cart || !d.data.cart.length)
+					{
+						$('.cart-not').addClass('h');
+						e_action_handler(null, "closeCart");
+					}else{
+						$('.cart-not').text(d.data.cart.length).removeClass('h');
+					}
+				}
 				
+				//reload add cart / del
+				if(/(up|del)Cart/gim.test(dom_type) && !$('html').hasClass('openCart')) window.location.reload();
+					
 				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
 				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
 				if(dom_type == 'recUpPass') window.location.href = "/login";

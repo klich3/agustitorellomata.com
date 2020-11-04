@@ -20,6 +20,19 @@ if($fn_ajax !== null)
 		)));
 	}
 	
+	$cart_lang = array(
+		'lang_box' => getLangItem("lang_box"),	
+		'lang_bot' => getLangItem("lang_bot"),	
+		'lang_ud' => getLangItem("lang_ud"),	
+		'cart_cant_bot' => getLangItem("cart_cant_bot"),	
+		'cart_cant_cajas' => getLangItem("cart_cant_cajas"),	
+		'cart_seguircomprando_but' => getLangItem("cart_seguircomprando_but"),	
+		'cart_checkout_but' => getLangItem("cart_checkout_but"),	
+		'cart_vercarrito_but' => getLangItem("cart_vercarrito_but"),	
+		'cart_empty' => getLangItem("cart_empty"),	
+		'lang_iva' => getLangItem("lang_iva"),	
+	);
+	
 	switch($fn_ajax)
 	{
 		//-----------------------------------------------------------------------------
@@ -76,8 +89,10 @@ if($fn_ajax !== null)
 				$fn_order_data = base64_decode($fn_get_order_data_based);
 				$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
 				
+				$fn_order_html = createCartCheckoutHtml($fn_order_data);
+				
 				//mails
-				sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_data);
+				sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_html);
 				sendAdminNotice($fn_g['o']);
 			}
 			exit;
@@ -102,8 +117,7 @@ if($fn_ajax !== null)
 				
 				echo createCartCheckoutHtml($fn_order_data);
 			}
-			
-			
+						
 			exit;
 		break;
 		
@@ -122,6 +136,7 @@ if($fn_ajax !== null)
 			if(!isset($fn_p['data'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('error_db'),
+				'lang' => $cart_lang
 			)));
 			
 			$u_level = $too_login->isAuth(15, false);
@@ -129,6 +144,7 @@ if($fn_ajax !== null)
 			if($u_level !== 200) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('no_level_msg'),
+				'lang' => $cart_lang
 			)));
 			
 			$fn_login_user_data = $too_login->getUserData();
@@ -148,22 +164,26 @@ if($fn_ajax !== null)
 				$fn_cart = base64_decode($fn_q->data_cart);
 				$fn_cart = (isJson($fn_cart)) ? json_decode($fn_cart, true) : $fn_cart;
 				
-				$_SESSION['cart'] = $fn_cart['cart'];
-				$_SESSION['checkout'] = $fn_cart['checkout'];
+				if(isset($fn_cart['cart'])) foreach($fn_cart['cart'] as $k)
+				{
+					$fn_p_id = "{$k['p_id']}{$k['cat_id']}";
+					$_SESSION['cart'][$fn_p_id] = $k;
+				}
 				
 				$fn_process_cart = cartProcessAndCalc($_SESSION);
-				
 				
 				exit(json_encode(array(
 					'status' => 200,
 					'message' => "ok",
-					'data' => $fn_process_cart
+					'data' => $fn_process_cart,
+					'lang' => $cart_lang
 				)));
 			}catch(Exception $e)
 			{
 				exit(json_encode(array(
 					'status' => 400,
 					'message' => getLangItem('error_db'),
+					'lang' => $cart_lang
 				)));
 			}
 			
@@ -174,6 +194,7 @@ if($fn_ajax !== null)
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
+				'lang' => $cart_lang
 			)));
 			
 			if(!isset($_SESSION) || !isset($_SESSION['cart']) || count($_SESSION['cart']) == 0)
@@ -184,6 +205,7 @@ if($fn_ajax !== null)
 				exit(json_encode(array(
 					'status' => 400,
 					'message' => getLangItem('cart_empty'),
+					'lang' => $cart_lang
 				)));
 			}
 			
@@ -195,11 +217,13 @@ if($fn_ajax !== null)
 					'status' => 200,
 					'message' => getLangItem('cart_generado'),
 					'data' => $fn_process_cart,
+					'lang' => $cart_lang
 				);
 			}else{
 				$fn_result = array(
 					'status' => 400,
 					'message' => getLangItem('cart_error_generar'),
+					'lang' => $cart_lang
 				);
 			}
 			
@@ -210,11 +234,13 @@ if($fn_ajax !== null)
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
+				'lang' => $cart_lang
 			)));
 			
 			if(!isset($fn_p['data'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'lang' => $cart_lang
 			)));
 			
 			//'data' => string 'product_id=2&category_id=1' (length=26)
@@ -228,11 +254,14 @@ if($fn_ajax !== null)
 			{
 				unset($_SESSION['cart']);
 				unset($_SESSION['checkout']);
+				
+				$_SESSION['cart'] = array();
 			}
 			
 			if(!is_numeric($fn_inputs['p_id']) || !is_numeric($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
+				'lang' => $cart_lang
 			)));
 			
 			//añadimos al carrito
@@ -261,6 +290,44 @@ if($fn_ajax !== null)
 				);
 			}
 			
+			if($fn_q_check_stock == 4)
+			{
+				$fn_q_prod = $db->FetchValue("
+					SELECT `menu_title`
+					FROM `product`
+					WHERE `id`=:pid
+					LIMIT 1;
+				", array(
+					"pid" => $fn_inputs['p_id']
+				));
+				
+				//html y content del mail
+				$fn_mail_html = $CONFIG['site']['standartEmail'];
+				
+				//email de aviso al administrador
+				$fn_subject = "[Stock a punto de agotarse] - {$CONFIG['site']['sitetitlefull']}";
+				
+				$fn_mail_html = str_replace(array(
+					'%message%',
+					'%regards%', 
+					'%site_name%', 
+					'%copyz%',
+					'%site_dir%', 
+					'%site_logo%', 
+				), array(
+					"<p>Aviso: En breve se agotara STOCK del producto <a href=\"{$CONFIG['site']['base']}admin/producto/action=editProduct&id={$fn_inputs['p_id']}\">\"{$fn_q_prod}\"</a>.</p><p>Acceda al panel de administacion para añadir STOCK.</p>",
+					$lang_items[$st_lang]['regards'],
+					$CONFIG['site']['sitetitlefull'],
+					$CONFIG['site']['sitecopyz'],
+					'',
+					'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
+				), $fn_mail_html);
+				
+				$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
+				
+				@mail($CONFIG['site']['mailpedidos'], $fn_subject, $fn_content['multipart'], $fn_content['headers']);	
+			}
+			
 			$fn_process_cart = cartProcessAndCalc($_SESSION);
 			
 			if($fn_process_cart)
@@ -269,11 +336,13 @@ if($fn_ajax !== null)
 					'status' => 200,
 					'message' => getLangItem('add_item_cart'),
 					'data' => $fn_process_cart,
+					'lang' => $cart_lang
 				);
 			}else{
 				$fn_result = array(
 					'status' => 400,
 					'message' => getLangItem('add_item_cart_error'),
+					'lang' => $cart_lang
 				);
 			}
 			
@@ -285,6 +354,7 @@ if($fn_ajax !== null)
 			if(IsHotlink()) exit(json_encode(array(
 				'status' => 400,
 				'message' => 'Ajax Fraud cached!',
+				'lang' => $cart_lang
 			)));
 			
 			//parse_str($fn_p['data'], $fn_inputs);
@@ -293,11 +363,13 @@ if($fn_ajax !== null)
 			if(!isset($fn_inputs['p_id']) || !isset($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_no_data'),
+				'lang' => $cart_lang
 			)));
 			
 			if(!is_numeric($fn_inputs['p_id']) || !is_numeric($fn_inputs['cat_id'])) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('msg_error_param'),
+				'lang' => $cart_lang
 			)));
 			
 			if(!isset($_SESSION) || !isset($_SESSION['cart']))
@@ -305,6 +377,7 @@ if($fn_ajax !== null)
 				exit(json_encode(array(
 					'status' => 400,
 					'message' => getLangItem('cart_empty'),
+					'lang' => $cart_lang
 				)));
 			}
 			
@@ -316,6 +389,7 @@ if($fn_ajax !== null)
 				exit(json_encode(array(
 					'status' => 400,
 					'message' => getLangItem('cart_empty'),
+					'lang' => $cart_lang
 				)));
 			}
 			
@@ -329,10 +403,15 @@ if($fn_ajax !== null)
 				if(sizeof($_SESSION['cart']) == 0)
 				{
 					unset($_SESSION['cart']);
+					$_SESSION['cart'] = array();
+					
+					$fn_process_cart = cartProcessAndCalc($_SESSION);
 					
 					exit(json_encode(array(
 						'status' => 200,
 						'message' => getLangItem('cart_empty'),
+						'data' => $fn_process_cart,
+						'lang' => $cart_lang
 					)));
 				}
 			}
@@ -350,6 +429,7 @@ if($fn_ajax !== null)
 			if($fn_q_check_stock == 0 || !$fn_q_check_stock) exit(json_encode(array(
 				'status' => 400,
 				'message' => getLangItem('tienda_no_items'),
+				'lang' => $cart_lang
 			)));
 			
 			//add
@@ -369,6 +449,7 @@ if($fn_ajax !== null)
 				'status' => 200,
 				'message' => getLangItem('add_item_cart'),
 				'data' => $fn_process_cart,
+				'lang' => $cart_lang
 			)));
 		break;
 
@@ -490,7 +571,7 @@ if($fn_ajax !== null)
 			
 			$fn_message .= htmlspecialchars($fn_inputs['f_message'], ENT_COMPAT, 'UTF-8');
 			
-			$fn_to = $CONFIG['site']['mailinfo'];
+			$fn_to = $CONFIG['site']['mailpedidos'];
 			$fn_subject = "[".getLangItem('mail_subject_reclamacion')."] - {$fn_inputs['f_or_id']} - {$CONFIG['site']['sitetitlefull']}";
 			
 			//html y content del mail
@@ -509,10 +590,12 @@ if($fn_ajax !== null)
 				$CONFIG['site']['sitetitlefull'],
 				$CONFIG['site']['sitecopyz'],
 				'',
-				'<img src="'.$CONFIG['site']['base'].'m/logo-mail.png" alt="logotype" />',
+				'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 			), $fn_mail_html);
 			
 			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
+			
+			if(preg_match("/;/", $fn_to)) $fn_to = str_replace(";", ",", $fn_to);
 			
 			//envio del mail
 			if(mail($fn_to, $fn_subject, $fn_content['multipart'], $fn_content['headers']))
@@ -736,7 +819,6 @@ if($fn_ajax !== null)
 									if(isset($result['Ds_Merchant_Identifier']))
 									{
 										//ok
-										
 										//update response data
 										$fn_response_data = base64_encode(json_encode($result));
 										$fn_mid = (isset($result['Ds_Merchant_Identifier'])) ? $result['Ds_Merchant_Identifier'] : '';
@@ -761,7 +843,9 @@ if($fn_ajax !== null)
 											's' => $_SESSION['promote']['id'],
 										));
 										
-										sendInvioce($getUserData->user_email, $fn_checkout_id_loc, $fn_order_data);
+										$fn_order_html = createCartCheckoutHtml($_SESSION);
+										
+										sendInvioce($getUserData->user_email, $fn_checkout_id_loc, $fn_order_html);
 										sendAdminNotice($fn_checkout_id_loc);
 										
 										//todo correcto borramos el cart y detalles
@@ -785,12 +869,16 @@ if($fn_ajax !== null)
 									$redsys->setTransactiontype('0');
 									$redsys->setMethod('C'); //c solo tarjeta || t visa+yupay
 									
+									$fb_base_uri = $CONFIG['site']['base_prefix'].$CONFIG['site']['base_script'];
+									
+									$fb_base_uri = "https://agustitorellomata.com/";
+									
 									$fn_wsd_debug = ($CONFIG['status']['debug']) ? 'local' : '';
-									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? "{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}response/response.php" : "{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
+									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? $fb_base_uri."response/response.php" : $fb_base_uri."class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
 									
 									$redsys->setNotification($fn_not_path); //Url de notificacion
-									$redsys->setUrlOk("{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}{$st_lang}/pago-completado");
-									$redsys->setUrlKo("{$CONFIG['site']['base_prefix']}{$CONFIG['site']['base_script']}{$st_lang}/pago-error");
+									$redsys->setUrlOk($fb_base_uri."{$st_lang}/pago-completado");
+									$redsys->setUrlKo($fb_base_uri."{$st_lang}/pago-error");
 									
 									$result = $redsys->createForm($fn_redsys_mode, array(
 										'form_name' => "{$CONFIG['site']['dm_nws']}pay_redsys",
@@ -944,7 +1032,7 @@ if($fn_ajax !== null)
 				$CONFIG['site']['sitetitlefull'],
 				$CONFIG['site']['sitecopyz'],
 				'',
-				'<img src="'.$CONFIG['site']['base'].'m/logo.png?" alt="logotype" />',
+				'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png?" alt="logotype" />',
 			), $fn_mail_html);
 			
 			$fn_content = preparehtmlmailBase64($getUserData->user_email, $fn_mail_html);
@@ -1588,9 +1676,7 @@ if($fn_ajax !== null)
 				$fn_to = $fn_inputs['email'];
 				$fn_subject = getLangItem('mail_recpassword');
 				
-				$fn_def_lang = $CONFIG['site']['defaultLang'];
-				
-				$fn_html_p = $lang_items[$fn_def_lang]['mail_recpassword_html'];
+				$fn_html_p = getLangItem('mail_recpassword_html');
 				$fn_mail_html = $CONFIG['site']['standartEmail'];
 				
 				$fn_html_p = str_replace(array(
@@ -1617,7 +1703,7 @@ if($fn_ajax !== null)
 					$CONFIG['site']['sitetitlefull'],
 					"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 					'',
-					"",
+					'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 					"",
 				), $fn_mail_html);
 				
@@ -1711,7 +1797,7 @@ if($fn_ajax !== null)
 					", array(
 						"id" => $fn_q->ID,
 						"k" => $fn_rand_key,
-						"key" => md5("{$fn_q->user_email}~{$fn_inputs['pass']}"),
+						"key" => md5($fn_inputs['pass']),
 						"a" => $fn_inputs['activation_key']
 					));
 					
@@ -3268,7 +3354,7 @@ if($fn_ajax !== null)
 					{
 						$fn_pass = (class_exists("tooSCrypt")) ? tooSCrypt::en($fn_p['f_user_pass'], $CONFIG['site']['tooSHash']) : hash_hmac('sha512', "{$fn_p['f_user_name']}~{$fn_p['f_user_pass']}", $CONFIG['site']['tooSHash'], false);
 					}else{
-						$fn_pass = md5("{$fn_p['f_user_name']}~{$fn_p['f_user_pass']}");
+						$fn_pass = md5($fn_p['f_user_pass']);
 					}
 					
 					$fn_q = $db->ExecuteSQL("
@@ -3324,7 +3410,7 @@ if($fn_ajax !== null)
 						$fn_to = $fn_p['f_email'];
 						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_invitacion');
 						
-						$fn_html_p = $lang_items[$fn_def_lang]['mail_invitacion_html'];
+						$fn_html_p = getLangItem('mail_invitacion_html');
 						$fn_mail_html = $CONFIG['site']['standartEmail'];
 						
 						$link_admin_or_cliente = (preg_match("/upUsuarios/", $fn_ajax)) ? "admin" : "mi-cuenta";
@@ -3345,7 +3431,7 @@ if($fn_ajax !== null)
 							$CONFIG['site']['sitetitlefull'],
 							"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
 							'',
-							"",
+							'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 							"{$CONFIG['site']['base']}{$fn_def_lang}/{$link_admin_or_cliente}", //link
 							$fn_p['f_user_name'],
 							$fn_p['f_user_pass'],
@@ -3489,7 +3575,7 @@ if($fn_ajax !== null)
 							'id' => $fn_p['id'],
 						));
 						
-						$fn_pass = md5("{$fn_user_email}~{$fn_inputs['f_user_pass']}");
+						$fn_pass = md5($fn_inputs['f_user_pass']);
 					}
 					
 					$fn_q = $db->Fetch("
@@ -3514,7 +3600,7 @@ if($fn_ajax !== null)
 						$fn_to = $fn_inputs['f_email'];
 						$fn_subject = "[{$CONFIG['site']['sitetitlefull']}] ".getLangItem('mail_restablecerpass');
 						
-						$fn_html_p = $lang_items[$fn_def_lang]['mail_restablecerpass_html'];
+						$fn_html_p = getLangItem('mail_restablecerpass_html');
 						$fn_mail_html = $CONFIG['site']['standartEmail'];
 						
 						$fn_mail_html = str_replace(array(
@@ -4474,6 +4560,12 @@ if($fn_ajax !== null)
 				'dom' => array("n_email"),
 			)));
 			
+			if(!isset($fn_inputs['n_name']) || empty($fn_inputs['n_name'])) exit(json_encode(array(
+				'status' => 400,
+				'message' => getLangItem('msg_no_data'),
+				'dom' => array("n_name"),
+			)));
+			
 			$fn_f_check_email = $cl_m->parseSTMP($fn_inputs['n_email'], false);
 				
 			if(!$fn_f_check_email) exit(json_encode(array(
@@ -4501,7 +4593,6 @@ if($fn_ajax !== null)
 			}else{
 				$fn_new_act_key = md5(microtime());
 				$fn_set_new_password = substr(md5(rand()), 8);
-				$fn_set_new_name_user = substr(str_replace(array('.', ' '), '', microtime()), 8);
 				$fn_today_date = date('Y-m-d H:i:s');
 				
 				$fn_f_check_email = $cl_m->parseSTMP($fn_inputs['n_email']);
@@ -4510,9 +4601,9 @@ if($fn_ajax !== null)
 					INSERT INTO `users` (`user_name`, `user_email`, `user_pass`, `user_registred`, `user_status`, `user_activation_key`)
 					VALUES (:un, :en, :ps, :td, '0', :ac);
 				", array(
-					'un' => $fn_set_new_name_user,
+					'un' => $fn_inputs['n_name'],
 					'en' => $fn_f_check_email,
-					'ps' => md5("{$fn_f_check_email}~{$fn_set_new_password}"),
+					'ps' => md5($fn_set_new_password),
 					'td' => $fn_today_date,
 					'ac' => $fn_new_act_key,
 				));
@@ -4549,7 +4640,7 @@ if($fn_ajax !== null)
 						getLangItem('mail_regards'),
 						$CONFIG['site']['sitetitlefull'],
 						"&copy; ".date('Y')." {$CONFIG['site']['sitetitlefull']}. All rights reserved.",
-						"Client ID: <strong>{$fn_set_new_name_user}</strong>",
+						"Client ID: <strong>{$fn_q}</strong>",
 						"<img src=\"{$CONFIG['site']['base']}images/logo-mail.png\" width=\"472\" height=\"71\" />",
 						"{$CONFIG['site']['base']}{$st_lang}/login?activation_key={$fn_new_act_key}", //link
 						$fn_inputs['n_email'],
@@ -4626,7 +4717,7 @@ if($fn_ajax !== null)
 				WHERE `ID`=:id
 			", array(
 				"id" => $fn_login_user_data->ID,
-				"key" => md5("{$fn_login_user_data->user_email}~{$fn_inputs['pass']}"),
+				"key" => md5($fn_inputs['pass']),
 			));
 			
 			if($fn_up)
@@ -4679,8 +4770,6 @@ if($fn_ajax !== null)
 			)));
 			
 			$fn_inJson = $fn_inputs;
-			unset($fn_inJson['user_name']);
-			unset($fn_inJson['user_email']);
 			unset($fn_inJson['pass']);
 			unset($fn_inJson['pass_repeat']);
 			
@@ -4705,6 +4794,17 @@ if($fn_ajax !== null)
 			", array(
 				"id" => $fn_login_user_data->ID,
 				"u" => $fn_inputs['user_name']
+			));
+			
+			//update email
+			if(isset($fn_inputs['user_email'])) $db->Fetch("
+				UPDATE `users`
+				SET `user_email`=:e
+				WHERE `ID`=:id
+				LIMIT 1;
+			", array(
+				"id" => $fn_login_user_data->ID,
+				"e" => $fn_inputs['user_email']
 			));
 			
 			//save

@@ -43,6 +43,29 @@ if($db_q_opt) foreach($db_q_opt as $opk => $opv)
 	$CONFIG['site'][$opv->options_key] = $opv->options_value;
 }
 
+$CONFIG['site']['base'] = "https://{$CONFIG['site']['dm_nws']}";
+$CONFIG['site']['base_script'] = $CONFIG['site']['dm_nws'];
+
+//langs
+$lang_items = array(); //language array of all site
+$fn_q_lang = $db->FetchAll("
+	SELECT *
+	FROM `lang`
+	WHERE `lang_type`=:lang
+	", array(
+	'lang' => $CONFIG['site']['defaultLang'],
+));
+
+if($fn_q_lang)
+{
+	foreach($fn_q_lang as $flk => $flv)
+	{
+		$lang_items[$flv->lang_type][$flv->lang_key] = $flv->lang_value;
+	}
+}
+
+//-------
+
 $fn_redsys_mode = ($CONFIG['site']['redsys_mode']) ? 'live' : 'test';
 $fn_redsys_mode_prefix = ($fn_redsys_mode == 'live') ? '_real' : '';
 
@@ -70,9 +93,6 @@ try{
 
     if(!isset($result['Ds_ErrorCode']) && (isset($result['Ds_AuthorisationCode']) && !empty($result['Ds_AuthorisationCode']) && !preg_match('/(\+)/', $result['Ds_AuthorisationCode']) ))
     {
-		unset($_SESSION['checkout']);
-		unset($_SESSION['cart']);
-		
 		//pago ok
 	    $fn_response_data = base64_encode(json_encode($result));
 		
@@ -99,9 +119,14 @@ try{
 		$fn_order_data = (isJson($fn_order_data)) ? json_decode($fn_order_data, true) : false;
 		
 		//mails
-		$fn_order_html = sendInvioce($fn_order_data);
-		sendInvioce($fn_order_data['user']['user_email'], $result['Ds_Order'], $fn_order_data);
-		sendAdminNotice($result['Ds_Order']);
+		$fn_order_html = createCartCheckoutHtml($fn_order_data);
+		
+		$fn_client_email = (isset($fn_order_data['user_order'])) ? $fn_order_data['user_order']['u_email'] : $fn_order_data['user']['user_email'];
+		sendInvioce($fn_client_email, $result['Ds_Order'], $fn_order_html);
+		sendAdminNotice($result['Ds_Order'], $fn_order_html);
+		
+		unset($_SESSION['checkout']);
+		unset($_SESSION['cart']);
     }    
 	
 	exit;

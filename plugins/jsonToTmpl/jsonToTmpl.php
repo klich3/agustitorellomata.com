@@ -252,7 +252,7 @@ class WIDGET_jsonToTmpl {
 			{
 				if($gv['control'] > 0)
 				{
-					$fn_page_metas = self::getPageMetas($fn_args['hash']);
+					$fn_page_metas = self::getPageMetas($fn_args);
 					
 					//button como llegar
 					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
@@ -360,15 +360,17 @@ class WIDGET_jsonToTmpl {
 	 * @param string $fn_page_hash
 	 * @return void
 	 */
-	private function getPageMetas($fn_page_hash)
+	private function getPageMetas($fn_args)
 	{
 		$fn_q = $this->db->FetchAll("
 			SELECT m.*
 			FROM `pages_meta` m
 			LEFT JOIN `pages` p ON(m.`p_id`=p.`id`)
 			WHERE p.`obj_hash`=:h
+			AND p.`lang`=:l
 		", array(
-			"h" => $fn_page_hash
+			"h" => $fn_args['hash'],
+			"l" => $fn_args['st_lang']
 		));
 		
 		$fn_result = false;
@@ -404,13 +406,33 @@ class WIDGET_jsonToTmpl {
 		if($fn_get_normal)
 		{
 			//normal page with lang
-			$fn_q_metas = self::getPageMetas($fn_args['hash']);
+			$fn_q_metas = self::getPageMetas($fn_args);
 			
 			return $fn_q_metas['page_content'];
 		}else{
 			//no lang look for rel
 			//redirect to correct one
+			
 			if(preg_match('/(admin)/', $fn_args['url'])) return false;
+			
+			$fn_trans = $this->db->FetchValue("
+				SELECT ph.`obj_hash`
+				FROM `pages` p
+				LEFT JOIN `pages_lang_rel` r ON(r.`page_id`=p.`id`)
+				LEFT JOIN `pages` ph ON(ph.`id`=r.`page_translate_id`)
+				WHERE p.`obj_hash`=:h
+				AND r.`lang_type`=:l
+				LIMIT 1;
+			", array(
+				"h" => $fn_args['hash'],
+				"l" => $fn_args['st_lang'],
+			));
+			
+			$fn_args['hash'] = $fn_trans;
+			
+			$fn_q_metas = self::getPageMetas($fn_args);
+			
+			return ($fn_q_metas) ? $fn_q_metas['page_content'] : false;
 		}
 	}
 	
