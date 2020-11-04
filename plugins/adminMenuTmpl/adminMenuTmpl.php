@@ -54,12 +54,12 @@ class WIDGET_adminMenuTmpl {
 		//hacer un array con admin hashes
 		
 		//hash de paginas
-		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
+		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones|dades|comand|perso|devolu)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 		
 		//prevent exec on admin stage
 		if(preg_match('/admin/', $fn_arg_url)) return;
 		
-		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details|pedidos|devoluciones)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
+		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details|pedidos|devoluciones|dades|comand|perso|devolu)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
 				
 		$fn_q_menus = $this->db->FetchArray("
 			SELECT m.*
