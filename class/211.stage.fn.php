@@ -75,16 +75,16 @@ function get_header($fn_args)
 	));
 	
 	//custom settings
-	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.header_lang_list_mob");
-	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.header_lang_list");
+	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.not_home.header_lang_list_mob");
+	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.not_home.header_lang_list");
 	
 	//header logged / not
 	if(class_exists('tooLogin') && $too_login->isLogged() == 200)
 	{
-		$b->parse("{$tmpl_header}.header_logged");
+		$b->parse("{$tmpl_header}.not_home.header_logged");
 	}else{
-		$b->parse("{$tmpl_header}.login_but_not_logged");
-		$b->parse("{$tmpl_header}.only_not_logged"); //but header login
+		$b->parse("{$tmpl_header}.not_home.login_but_not_logged");
+		$b->parse("{$tmpl_header}.not_home.only_not_logged"); //but header login
 	}
 	
 	//widgets load template
@@ -141,7 +141,7 @@ function get_header($fn_args)
 		}
 	}
 	//end logged header
-		
+	if(!preg_match("/home/", $fn_args['url'])) $b->parse("{$tmpl_header}.not_home");
 	$b->parse($tmpl_header);
 	$b->out($tmpl_header);
 }
@@ -202,12 +202,13 @@ function get_footer($fn_args)
 		//normal "client" loggged
 		if(class_exists('tooLogin') && $too_login->isLogged() == 200)
 		{
-			$b->parse("{$tmpl_footer}.logged");
+			$b->parse("{$tmpl_footer}.not_home.logged");
 		}else{
-			$b->parse("{$tmpl_footer}.unlogged");
+			$b->parse("{$tmpl_footer}.not_home.unlogged");
 		}
 	}
 	
+	if(!preg_match("/home/", $fn_args['url'])) $b->parse("{$tmpl_footer}.not_home");
 	$b->parse($tmpl_footer);
 	$b->out($tmpl_footer);
 }
@@ -353,7 +354,8 @@ function pageBParser($b = null, $fn_xtemplate_parse)
 		}else if(sizeof($fn_xtemplate_parse['parse']) == 0)
 		{
 			$fn_objToArry = object_to_array($fn_xtemplate_parse['assign'][0]);
-			$b->assign($fn_objToArry);
+			
+			$b->assign($fn_objToArry); //not_home
 			if(!empty($fn_xtemplate_parse['parse'])) $b->parse($fn_xtemplate_parse['parse'][0]);
 		}
 	}

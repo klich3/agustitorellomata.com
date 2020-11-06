@@ -142,7 +142,7 @@ class WIDGET_footerMenuTermsTmpl {
 					$fn_count_w++;
 					
 					self::$fn_xtemplate_parse['assign'][] = $mv;
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.footerMenuTermsTmpl.row_item";
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.footerMenuTermsTmpl.row_item";
 					//anti loop
 					if($mk > ($fn_totla_mv-1) ) break;
 				}
@@ -152,7 +152,7 @@ class WIDGET_footerMenuTermsTmpl {
 		self::$fn_xtemplate_parse['assign'][] = array(
 			'count_g' => (!preg_match('/(0|8|9)/', $fn_count_w)) ? "g gw-1-{$fn_count_w}" : "mr-4",
 		);
-		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.footerMenuTermsTmpl";
+		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.footerMenuTermsTmpl";
 		
 		return self::$fn_xtemplate_parse;
 	}

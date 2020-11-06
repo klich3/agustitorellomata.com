@@ -91,11 +91,11 @@ class WIDGET_header_lang {
 					'plugin_hash' => $fn_hash,
 					'img' => ($fn_get_flag_image) ? '<img class="lang-flag" src="'.$fn_get_flag_image.'" />' : '',
 				);
-				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.header_lang.row_lang";
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.header_lang.row_lang";
 			}
 			
 			self::$fn_xtemplate_parse['assign'][] = array();
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.header_lang";
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.header_lang";
 		}
 		
 		return self::$fn_xtemplate_parse;

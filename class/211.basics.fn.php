@@ -598,6 +598,31 @@ function cartProcessAndCalc($fn_array)
 	return $fn_data_out;
 }
 
+/*
+	return names of fields
+*/
+function nameFormFields($fn_key)
+{
+	$fn_dir_fields = array(
+		"u_name" => "Nombre",
+		"user_name" => "Nombre",
+		"u_surname" => "Apellido",
+		"u_lastname" => "Apellido",
+		"u_idd" => "Id interna",
+		"u_tel" => "Telefono",
+		"u_cif" => "CIF/NIF",
+		"u_email" => "Email",
+		"user_email" => "Email",
+		"dir_country" => "País",
+		"dir_city" => "Ciudad",
+		"dir_primary" => "Dirección",
+		"dir_post" => "C.P.",
+		"dir_default" => "Dirección por defecto",
+	);
+	
+	return ($fn_key) ? $fn_dir_fields[$fn_key] : ""; 
+}
+
 /**
  * sendInvioceAndAdminMail function.
  * 
@@ -607,7 +632,7 @@ function cartProcessAndCalc($fn_array)
  * @param mixed $fn_order_html //html createCartCheckoutHtml()
  * @return void
  */
-function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
+function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html, $fn_cart_data = false)
 {
 	global $st_lang, $CONFIG, $lang_items;
 	
@@ -624,8 +649,29 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 	
 	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
 	$fn_message = str_replace('%order_details%', $fn_order_html, $fn_message);
-	//$fn_message = str_replace('%user_envio_data%', $fn_order_html, $fn_message);
-	//$fn_message = str_replace('%user_facturacion_data%', $fn_order_html, $fn_message);
+	
+	$fn_shipping_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_order']))
+	{
+		$fn_shipping_html = "";
+		foreach($fn_cart_data['user_order'] as $kf => $vf)
+		{
+			$fn_shipping_html .= "<strong>".nameFormFields($kf)."</strong> ".$vf."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_envio_data%', $fn_shipping_html, $fn_message);
+	
+	//facturacion
+	$fn_facturacion_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_facturacion']))
+	{
+		$fn_facturacion_html = "";
+		foreach($fn_cart_data['user_facturacion'] as $kff => $vff)
+		{
+			$fn_facturacion_html .= "<strong>".nameFormFields($kff)."</strong> ".$vff."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_facturacion_data%', $fn_facturacion_html, $fn_message);
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -640,10 +686,10 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 		$CONFIG['site']['sitetitlefull'],
 		$CONFIG['site']['sitecopyz'],
 		'',
-		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png?e='.urlencode($fn_user_mail).'" alt="logotype" />',
+		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 	), $fn_mail_html);
 	
-	$fn_content = preparehtmlmailBase64($CONFIG['site']['mailinfo'], $fn_mail_html);
+	$fn_content = preparehtmlmailBase64($CONFIG['site']['mailvisitas'], $fn_mail_html);
 	
 	//------ mail admin aviso de compra
 	
@@ -658,7 +704,7 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
  * @param mixed $fn_order_num
  * @return void
  */
-function sendAdminNotice($fn_order_num, $fn_cart_html = false)
+function sendAdminNotice($fn_order_num, $fn_cart_html = false, $fn_cart_data = false)
 {
 	global $st_lang, $CONFIG, $lang_items;
 	
@@ -670,17 +716,31 @@ function sendAdminNotice($fn_order_num, $fn_cart_html = false)
 	
 	$fn_message = '<p>Aviso de una nueva compra con siguiente referencia: <strong>%ref_number%</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p><br/><br/><br/><br/><br/><p><h2><strong style="color:#B99219">INFORMACIÓN DE COMPRA:</strong></h2></p>%order_details%<br/><br/><hr/><br/><br/><p><h2><strong style="color:#B99219">DATOS DEL CLIENTE:</strong></h2></p>%user_envio_data%<br/><br/><p><h2><strong style="color:#B99219">DATOS DE FACTURACIÓN:</strong></h2></p>%user_facturacion_data%<br/><br/>';
 	
-	//------->
-	//------->
-	//------->
 	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
-	$fn_message = str_replace('%order_details%', $fn_order_html, $fn_message);
-	//$fn_message = str_replace('%user_envio_data%', $fn_order_html, $fn_message);
-	//$fn_message = str_replace('%user_facturacion_data%', $fn_order_html, $fn_message);
-	//------->
-	//------->
-	//------->
-	//------->
+	$fn_message = str_replace('%order_details%', $fn_cart_html, $fn_message);
+	
+	$fn_shipping_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_order']))
+	{
+		$fn_shipping_html = "";
+		foreach($fn_cart_data['user_order'] as $kf => $vf)
+		{
+			$fn_shipping_html .= "<strong>".nameFormFields($kf)."</strong> ".$vf."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_envio_data%', $fn_shipping_html, $fn_message);
+	
+	//facturacion
+	$fn_facturacion_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_facturacion']))
+	{
+		$fn_facturacion_html = "";
+		foreach($fn_cart_data['user_facturacion'] as $kff => $vff)
+		{
+			$fn_facturacion_html .= "<strong>".nameFormFields($kff)."</strong> ".$vff."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_facturacion_data%', $fn_facturacion_html, $fn_message);
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -720,7 +780,7 @@ function createCartCheckoutHtml($fn_cart_array)
 		<thead>
 			<tr style="width: 50%">
 				<th style="text-align:left;">'.strtoupper(getLangItem('lang_cart_producto_title')).'</th>
-				<th style="width: 30%">'.strtoupper(getLangItem('lang_cart_cantidad_title')).'</th>
+				<th style="width: 30%">'.strtoupper(getLangItem('lang_cart_cantidad_unidades_title')).'</th>
 				<th style="width: 30%">'.strtoupper(getLangItem('cart_cant_cajas')).'</th>
 				<th style="width: 20%">TOTAL</th>
 			</tr>
@@ -732,7 +792,7 @@ function createCartCheckoutHtml($fn_cart_array)
 			<td style="text-transform: uppercase;width: 50%;text-align:left;">'.$cv['title'].' '.$cv['subtitle'].'</td>
 			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['pax'].'</td>
 			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['multimplier'].'</td>
-			<td style="text-transform: uppercase;width: 20%;text-align:right;">'.$cv['price_unit'].'</td>
+			<td style="text-transform: uppercase;width: 20%;text-align:right;">'.$cv['price_total'].'</td>
 		</tr>';
 	}
 	

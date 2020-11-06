@@ -141,75 +141,29 @@
                     <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10">
                       <div class="g">
                         <div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10">
-                          <!-- BEGIN: multiplier_selector -->
+                          <!-- BEGIN: by_box -->
                           <div class="g gc" data-group="control">
                             <div class="w-1-1 pb-2">
                               <strong>{cart_cant_cajas}</strong>
                             </div>
-                            <div class="w-8-10">
-                              <div class="w-1-1">
-                                <input
-                                  type="number"
-                                  name="multimplier"
-                                  min="1"
-                                  max="{stock_count}"
-                                  value="{multimplier}"
-                                  data-multimplier
-                                  class="w-1-1 txt@c"
-                                />
-                              </div>
+                            <div class="w-1-1">
+                              <input type="number" name="multimplier" min="1" max="{stock_count}" value="{multimplier}" data-multimplier class="w-1-1 txt@c" readonly="true" />
                             </div>
-                            <div class="w-2-10">
-                              <a
-                                href="javascript:void(0);"
-                                class="fr"
-                                data-action="cartDelItem"
-                              >
-                                <img
-                                  src="{base_script}images/icon-trash.svg"
-                                  width="22px"
-                                  height="27px"
-                                />
-                              </a>
-                            </div>
-                            <div class="w-1-1 pt-4"></div>
-                            <div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
-                              <a
-                                href="javascript:void(0);"
-                                data-action="cartDownItem"
-                              >
-                                <img
-                                  src="{base_script}images/icon-minus.svg"
-                                  width="25px"
-                                  height="25px"
-                                />
-                              </a>
-                              <a
-                                href="javascript:void(0);"
-                                data-action="cartUpItem"
-                              >
-                                <img
-                                  src="{base_script}images/icon-plus.svg"
-                                  width="25px"
-                                  height="25px"
-                                />
-                              </a>
-                            </div>
-                            <div class="w-2-10"></div>
 
                             <div class="w-1-1 txt-org txt@r pt-9">
                               <strong>{price_multimplier}&euro;</strong>
                             </div>
                           </div>
-
+                          <!-- END: by_box -->
+                          <!-- BEGIN: by_box_sep -->
                           <div class="w-1-1 sep pt-1 pb-1 mt-5@s pb-5@s"></div>
-                          <!-- END: multiplier_selector -->
+                          <!-- END: by_box_sep -->
+                          <!-- BEGIN: by_pax -->
                           <div class="g gc" data-group="control">
                             <div class="w-1-1 pb-2">
                               <strong>{cart_cant_bot}</strong>
                             </div>
-                            <div class="w-8-10">
-                              <div class="w-1-1">
+                            <div class="w-1-1">
                                 <input
                                   type="number"
                                   name="pax"
@@ -220,7 +174,6 @@
                                   class="w-1-1 txt@c"
                                   readonly="true"
                                 />
-                              </div>
                             </div>
                             <div class="w-1-1 pt-4"></div>
                             <div class="w-2-10"></div>
@@ -228,6 +181,7 @@
                               <strong>{price_unit_total}&euro;</strong>
                             </div>
                           </div>
+                          <!-- END: by_pax -->
                         </div>
                       </div>
                     </div>
