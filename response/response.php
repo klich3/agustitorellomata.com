@@ -122,8 +122,8 @@ try{
 		$fn_order_html = createCartCheckoutHtml($fn_order_data);
 		
 		$fn_client_email = (isset($fn_order_data['user_order'])) ? $fn_order_data['user_order']['u_email'] : $fn_order_data['user']['user_email'];
-		sendInvioce($fn_client_email, $result['Ds_Order'], $fn_order_html);
-		sendAdminNotice($result['Ds_Order'], $fn_order_html);
+		sendInvioce($fn_client_email, $result['Ds_Order'], $fn_order_html, $fn_order_data);
+		sendAdminNotice($result['Ds_Order'], $fn_order_html, $fn_order_data);
 		
 		unset($_SESSION['checkout']);
 		unset($_SESSION['cart']);

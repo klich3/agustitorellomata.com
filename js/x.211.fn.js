@@ -9,20 +9,7 @@ $(function()
 		   
 		   //slider action
 		   '{{if v.type=="action"}}<a href="${v.url}" class="item" data-bgfrom-img="${v.img}" data-id="${i}">&nbsp;</a>{{/if}}'+
-		   
-			//slider video
-			/*'{{if v.type=="video"}}<div class="item video" data-bgfrom-img="${v.file}" data-id="${i}">'+
-				'<a href="javascript:void(0);" data-slider-action="stopvideo" class="video-close h"><svg width="35" height="35" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-videoclose"></use></svg></a>'+
-				'<div class="iframe-conteiner h"></div>'+
-				'<a href="javascript:void(0);" data-slider-action="loadvideo" data-video-iframe="${v.url}" data-event="home/video/${v.id}">'+
-					'<div class="video-icon"><svg width="92" height="92" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-videoplay"></use></svg></div>'+
-				'</a>'+
-			'</div>{{/if}}'+
-			*/
-		   
-			//slider media
-			//'{{if v.type=="media"}}<div class="item" data-bgfrom-img><div class="media-conteiner hidden"></div><a href="javascript:void(0);" data-media-file="${v.file}" data-event="home/slider/${v.file}"><div class="video-icon"></div><img src="${v.image}" alt="${v.alt}"/></a></div></div></div>{{/if}}'+
-			
+		   			
 		'{{/each}}{{/if}}'+
 		
 		'</div>'+ //slider-content
@@ -204,6 +191,8 @@ $(function()
 		USERLANG: userLang,
 		REQ:false,
 		COOKIES:false,
+		EDAD:false,
+		EDAD_OPEN:false,
 		GMAP:false,
 		GMAPSTYLE:[{featureType:"all",stylers:[{saturation:-100},{gamma:0.50}]},{featureType:"water",elementType:"all",stylers:[{hue:"#d8d8d8"},{visibility: "simplified"}]},{featureType:"landscape",elementType:"all",stylers:[{hue:"#0077ff"},{visibility:"simplified"},{invert_lightness:"true"}]} ],
 		GMAP_JSON:{},
@@ -215,6 +204,9 @@ $(function()
 	var init = function()
 	{
 		trace('init running up jquery.ver['+$().jquery+']');			
+		
+		_G.COOKIES = readCookie('showPrivacy');
+		_G.EDAD = readCookie('showEdad');
 		
 		//miramos el hash y cargamos los scripts correspondientes
 		$('html[data-hash]').each(function(e)
@@ -237,6 +229,17 @@ $(function()
 			
 			switch(_G.TYPE)
 		    {
+				case "home":
+					if(!_G.EDAD) window.loadJS(
+						{
+							items:[
+								fn_base_script+'js/jquery.fancybox.min.js',
+								fn_base_script+'js/jquery.fancybox.min.js'
+							],
+							callback: fn_home_edad()		
+						});
+				break;
+				
 			    case "checkout":
 					$('html[data-hash="checkout"] :input').on("change", e_checkoutValidator_handler);
 			    break;
@@ -249,9 +252,8 @@ $(function()
 		
 		fn_init_fn();
 		
-		_G.COOKIES = readCookie('showPrivacy');
 		
-		if(_G.COOKIES !== 'false')
+		if(!_G.COOKIES)
 		{
 			if(debug) console.log("[>] COOKIES");
 			
@@ -275,17 +277,61 @@ $(function()
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
 		$(document).on('click', '.cart-close-outside', e_closeCartOutDom);
+		$(document).on('click', '[data-show-pass]', e_showPass);
+		$(document).on('click', '[data-edad]', fn_home_edad_buttons_handler);
 				
 		$(window).on('resize', e_resize).trigger('resize');
 		
-		if($('[data-fancybox]').length !== 0) //load script
-		window.loadJS(
+		//load script
+		if($('[data-fancybox]').length !== 0) window.loadJS(
 		{
 			items:[
 				fn_base_script+'js/jquery.fancybox.min.js'
 			],
 			callback: fn_init_fancybox()		
 		});
+	}
+	
+	fn_home_edad_buttons_handler = function()
+	{
+		var ele = $(this).attr('data-edad');
+		
+		if(ele == "si") createCookie('showEdad', 'true', 2);
+		$.fancybox.close(true);
+	}
+	
+	fn_home_edad = function()
+	{
+		if(_G.EDAD_OPEN) return;
+		
+		_G.EDAD_OPEN = true;
+		
+		clearTimeout($.data(this, 'timertoshowEdad'));
+		$.data(this, 'timertoshowEdad', setTimeout(function()
+		{
+			$.fancybox.open({
+				src  : '#modal_edad',
+				type : 'inline',
+				toolbar  : false,
+				smallBtn : true,
+				infobar : false,
+				arrows : false,
+				closeExisting : true,
+				buttons:[],
+			});
+		}, 5000));
+	}
+	
+	e_showPass = function(e)
+	{
+		var ele = $(e.currentTarget).parents('span').find(':input');
+		
+		if(ele.attr('type') == "password")
+		{
+			ele.attr('type', 'text');
+		}else{
+			ele.attr('type', 'password');
+		}
 	}
 	
 	e_closeCartOutDom = function(e){
@@ -577,7 +623,6 @@ $(function()
 		
 		if($('noscript[id*="slider"]').length !== 0) fn_initSlider_handler();
 		if($('noscript[id*="videofs"]').length !== 0) fn_videofs_handler();
-		if($('noscript[id*="gmap"]').length !== 0) fn_gmap_handler();
 		
 		if($('[data-some-h]').length !== 0) some_h();
 		if($('[data-source]').length !== 0) fn_content_from_source();
@@ -656,6 +701,8 @@ $(function()
 	{
 		if(typeof $.fancybox == 'function')
 		{
+			clearTimeout($.data(this, 'data-fancybox'));
+			
 			var dom_gid = $.parseJSON($('body[data-popup]').attr('data-popup'));
 		
 			if(dom_gid) fn_call_ajax('homeGalleryContent', dom_gid, null, function(d)
@@ -674,10 +721,6 @@ $(function()
 					}
 				});
 			});
-			
-			$('a[data-fancybox="iframe"]') 
-			
-   			clearTimeout($.data(this, 'data-fancybox'));
 		}else{
 			clearTimeout($.data(this, 'data-fancybox'));
 			$.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
@@ -687,7 +730,7 @@ $(function()
 	//cookies conditions
 	e_cond_accept = function()
 	{
-		createCookie('showPrivacy', 'false', 2);
+		createCookie('showPrivacy', 'true', 2);
 		
 		$('.cookies-policy', document).fadeOut(1200, function()
 		{
@@ -711,13 +754,28 @@ $(function()
 			var data = $.parseJSON(ele_c[0].data);
 			
 			var items = {};
+			var dom_v_sources = "";
 				
 			if(data && data.data.length !== 0) for(var i in data.data)
 			{
-				if(/mp4/gim.test(data.data[i].img)) items.mp4 = data.data[i].img;
+				if(/mp4/gim.test(data.data[i].img))
+				{
+					items.mp4 = data.data[i].img;
+					dom_v_sources += '<source src="'+items.mp4+'" type="video/mp4">';
+				}
+				
 				//if(/webmsd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
-				if(/webmhd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
-				if(/ogv|ogg/gim.test(data.data[i].img)) items.ogv = data.data[i].img;
+				if(/webmhd/gim.test(data.data[i].img))
+				{
+					items.webm = data.data[i].img;
+					dom_v_sources += '<source src="'+items.webm+'" type="video/webm">';
+				}
+				
+				if(/ogv|ogg/gim.test(data.data[i].img))
+				{
+					items.ogv = data.data[i].img;
+					dom_v_sources += '<source src="'+items.ogv+'" type="video/ogv">';
+				}
 			}
 			
 			data.data = items;
@@ -728,27 +786,38 @@ $(function()
 			};
 			
 			var dom_v = $('[data-slider-id="'+_G.VIDEOFS[i].id+'"] video');
-			var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
+			//var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
 			
-			dom_v.attr('src', fn_src);
 			
-			$(dom_v).on('loadedmetadata', function(e)
-			{
-				//f_resizeVideo(e.target);
-				
-				$(e.target).animate(
-				{
-					opacity:1
-				}, 2000, 'easeOutExpo');
-				
-				$(e.target)[0].play();
-			});
-			
-			$(dom_v).on('oncanplay, loadedmetadata', function(e)
-			{
-				$(e.target)[0].play();
-			});
+			dom_v.append(dom_v_sources);
+			dom_v.attr('muted', true);
+			dom_v.on('oncanplay, loadedmetadata', e_play_video);
 		});
+	}
+	
+	e_play_video = function(e)
+	{
+		var dom = $(e.currentTarget).get(0);
+		var status;
+		
+		try{
+			status = dom.play();
+			dom.attr('muted', false);
+		}catch(error)
+		{
+			status == undefined;
+		}
+		
+		if(status !== undefined)
+		{
+			clearTimeout($.data(this, 'data-playVideo'));
+			$.data(this, 'data-playVideo', setTimeout(function()
+			{
+				e_play_video(e);
+			}, 350));
+		}else{
+			clearTimeout($.data(this, 'data-playVideo'));
+		}
 	}
 	
 	//process slider
@@ -889,98 +958,6 @@ $(function()
 		ele.find('.dual-slider .iosSlider').iosSlider("goToSlide", c.currentSlideNumber);
 		ele.find('.dual-slider .iosSlider .thumb').removeClass("selected");
 		ele.find('.dual-slider .iosSlider .thumb:eq(' + (c.currentSlideNumber - 1) + ')').addClass("selected");
-	}
-	
-	//process gmap
-	fn_gmap_handler = function()
-	{
-		if(!fn_gmapkey) return;
-		
-		trace("[R:681]");
-		
-		$('noscript[id*="gmap"]').each(function()
-		{
-			var dom_j = $('noscript#gmap').contents();
-			
-			if(dom_j.length == 0 && dom_j[0].data == undefined) return;
-			
-			_G.GMAP_JSON = $.parseJSON(dom_j[0].data);
-			
-			//cargamos el api de google maps
-			window.loadJS(
-			{
-				items:[
-					'//maps.googleapis.com/maps/api/js?v=3&key='+fn_gmapkey+'&callback=fn_gmapInit'
-				],
-				callback:function()
-				{
-					_G.GMAP = true;
-				}
-			});
-		});
-	}
-	
-	//google maps
-	fn_gmapInit = function(fn_action)
-	{
-		var ele = $('#'+_G.GMAP_JSON.renderDomId);
-		
-		if(!_G.FIRSTRUN) return;
-		if(fn_action == 'resize') ele.empty();
-		
-		trace("[R:713]");
-		
-		var args = {
-			center: new google.maps.LatLng(41.385064, 2.173403), //barcelona
-			zoom: 16,
-			disableDefaultUI: false,
-			draggable: true,
-			scaleControl: false,
-			scrollwheel: true,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-		
-		if(_G.GMAPSTYLE !== undefined && _G.GMAPSTYLE.length !== 0) args.styles = _G.GMAPSTYLE;
-		
-		//gmap
-		var map = new google.maps.Map(document.getElementById(_G.GMAP_JSON.renderDomId), args);
-		
-		var infowindow = new google.maps.InfoWindow();
-		var bounds = new google.maps.LatLngBounds();
-		
-		/*
-			for (var k in j) {
-				var d = j[k][0].split(", ");
-				var f = new google.maps.LatLng(d[0], d[1]);
-				b.extend(f);
-				l = new google.maps.Marker({
-					position: f,
-					map: c,
-					animation: (g == "resize") ? google.maps.Animation.NONE : google.maps.Animation.DROP
-				});
-				google.maps.event.addListener(l, "click", (function(m, p) {
-					return function() {
-						h.setContent('<a href="' + j[p][2] + '" style="color:#000"><strong>' + j[p][1] + "</strong></a>");
-						h.open(c, m)
-					}
-				})(l, k))
-			}
-		*/
-		var p = (_G.GMAP_JSON.gps.indexOf(', ') !== -1) ? _G.GMAP_JSON.gps.split(", ") : _G.GMAP_JSON.gps.split(",");
-		var fn_point = new google.maps.LatLng(p[0], p[1]);
-		
-		bounds.extend(fn_point);
-		
-		var marker = new google.maps.Marker(
-		{
-			position: fn_point, 
-			map: map,
-			icon: fn_base_script+'images/map-pin.png',
-			animation: (fn_action == 'resize') ? google.maps.Animation.NONE : google.maps.Animation.DROP
-		});
-		
-		map.setCenter(bounds.getCenter());
-		//map.fitBounds(bounds);
 	}
 	
 	//preload images

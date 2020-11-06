@@ -92,8 +92,8 @@ if($fn_ajax !== null)
 				$fn_order_html = createCartCheckoutHtml($fn_order_data);
 				
 				//mails
-				sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_html);
-				sendAdminNotice($fn_g['o']);
+				sendInvioce($fn_g['i'], $fn_g['o'], $fn_order_html, $fn_order_data);
+				sendAdminNotice($fn_g['o'], $fn_order_html, $fn_order_data);
 			}
 			exit;
 		break;
@@ -749,7 +749,23 @@ if($fn_ajax !== null)
 				
 				$fn_order_data = cartProcessAndCalc($_SESSION);
 				$fn_order_data['checkout']['checkout_date'] = $fn_now_date;
+				//envio
 				$fn_order_data['user_order'] = $fn_user_dir;
+				
+				//facturacion
+				$fn_facturaicon = $db->FetchValue("
+					SELECT `meta_value`
+					FROM `users_meta`
+					WHERE `user_id`=:uid
+					AND `meta_key`='user_pers_data'
+					LIMIT 1;
+				", array(
+					"uid" => $getUserData->ID
+				));
+				
+				$fn_user_facturacion = (isJson($fn_facturaicon)) ? json_decode($fn_facturaicon, true) : false;
+				if($fn_user_facturacion) $fn_order_data['user_facturacion'] = $fn_user_facturacion;
+				//facturacion
 				
 				$fn_user_payment_method = ($fn_inputs['p_pay_type'] == 'rd') ? 'redsys' : 'paypal';
 				
@@ -862,8 +878,8 @@ if($fn_ajax !== null)
 										
 										$fn_order_html = createCartCheckoutHtml($_SESSION);
 										
-										sendInvioce($getUserData->user_email, $fn_checkout_id_loc, $fn_order_html);
-										sendAdminNotice($fn_checkout_id_loc);
+										sendInvioce($getUserData->user_email, $fn_checkout_id_loc, $fn_order_html, $_SESSION);
+										sendAdminNotice($fn_checkout_id_loc, $_SESSION);
 										
 										//todo correcto borramos el cart y detalles
 										//----------------> 
@@ -886,16 +902,14 @@ if($fn_ajax !== null)
 									$redsys->setTransactiontype('0');
 									$redsys->setMethod('C'); //c solo tarjeta || t visa+yupay
 									
-									$fb_base_uri = $CONFIG['site']['base_prefix'].$CONFIG['site']['base_script'];
-									
-									$fb_base_uri = "https://agustitorellomata.com/";
-									
 									$fn_wsd_debug = ($CONFIG['status']['debug']) ? 'local' : '';
-									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? $fb_base_uri."response/response.php" : $fb_base_uri."class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
+									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? "{$CONFIG['site']['base']}response/response.php" : $fb_base_uri."class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
+									
+									$fn_not_path = "https://agustitorellomata.com/";
 									
 									$redsys->setNotification($fn_not_path); //Url de notificacion
-									$redsys->setUrlOk($fb_base_uri."{$st_lang}/pago-completado");
-									$redsys->setUrlKo($fb_base_uri."{$st_lang}/pago-error");
+									$redsys->setUrlOk("{$CONFIG['site']['base']}{$st_lang}/pago-completado");
+									$redsys->setUrlKo("{$CONFIG['site']['base']}{$st_lang}/pago-error");
 									
 									$result = $redsys->createForm($fn_redsys_mode, array(
 										'form_name' => "{$CONFIG['site']['dm_nws']}pay_redsys",
@@ -5106,31 +5120,7 @@ if($fn_ajax !== null)
 			{
 				$fn_q = object_to_array(json_decode($fn_q));
 				
-				if(isset($fn_q['checkout']) && count($fn_q['checkout']))
-				{
-					//nombres de la persona
-					if($fn_user_id)
-					{
-						//facturacion
-						$fn_q_userFcturacion = $db->FetchValue("
-							SELECT `meta_value`
-							FROM `users_meta`
-							WHERE `user_id`=:uid
-							AND `meta_key`='user_pers_data'
-							LIMIT 1;
-						", array(
-							'uid' => $fn_user_id,
-						));
-						
-						if($fn_q_userFcturacion && isJson($fn_q_userFcturacion))
-						{
-							$fn_json_data_loc = json_decode($fn_q_userFcturacion, JSON_UNESCAPED_UNICODE);
-							$fn_q['user_facturacion_data'] = $fn_json_data_loc;
-						}
-					}
-					
-					if($fn_order_id) $fn_q['checkout']['checkout_id'] = $fn_order_id;
-				}
+				if($fn_order_id) $fn_q['checkout']['checkout_id'] = $fn_order_id;
 				
 				exit(json_encode(array(
 					'status' => 200,

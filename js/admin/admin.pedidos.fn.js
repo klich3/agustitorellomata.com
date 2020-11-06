@@ -35,34 +35,34 @@ $(function()
 		'</div></div></div>'+
 		
 		//-->
-		'{{if data.user_facturacion_data}}<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top uk-padding-remove"><div class="uk-panel-body"><div class="uk-grid uk-grid-small">'+
+		'{{if data.user_facturacion}}<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top uk-padding-remove"><div class="uk-panel-body"><div class="uk-grid uk-grid-small">'+
 		'<div class="uk-panel-badge uk-badge uk-badge-notification uk-text-small">Facturación</div>'+
 		
 		//datos del user
 		'<div class="uk-width-1-2">\
 			<strong>Datos de facturación:</strong><br/>\
-			{{if data.user_facturacion_data && data.user_facturacion_data.u_name}}<strong>Nombres:</strong> \
-				{{if data.user_facturacion_data && data.user_facturacion_data.u_name}} ${data.user_facturacion_data.u_name} {{/if}}\
+			{{if data.user_facturacion && data.user_facturacion.u_name}}<strong>Nombres:</strong> \
+				{{if data.user_facturacion && data.user_facturacion.u_name}} ${data.user_facturacion.u_name} {{/if}}\
 				{{if data.user_order && data.user_order.u_surname}} ${data.user_order.u_surname} {{/if}}<br/>\
 			{{/if}}\
-			{{if data.user_facturacion_data && data.user_facturacion_data.u_cif}}<strong>Nif / Cif:</strong> ${data.user_facturacion_data.u_cif} <br/>{{/if}}\
-			{{if data.user_facturacion_data && data.user_facturacion_data.u_tel}}<strong>Teléfono:</strong> ${data.user_facturacion_data.u_tel} <br/>{{/if}}\
-				<strong>Email:</strong> <a href="mailto:${data.user_facturacion_data.u_email}" target="_blank">${data.user_facturacion_data.u_email}</a><br/>\
+			{{if data.user_facturacion && data.user_facturacion.u_cif}}<strong>Nif / Cif:</strong> ${data.user_facturacion.u_cif} <br/>{{/if}}\
+			{{if data.user_facturacion && data.user_facturacion.u_tel}}<strong>Teléfono:</strong> ${data.user_facturacion.u_tel} <br/>{{/if}}\
+				<strong>Email:</strong> <a href="mailto:${data.user_facturacion.u_email}" target="_blank">${data.user_facturacion.u_email}</a><br/>\
 			</div>'+
 		//direccion
-		'<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_facturacion_data}}<strong>Dir. primaria:</strong> {{if data.user_facturacion_data.dir_primary}}${data.user_facturacion_data.dir_primary}{{/if}}<br/><strong>Ciudad:</strong> {{if data.user_facturacion_data.dir_city}}${data.user_facturacion_data.dir_city}{{/if}}<br/><strong>Region:</strong> {{if data.user_facturacion_data.dir_region}}${data.user_facturacion_data.dir_region}{{/if}}<br/><strong>Cod. Postal:</strong> {{if data.user_facturacion_data.dir_post}}${data.user_facturacion_data.dir_post}{{/if}}<br/><strong>País:</strong> {{if data.user_facturacion_data.dir_country}}${data.user_facturacion_data.dir_country}{{/if}} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
+		'<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_facturacion}}<strong>Dir. primaria:</strong> {{if data.user_facturacion.dir_primary}}${data.user_facturacion.dir_primary}{{/if}}<br/><strong>Ciudad:</strong> {{if data.user_facturacion.dir_city}}${data.user_facturacion.dir_city}{{/if}}<br/><strong>Region:</strong> {{if data.user_facturacion.dir_region}}${data.user_facturacion.dir_region}{{/if}}<br/><strong>Cod. Postal:</strong> {{if data.user_facturacion.dir_post}}${data.user_facturacion.dir_post}{{/if}}<br/><strong>País:</strong> {{if data.user_facturacion.dir_country}}${data.user_facturacion.dir_country}{{/if}} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
 			
 	'</div></div></div>{{/if}}'+
 		//-->
 	
 		//carrito
-		'<div class="uk-width-1-1 uk-margin-top uk-margin-bottom"><table class="uk-table uk-table-condensed uk-table-striped"><thead><tr><th class="uk-text-center">Articulo</th><th class="uk-text-center">Cajas</th><th class="uk-text-center">Cantidad</th><th class="uk-text-center">Precio</th></tr></thead><tbody>'+
+		'<div class="uk-width-1-1 uk-margin-top uk-margin-bottom"><table class="uk-table uk-table-condensed uk-table-striped"><thead><tr><th class="uk-text-center">Articulo</th><th class="uk-text-center">Cajas</th><th class="uk-text-center">Botellas</th><th class="uk-text-center">Precio</th></tr></thead><tbody>'+
 	        
 	    '{{each(i, v) data.cart}}<tr> \
 			<td class="uk-text-center">{{html v.title}} {{if v.subtitle}}{{html v.subtitle}}{{/if}}</td> \
 			<td class="uk-text-center">{{if v.multimplier}}${v.multimplier}{{else}}0{{/if}}</td> \
 			<td class="uk-text-center">${v.pax}</td> \
-			<td class="uk-text-center">${v.price_unit}</td> \
+			<td class="uk-text-center">${v.price_total}</td> \
 			</tr>{{/each}}'+
 	        
 	    '</tbody></table></div><div class="uk-grid uk-grid-small">'+
@@ -71,7 +71,7 @@ $(function()
 		'<div class="uk-width-1-1 uk-text-right">'+
 		'<strong>IVA (${data.checkout.cart_iva_percent}%):</strong> ${data.checkout.cart_iva}&euro;<br/>'+
 		'<strong>Subtotal:</strong> ${data.checkout.cart_subtotal}&euro;<br/>'+
-		'<strong>Total:</strong> ${data.checkout.cart_subtotal}&euro;<br/></div>'+
+		'<strong>Total:</strong> ${data.checkout.cart_total}&euro;<br/></div>'+
 		
 		'</div>{{/if}}');
 	
