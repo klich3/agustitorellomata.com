@@ -127,6 +127,7 @@ try{
 		
 		unset($_SESSION['checkout']);
 		unset($_SESSION['cart']);
+		unset($_SESSION['user_order']);
     }    
 	
 	exit;

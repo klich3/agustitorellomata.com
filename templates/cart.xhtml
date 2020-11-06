@@ -85,14 +85,12 @@
               <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
                 <div class="g">
                   <div class="w-1-1">
-                    <!-- BEGIN: multiplier -->
                     <div class="bot">
                       <strong>{lang_box} {pax_multimplier} {lang_bot}</strong>
                     </div>
                     <div class="bot-price txt-org">
                       <strong>{price_caja}&euro;</strong>
                     </div>
-                    <!-- END: multiplier -->
                     <div class="price">
                       <strong>{price_unit}&euro; {lang_ud}</strong>
                     </div>
@@ -107,7 +105,7 @@
               <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
                 <div class="g">
                   <div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
-                    <!-- BEGIN: multiplier_selector -->
+                    <!-- BEGIN: by_box -->
                     <div class="g gc" data-group="control">
                       <div class="w-1-1 pb-2">
                         <strong>{cart_cant_cajas}</strong>
@@ -164,9 +162,11 @@
                         <strong>{price_multimplier}&euro;</strong>
                       </div>
                     </div>
-
+                    <!-- END: by_box -->
+                    <!-- BEGIN: by_box_sep -->
                     <div class="w-1-1 sep pt-1 pb-1 mt-5@s pb-5@s"></div>
-                    <!-- END: multiplier_selector -->
+                    <!-- END: by_box_sep -->
+                    <!-- BEGIN: by_pax -->
                     <div class="g gc" data-group="control">
                       <div class="w-1-1 pb-2">
                         <strong>{cart_cant_bot}</strong>
@@ -222,6 +222,7 @@
                         <strong>{price_unit_total}&euro;</strong>
                       </div>
                     </div>
+                    <!-- END: by_pax -->
                   </div>
                 </div>
               </div>

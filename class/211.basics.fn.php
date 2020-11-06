@@ -525,11 +525,29 @@ function cartProcessAndCalc($fn_array)
 			'id' => $v['p_id']
 		));
 		
+		$fn_get_meta = $db->FetchAll("
+			SELECT * 
+			FROM `product_meta`
+			WHERE `p_id`=:pid
+		", array(
+			'pid' => $fn_q['id']
+		));
+		
+		$fn_metas = array();
+		
+		if($fn_get_meta) foreach($fn_get_meta as $kk => $vv)
+		{
+			$fn_metas[$vv->m_key] = $vv->m_value;
+		}
+		
 		$fn_prod_title = (isset($fn_q['lang_data']) && isJson($fn_q['lang_data'])) ? object_to_array(json_decode($fn_q['lang_data'])) : array();
 		$fn_prod_subtitle = (isset($fn_q['subtitle_lang_data']) && isJson($fn_q['subtitle_lang_data'])) ? object_to_array(json_decode($fn_q['subtitle_lang_data'])) : array();
 		
 		$fn_array['cart'][$k]['cat_id'] = $fn_q['cat_id'];
 		$fn_array['cart'][$k]['p_id'] = $fn_q['id'];
+		
+		$fn_array['cart'][$k]['by_box'] = (isset($fn_metas['by_box']) && $fn_metas['by_box'] == "1") ? 1 : 0;
+		$fn_array['cart'][$k]['by_pax'] = (isset($fn_metas['by_pax']) && $fn_metas['by_pax'] == "1") ? 1 : 0;
 		
 		$fn_array['cart'][$k]['hash'] = $fn_q['hash'];
 		$fn_array['cart'][$k]['title'] = html_entity_decode($fn_prod_title[$st_lang]);
@@ -603,9 +621,11 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 	$fn_subject = "{$fn_s} - {$CONFIG['site']['sitetitlefull']}";
 	
 	$fn_message = getLangItem('mail_order_confirm_text');
-	$fn_message .= $fn_order_html;
 	
 	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
+	$fn_message = str_replace('%order_details%', $fn_order_html, $fn_message);
+	//$fn_message = str_replace('%user_envio_data%', $fn_order_html, $fn_message);
+	//$fn_message = str_replace('%user_facturacion_data%', $fn_order_html, $fn_message);
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -648,8 +668,19 @@ function sendAdminNotice($fn_order_num, $fn_cart_html = false)
 	//email de aviso al administrador
 	$fn_subject = "[Nueva compra] - {$fn_order_num} - {$CONFIG['site']['sitetitlefull']}";
 	
-	$fn_message = '<p>Aviso de una nueva compra con siguiente referencia: <strong>'.$fn_order_num.'</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p><br/><br/><br/><br/><br/>';
-	if($fn_cart_html) $fn_message .= $fn_cart_html;
+	$fn_message = '<p>Aviso de una nueva compra con siguiente referencia: <strong>%ref_number%</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p><br/><br/><br/><br/><br/><p><h2><strong style="color:#B99219">INFORMACIÓN DE COMPRA:</strong></h2></p>%order_details%<br/><br/><hr/><br/><br/><p><h2><strong style="color:#B99219">DATOS DEL CLIENTE:</strong></h2></p>%user_envio_data%<br/><br/><p><h2><strong style="color:#B99219">DATOS DE FACTURACIÓN:</strong></h2></p>%user_facturacion_data%<br/><br/>';
+	
+	//------->
+	//------->
+	//------->
+	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
+	$fn_message = str_replace('%order_details%', $fn_order_html, $fn_message);
+	//$fn_message = str_replace('%user_envio_data%', $fn_order_html, $fn_message);
+	//$fn_message = str_replace('%user_facturacion_data%', $fn_order_html, $fn_message);
+	//------->
+	//------->
+	//------->
+	//------->
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -734,10 +765,7 @@ function getCartCount()
 			
 	if(isset($_SESSION) && isset($_SESSION['cart']) && sizeof($_SESSION['cart']) !== 0)
 	{
-		foreach($_SESSION['cart'] as $kk => $kv)
-		{
-			if(isset($kv['pax'])) $fn_size_of_cart += $kv['pax'];
-		}
+		$fn_size_of_cart = count($_SESSION['cart']);
 	}else{
 		unset($_SESSION['cart']);
 		unset($_SESSION['cart_checkout']);

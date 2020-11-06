@@ -35,13 +35,23 @@ if($too_login->isLogged() == 400)
 				if(!isset($cv['multimplier'])) $cv['multimplier'] = 0;
 				
 				
-				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1)
+				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1 && isset($cv['by_box']) && $cv['by_box'] == "1")
 				{
 					$fn_xtemplate_parse['assign'][] = $cv;
-					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.multiplier';
-					
+					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.by_box';
+				}
+				
+				if(isset($cv['by_pax']) && $cv['by_pax'] == "1")
+				{
 					$fn_xtemplate_parse['assign'][] = $cv;
-					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.multiplier_selector';
+					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.by_pax';
+				}
+				
+				if(isset($cv['by_box']) && $cv['by_box'] == "1" && isset($cv['by_pax']) && $cv['by_pax'] == "1")
+				{
+					$fn_xtemplate_parse['assign'][] = "";
+					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.by_box_sep';
+					
 				}
 				
 				$fn_xtemplate_parse['assign'][] = $cv;

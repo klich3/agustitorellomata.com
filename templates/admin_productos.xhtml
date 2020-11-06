@@ -340,6 +340,22 @@
 							<hr/>
 							
 							<div class="uk-form-row">
+								<label for="metas[by_box]">Activar venta por cajas</label><br/>
+								<select name="metas[by_box]" class="uk-width-1-1">
+									<option value="0">Ocultar</option>
+									<option value="1" {by_box}>Mostrar</option>
+								</select>
+							</div>
+							
+							<div class="uk-form-row">
+								<label for="metas[by_pax]">Activar venta por unidad</label><br/>
+								<select name="metas[by_pax]" class="uk-width-1-1">
+									<option value="0">Ocultar</option>
+									<option value="1" {by_pax}>Mostrar</option>
+								</select>
+							</div>
+							
+							<div class="uk-form-row">
 								<label for="stock[pax_multimplier]">Producto en caja</label><br/>
 								<span class="uk-text-small"><span class="uk-badge uk-badge-notification uk-margin-small-bottom uk-text-small">Nota:</span> Si se trata de botellas, cantidad de botellas en una caja.</span>
 								<input type="number" name="stock[pax_multimplier]" value="{pax_multimplier}" class="uk-width-1-1" />

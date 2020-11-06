@@ -13,16 +13,19 @@ $g_action = (isset($fn_g['action'])) ? $fn_g['action'] : null;
 
 $fn_dir_fields = array(
 	"u_name" => "Nombre",
+	"user_name" => "Nombre",
 	"u_surname" => "Apellido",
 	"u_lastname" => "Apellido",
 	"u_idd" => "Id interna",
 	"u_tel" => "Telefono",
 	"u_cif" => "CIF/NIF",
 	"u_email" => "Email",
+	"user_email" => "Email",
 	"dir_country" => "País",
 	"dir_city" => "Ciudad",
 	"dir_primary" => "Dirección",
 	"dir_post" => "C.P.",
+	"dir_default" => "Dirección por defecto",
 );
 
 //defaults
@@ -134,11 +137,11 @@ switch($g_action)
 				
 				if($fn_for_data) foreach($fn_for_data as $k => $v)
 				{
-					if(preg_match("/dir_name|dir_id/", $k)) continue;
+					if(preg_match("/dir_name|dir_id|dir_default|u_id/", $k)) continue;
 					
 					$fn_xtemplate_parse['assign'][] = array(
-						"title" => $fn_dir_fields[$k],
-						"value" => $v,
+						"title" => (isset($fn_dir_fields[$k])) ? $fn_dir_fields[$k] : "",
+						"value" => (!empty($v)) ? $v : "",
 					);
 					$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_dirs.row';
 				}
@@ -153,11 +156,11 @@ switch($g_action)
 				
 				if($fn_for_data) foreach($fn_for_data as $k => $v)
 				{
-					if(preg_match("/dir_name|dir_id/", $k)) continue;
+					if(preg_match("/dir_name|dir_id|dir_default|u_id/", $k)) continue;
 					
 					$fn_xtemplate_parse['assign'][] = array(
-						"title" => $fn_dir_fields[$k],
-						"value" => $v,
+						"title" => (isset($fn_dir_fields[$k])) ? $fn_dir_fields[$k] : "",
+						"value" => (!empty($v)) ? $v : "",
 					);
 					$fn_xtemplate_parse['parse'][] = 'admin_clientes.details.user_pers_data.row';
 				}
@@ -173,7 +176,7 @@ switch($g_action)
 			FROM `users_status`;
 		");
 		
-		if($fn_q_statuts) foreach($fn_q_statuts as $sk => $sv)
+		foreach($fn_q_statuts as $sk => $sv)
 		{
 			$fn_for_data = object_to_array($sv);
 			

@@ -54,12 +54,12 @@ class WIDGET_adminMenuTmpl {
 		//hacer un array con admin hashes
 		
 		//hash de paginas
-		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones|dades|comand|perso|devolu)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
+		$fn_arg_url = (preg_match('/(pages_details|pedidos|devoluciones|datos|dire|dades|comand|perso|devolu|cuenta)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 		
 		//prevent exec on admin stage
 		if(preg_match('/admin/', $fn_arg_url)) return;
 		
-		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details|pedidos|devoluciones|dades|comand|perso|devolu)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
+		$fn_hash = (isset($fn_args['url']) && !preg_match('/(pages_details|pedidos|dire|datos|devoluciones|dades|comand|perso|devolu|cuenta)/', $fn_args['url'])) ? $fn_args['url'] : $fn_args['hash'];
 				
 		$fn_q_menus = $this->db->FetchArray("
 			SELECT m.*
@@ -123,9 +123,25 @@ class WIDGET_adminMenuTmpl {
 							'i' => $fn_mv_page_id,
 						));
 						
-						$fn_hash_correction = preg_replace("/\_/", "-", $fn_hash);
-						if($fn_p_data['obj_hash'] == $fn_hash) $mv['class_active'] = "active";
-						if($fn_p_data['obj_hash'] == $fn_hash_correction) $mv['class_active'] = "active";
+						$fn_url_correction = preg_replace("/\_/", "-", $fn_args['url']);
+						$fn_hash_correction = (isset($fn_args['hash'])) ? preg_replace("/\_/", "-", $fn_args['hash']) : null;
+						
+						$fn_trans = $this->db->FetchValue("
+							SELECT ph.`obj_hash`
+							FROM `pages` p
+							LEFT JOIN `pages_lang_rel` r ON(r.`page_id`=p.`id`)
+							LEFT JOIN `pages` ph ON(ph.`id`=r.`page_translate_id`)
+							WHERE p.`obj_hash`=:h
+							AND r.`lang_type`=:l
+							LIMIT 1;
+						", array(
+							"h" => $fn_url_correction,
+							"l" => $fn_args['st_lang'],
+						));
+						
+						$mv['class_active'] = ($fn_hash_correction == $fn_trans || $fn_url_correction == $fn_trans) ? "active" : "";
+						$mv['class_active'] = ($fn_p_data['obj_hash'] == $fn_trans || 
+						$fn_p_data['obj_hash'] == $fn_hash || $fn_p_data['obj_hash'] == $fn_url_correction) ? "active" : "";
 						
 						if(isset($mv['title']) && empty($mv['title'])) $mv['title'] = $fn_p_data['obj_title'];
 						if(isset($mv['url']) && empty($mv['url'])) $mv['url'] = "{$this->CONFIG['site']['base_script']}{$fn_args['st_lang']}/{$fn_p_data['obj_hash']}";

@@ -117,10 +117,10 @@ $(function()
 			{{if data.pax_multimplier > "1"}}\
 			<div class="w-1-1"><strong>${lang.lang_box} ${data.pax_multimplier} ${lang.lang_bot}</strong></div>\
 			<div class="w-1-1 txt-org"><strong>${data.price_caja}&euro;</strong></div>\
-			<div class="w-1-1"><strong>${data.price_unit_total}&euro; ${lang.lang_ud}</strong></div>\
+			{{if data.price_unit != "0"}}<div class="w-1-1"><strong>${data.price_unit}&euro; ${lang.lang_ud}</strong></div>{{/if}}\
 			<div class="w-1-1 sep"></div>'+
 //cajas			
-'<div class="w-1-1">\
+'{{if data.by_box && data.by_box == "1"}}<div class="w-1-1">\
 	<div class="g gc" data-group="control">\
 	  <div class="w-1-1 pb-2">\
 		<strong>${lang.cart_cant_cajas}</strong>\
@@ -149,13 +149,13 @@ $(function()
 		<strong>${data.price_multimplier}&euro;</strong>\
 	  </div>\
   </div>\
-</div>'+			
+</div>{{/if}}'+			
 			
-			'<div class="w-1-1 sep"></div>\
+			'{{if data.by_box && data.by_box == "1" && data.by_pax && data.by_pax == "1"}}<div class="w-1-1 sep"></div>{{/if}}\
 			{{/if}}'+
 		
 //botones botellas
-'<div class="w-1-1">\
+'{{if data.by_pax && data.by_pax == "1"}}<div class="w-1-1">\
 	<div class="g gc" data-group="control">\
 	  <div class="w-1-1 pb-2">\
 		<strong>${lang.cart_cant_bot}</strong>\
@@ -184,7 +184,7 @@ $(function()
 		<strong>${data.price_unit_total}&euro;</strong>\
 	  </div>\
   </div>\
-</div>'+	
+</div>{{/if}}'+	
 		
 		'</div> \
 		<div class="w-1-1 pt-1"></div><div class="w-1-1 sep"></div><div class="w-1-1 pt-1"></div> \

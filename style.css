@@ -3869,8 +3869,22 @@ html.openCart [data-cart-container] {
 
 .header-logged {
   background-color: #b99219;
-  padding: 10px 28px;
+  padding: 10px 4%;
   font-weight: bold;
+}
+
+.header-logged .myaccount {
+  max-width: 40px;
+  word-wrap: normal;
+  white-space: nowrap;
+}
+
+.header-logged .myaccount span {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
 
 .header-logged [data-action="openCart"] {
@@ -4491,6 +4505,12 @@ html.openCart [data-cart-container] .sep:after,
 
 .button.small {
   font-size: 0.92rem;
+}
+
+@media (max-width: 414px) {
+  .header-logged .myaccount span {
+    max-width: 80px;
+  }
 }
 
 @media (max-width: 768px) {

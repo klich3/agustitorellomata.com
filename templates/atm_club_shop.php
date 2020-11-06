@@ -87,7 +87,7 @@ if($fn_q_cat_list)
 					$fn_xtemplate_parse['assign'][] = array();
 					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.login_but";
 				}else{
-					if($fn_stock && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+					if($fn_stock && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0 && isset($fn_meta_array['show_button_addcart']) && $fn_meta_array['show_button_addcart'] == 1)
 					{
 						$fn_xtemplate_parse['assign'][] = $fn_stock;
 						$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_price";
