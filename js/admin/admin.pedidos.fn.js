@@ -6,10 +6,8 @@ $(function()
 	
 	$.template('modalCartContent', '<div class="uk-width-1-1">&nbsp;</div>{{if status == 200}}<div class="uk-text-small">'+
 	
-		'{{if data.checkout && data.checkout.checkout_id}}<div class="uk-width-1-1"><strong>Numero del pedido:</strong>{{if data.checkout.checkout_id}} ${data.checkout.checkout_id} {{/if}}</div>{{/if}}'+
-		'<div class="uk-width-1-1"><strong>Fecha del pago:</strong>{{if data.checkout.cart_checkout_date}} ${data.checkout.cart_checkout_date} {{/if}}</div>'+
-		//envio
-		'{{if data.checkout && data.checkout.cart_shipping_name}}<div class="uk-width-1-1"><strong>Compañía de envío:</strong> ${data.checkout.cart_shipping_name} (id: ${data.checkout.cart_shipping_type})</div>{{/if}}'+
+		'{{if data.checkout && data.checkout.checkout_id}}<div class="uk-width-1-1"><strong>Numero pedido:</strong>{{if data.checkout.checkout_id}} ${data.checkout.checkout_id} {{/if}}</div>{{/if}}'+
+		'<div class="uk-width-1-2"><strong>Fecha del pago:</strong>{{if data.checkout.checkout_date}} ${data.checkout.checkout_date} {{/if}}</div>'+
 		
 		//user register data
 		'<div class="uk-panel uk-panel-box uk-panel-box-secundary uk-margin-top uk-padding-remove"><div class="uk-panel-body"><div class="uk-grid uk-grid-small"><div class="uk-width-1-1">'+
@@ -32,15 +30,36 @@ $(function()
 				'<strong>Email:</strong> <a href="mailto:${data.user_order.u_email}" target="_blank">${data.user_order.u_email}</a><br/>'+
 				'{{else}}No te puedo mostrar estos datos ya que hubo problema en el proceso de guardada.{{/if}}</div>'+
 			//direccion
-		    '<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_order}}<strong>Nombre de la entrada:</strong> {{if data.user_order.dir_name}}${data.user_order.dir_name}{{/if}}<br/><strong>Dir. primaria:</strong> {{if data.user_order.dir_primary}}${data.user_order.dir_primary}{{/if}}<br/><strong>Ciudad:</strong> {{if data.user_order.dir_city}}${data.user_order.dir_city}{{/if}}<br/><strong>Region:</strong> {{if data.user_order.dir_region}}${data.user_order.dir_region}{{/if}}<br/><strong>Cod. Postal:</strong> {{if data.user_order.dir_post}}${data.user_order.dir_post}{{/if}}<br/><strong>País:</strong> {{if data.user_order.dir_country}}${data.user_order.dir_country}{{/if}} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
+		    '<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_order}}<strong>Dir. primaria:</strong> {{if data.user_order.dir_primary}}${data.user_order.dir_primary}{{/if}}<br/><strong>Ciudad:</strong> {{if data.user_order.dir_city}}${data.user_order.dir_city}{{/if}}<br/><strong>Region:</strong> {{if data.user_order.dir_region}}${data.user_order.dir_region}{{/if}}<br/><strong>Cod. Postal:</strong> {{if data.user_order.dir_post}}${data.user_order.dir_post}{{/if}}<br/><strong>País:</strong> {{if data.user_order.dir_country}}${data.user_order.dir_country}{{/if}} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
 			    
 		'</div></div></div>'+
+		
+		//-->
+		'{{if data.user_facturacion_data}}<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin-top uk-padding-remove"><div class="uk-panel-body"><div class="uk-grid uk-grid-small">'+
+		'<div class="uk-panel-badge uk-badge uk-badge-notification uk-text-small">Facturación</div>'+
+		
+		//datos del user
+		'<div class="uk-width-1-2">\
+			<strong>Datos de facturación:</strong><br/>\
+			{{if data.user_facturacion_data && data.user_facturacion_data.u_name}}<strong>Nombres:</strong> \
+				{{if data.user_facturacion_data && data.user_facturacion_data.u_name}} ${data.user_facturacion_data.u_name} {{/if}}\
+				{{if data.user_order && data.user_order.u_surname}} ${data.user_order.u_surname} {{/if}}<br/>\
+			{{/if}}\
+			{{if data.user_facturacion_data && data.user_facturacion_data.u_cif}}<strong>Nif / Cif:</strong> ${data.user_facturacion_data.u_cif} <br/>{{/if}}\
+			{{if data.user_facturacion_data && data.user_facturacion_data.u_tel}}<strong>Teléfono:</strong> ${data.user_facturacion_data.u_tel} <br/>{{/if}}\
+				<strong>Email:</strong> <a href="mailto:${data.user_facturacion_data.u_email}" target="_blank">${data.user_facturacion_data.u_email}</a><br/>\
+			</div>'+
+		//direccion
+		'<div class="uk-width-1-2"><strong>Dirección:</strong><br/>{{if data.user_facturacion_data}}<strong>Dir. primaria:</strong> {{if data.user_facturacion_data.dir_primary}}${data.user_facturacion_data.dir_primary}{{/if}}<br/><strong>Ciudad:</strong> {{if data.user_facturacion_data.dir_city}}${data.user_facturacion_data.dir_city}{{/if}}<br/><strong>Region:</strong> {{if data.user_facturacion_data.dir_region}}${data.user_facturacion_data.dir_region}{{/if}}<br/><strong>Cod. Postal:</strong> {{if data.user_facturacion_data.dir_post}}${data.user_facturacion_data.dir_post}{{/if}}<br/><strong>País:</strong> {{if data.user_facturacion_data.dir_country}}${data.user_facturacion_data.dir_country}{{/if}} {{else}}La dirección no esta asignada porfavor contacte con el usuario.{{/if}}</div>'+	
+			
+	'</div></div></div>{{/if}}'+
+		//-->
 	
 		//carrito
 		'<div class="uk-width-1-1 uk-margin-top uk-margin-bottom"><table class="uk-table uk-table-condensed uk-table-striped"><thead><tr><th class="uk-text-center">Articulo</th><th class="uk-text-center">Cajas</th><th class="uk-text-center">Cantidad</th><th class="uk-text-center">Precio</th></tr></thead><tbody>'+
 	        
 	    '{{each(i, v) data.cart}}<tr> \
-			<td class="uk-text-center">${v.title} {{if v.subtitle}}${v.subtitle}{{/if}}</td> \
+			<td class="uk-text-center">{{html v.title}} {{if v.subtitle}}{{html v.subtitle}}{{/if}}</td> \
 			<td class="uk-text-center">{{if v.multimplier}}${v.multimplier}{{else}}0{{/if}}</td> \
 			<td class="uk-text-center">${v.pax}</td> \
 			<td class="uk-text-center">${v.price_unit}</td> \
@@ -56,7 +75,7 @@ $(function()
 		
 		'</div>{{/if}}');
 	
-	$.template('modalSegContent', '{{if data && data.id}}<div class="uk-width-1-1">&nbsp;</div><form data-segform class="uk-form"><div class="uk-form-row"><label for="f_num">Numero de seguimiento</label><input type="text" name="f_num" id="f_num" value="{{if data.num_seg}} ${data.num_seg} {{/if}}" class="uk-width-1-1"/></div><div class="uk-form-row"><select name="f_sel_shipping" class="uk-width-1-1"><option value="0" {{if data.entrega_status == 0}}selected{{/if}}>En proceso de envío</option><option value="1" {{if data.entrega_status == 1}}selected{{/if}}>Enviado</option><option value="2" {{if data.entrega_status == 2}}selected{{/if}}>Entregado</option></select></div><div class="uk-form-row"><select name="f_sel_payment" class="uk-width-1-1"><option value="0" {{if data.payment_status == 0}}selected{{/if}}>Sin pagar</option><option value="1" {{if data.payment_status == 1}}selected{{/if}}>Pagado</option><option value="2" {{if data.payment_status == 2}}selected{{/if}}>Devuelto</option></select></div><div class="uk-form-row"><input type="hidden" name="id" value="${data.id}" /><a href="javascript:void(0);" data-action="adminStPedidoStatus" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar</a></div></form>{{else}}<div class="uk-width-1-1">&nbsp;</div>No te puedo mostrar estos datos hay algo que esta mal. Intenta refrescar la página y vuelve a intentarlo. Disculpa las molestias.{{/if}}');
+	$.template('modalSegContent', '{{if data && data.id}}<div class="uk-width-1-1">&nbsp;</div><form data-segform class="uk-form"><div class="uk-form-row"><select name="f_sel_shipping" class="uk-width-1-1"><option value="0" {{if data.entrega_status == 0}}selected{{/if}}>En proceso de envío</option><option value="1" {{if data.entrega_status == 1}}selected{{/if}}>Enviado</option><option value="2" {{if data.entrega_status == 2}}selected{{/if}}>Entregado</option></select></div><div class="uk-form-row"><select name="f_sel_payment" class="uk-width-1-1"><option value="0" {{if data.payment_status == 0}}selected{{/if}}>Sin pagar</option><option value="1" {{if data.payment_status == 1}}selected{{/if}}>Pagado</option><option value="2" {{if data.payment_status == 2}}selected{{/if}}>Devuelto</option></select></div><div class="uk-form-row"><input type="hidden" name="id" value="${data.id}" /><a href="javascript:void(0);" data-action="adminStPedidoStatus" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar</a></div></form>{{else}}<div class="uk-width-1-1">&nbsp;</div>No te puedo mostrar estos datos hay algo que esta mal. Intenta refrescar la página y vuelve a intentarlo. Disculpa las molestias.{{/if}}');
 	
 	var admin_pedidos = function() 
 	{

@@ -2,21 +2,11 @@
 
 date_default_timezone_set('Europe/Madrid');
 ini_set("always_populate_raw_post_data" , "-1");
-
 header("X-Author: Anthony Sychev https://dm211.com | https://twooneone.xyz ");
+
 
 //cookies & session security config
 ini_set("session.cookie_lifetime", "3600");
-//ini_set("session.cookie_httponly", 1); // Prevents javascript XSS attacks aimed to steal the session ID
-//ini_set("session.cookie_secure", 1); // Uses a secure connection (HTTPS) if possible
-//ini_set("session.use_only_cookies", 1); // Session ID cannot be passed through URLs
-
-//x-xss config
-header("X-Content-Type-Options: nosniff");
-//header("X-Frame-Options: SAMEORIGIN");
-//header("X-XSS-Protection: 1;mode=block");
-//header("X-Content-Security-Policy: allow 'self'; frame-ancestors 'none'");
-//header("Strict-Transport-Security: max-age=31536000; preload"); //HSTS Header
 
 global $CONFIG, $db, $fn_url, $fn_hash, $st_lang, $lang_items, $too_login, $cl_m;
 

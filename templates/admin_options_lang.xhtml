@@ -12,33 +12,36 @@
 					<div class="uk-panel uk-panel-box uk-panel-box-secondary uk-margin">
 						<div class="uk-panel-header"><strong>Opciones en la web</strong></div>
 						<div class="uk-panel-body uk-padding-remove">
-							
-							<div class="uk-form-row">
-								<label for="defaultLang">Idioma por defecto</label>
-								<select name="defaultLang" class="uk-width-1-1">
-									<!-- BEGIN: sel_def_lang -->
-									<option value="{lang}" {selected}>{lang}</option>
-									<!-- END: sel_def_lang -->
-								</select>
-							</div>
-							
-							<div class="uk-form-row">
-								<label for="analytics">Mostrar barra de idiomas en el header</label>
-								<select name="showHeaderLangs" class="uk-width-1-1">
-									<option value="0" {showHeaderLangs_0}>No mostrar</option>
-									<option value="1" {showHeaderLangs_1}>Mostrar</option>
-								</select>
-							</div>
-							
-							<div class="uk-form-row">
-								<label for="analytics">Mostrar barra de idiomas en el header (Mobil)</label>
-								<select name="showHeaderLangsMob" class="uk-width-1-1">
-									<option value="0" {showHeaderLangsMob_0}>No mostrar</option>
-									<option value="1" {showHeaderLangsMob_1}>Mostrar</option>
-								</select>
-							</div>
-							
-							
+							<form>
+								<div class="uk-form-row">
+									<label for="defaultLang">Idioma por defecto</label>
+									<select name="defaultLang" class="uk-width-1-1">
+										<!-- BEGIN: sel_def_lang -->
+										<option value="{lang}" {selected}>{lang}</option>
+										<!-- END: sel_def_lang -->
+									</select>
+								</div>
+								
+								<div class="uk-form-row">
+									<label for="analytics">Mostrar barra de idiomas en el header</label>
+									<select name="showHeaderLangs" class="uk-width-1-1">
+										<option value="0" {showHeaderLangs_0}>No mostrar</option>
+										<option value="1" {showHeaderLangs_1}>Mostrar</option>
+									</select>
+								</div>
+								
+								<div class="uk-form-row">
+									<label for="analytics">Mostrar barra de idiomas en el header (Mobil)</label>
+									<select name="showHeaderLangsMob" class="uk-width-1-1">
+										<option value="0" {showHeaderLangsMob_0}>No mostrar</option>
+										<option value="1" {showHeaderLangsMob_1}>Mostrar</option>
+									</select>
+								</div>
+								
+								<div class="uk-form-row">
+									<a href="javascript:void(0);" data-submit="upConfig" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar</a>
+								</div>
+							</form>
 						</div>
 					</div>
 					

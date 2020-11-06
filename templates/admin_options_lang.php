@@ -16,19 +16,23 @@ $fn_lang = (isset($CONFIG['site']['lang']) && isJson($CONFIG['site']['lang'])) ?
 $fn_lang_ignore = (isset($CONFIG['site']['langIgnore']) && isJson($CONFIG['site']['langIgnore'])) ? json_decode($CONFIG['site']['langIgnore']) : false;
 
 //ignore list
-if($fn_lang_ignore) foreach($fn_lang_ignore as $lngi)
+if($fn_lang_ignore)
 {
-	$fn_xtemplate_parse['assign'][] = array(
-		'lang' => $lngi,
-	);
-	$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.lang_ignore_row";
+	foreach($fn_lang_ignore as $lngi)
+	{
+		$fn_xtemplate_parse['assign'][] = array(
+			'lang' => $lngi,
+		);
+		$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.lang_ignore_row";
+	}
+}else{
+	$fn_lang_ignore = array();
 }
 
 $fn_lang_ignore_list = array_diff($fn_lang, $fn_lang_ignore);
 
 foreach($fn_lang_ignore_list as $lngisel)
 {
-	
 	$fn_xtemplate_parse['assign'][] = array(
 		'code' => $lngisel,
 	);

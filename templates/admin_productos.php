@@ -111,7 +111,7 @@ switch($g_action)
 		{
 			if(preg_match('/(link|customimage|keywords|description|resumen|image|freatured|gallery)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value)) ? html_entity_decode($mv->m_value, ENT_QUOTES) : '';
 			
-			if(preg_match('/(noodp|noydir|nofollow|noarchive|check|show_button_addcart)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value) && $mv->m_value == 1) ? 'selected' : '';
+			if(preg_match('/(noodp|noydir|nofollow|noarchive|check|show_button_addcart|by_pax|by_box)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value) && $mv->m_value == 1) ? 'selected' : '';
 		}
 		//metas
 		

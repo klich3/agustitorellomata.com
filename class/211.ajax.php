@@ -266,7 +266,7 @@ if($fn_ajax !== null)
 			
 			//añadimos al carrito
 			$fn_q_check_stock = $db->FetchArray("
-				SELECT `stock_count`, `precio_venta`, `pax_multimplier`
+				SELECT `stock_count`, `precio_venta`, `pax_multimplier`, `stock_min`
 				FROM `product_stock` 
 				WHERE `prid`=:pid
 				LIMIT 1;
@@ -274,23 +274,39 @@ if($fn_ajax !== null)
 				'pid' => $fn_inputs['p_id'],
 			));
 			
+			$fn_get_meta = $db->FetchAll("
+				SELECT * 
+				FROM `product_meta`
+				WHERE `p_id`=:pid
+			", array(
+				'pid' => $fn_inputs['p_id'],
+			));
+			
+			$fn_metas = array();
+			
+			if($fn_get_meta) foreach($fn_get_meta as $k => $v)
+			{
+				$fn_metas[$v->m_key] = $v->m_value;
+			}
+			
 			//id del producto en el carrito
 			$fn_pr_cart_id = "{$fn_inputs['p_id']}{$fn_inputs['cat_id']}";
 			
 			//vacio añadimos uno nuevo
-			if($fn_q_check_stock >= 1 && !array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
+			if($fn_q_check_stock['stock_count'] >= 1 && !array_key_exists($fn_pr_cart_id, $_SESSION['cart']))
 			{
 				$_SESSION['cart'][$fn_pr_cart_id] = array(
 					'cat_id' => $fn_inputs['cat_id'],
 					'p_id' => $fn_inputs['p_id'],
-					'pax' => '1',
+					'pax' => (isset($fn_metas['by_pax']) && $fn_metas['by_pax'] == "1") ? '1' : '0',
+					'multimplier' => (isset($fn_metas['by_box']) && $fn_metas['by_box'] == "1" && !isset($fn_metas['by_pax']) || (isset($fn_metas['by_pax']) && $fn_metas['by_pax'] != "1")) ? '1' : '0',
 					'pax_multimplier' => $fn_q_check_stock['pax_multimplier'],
-					'multimplier' => '0',
 					'precio_venta' => $fn_q_check_stock['precio_venta'],
 				);
 			}
 			
-			if($fn_q_check_stock == 4)
+			//send mail to admin on stock on limit
+			if($fn_q_check_stock['stock_count'] <= $fn_q_check_stock['stock_min'])
 			{
 				$fn_q_prod = $db->FetchValue("
 					SELECT `menu_title`
@@ -439,7 +455,8 @@ if($fn_ajax !== null)
 				$_SESSION['cart'][$fn_pr_cart_id]['multimplier'] = isset($fn_inputs['multimplier']) ? $fn_inputs['multimplier'] : "0";
 				
 				//sum client pax or add existing on stock
-				$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax'] == 0) ? "0" : $fn_inputs['pax'];
+				$fn_pax = (isset($fn_inputs['pax']) && $fn_inputs['pax']) ? $fn_inputs['pax'] : "0";
+				
 				$_SESSION['cart'][$fn_pr_cart_id]['pax'] = ($fn_pax < $fn_q_check_stock) ? $fn_pax : $fn_q_check_stock;	
 			}
 			
@@ -3493,11 +3510,11 @@ if($fn_ajax !== null)
 					foreach($fn_inputs as $ik => $iv)
 					{
 						if(preg_match('/(pass|activ|key|meta|user_access)/', $ik)) continue;
+						if(empty($iv)) continue;
 						
 						$fn_parse_field_name = str_replace('f_', '', $ik);
 						$fn_update_rows[] = "`{$fn_parse_field_name}`=:iv_{$i}";
 						$fn_q_a["iv_{$i}"] = $iv;
-						
 						$i++;
 					}
 					
@@ -5089,12 +5106,13 @@ if($fn_ajax !== null)
 			{
 				$fn_q = object_to_array(json_decode($fn_q));
 				
-				if(isset($fn_q['cart_checkout']) && count($fn_q['cart_checkout']))
+				if(isset($fn_q['checkout']) && count($fn_q['checkout']))
 				{
 					//nombres de la persona
 					if($fn_user_id)
 					{
-						$fn_q_userPersNames = $db->FetchValue("
+						//facturacion
+						$fn_q_userFcturacion = $db->FetchValue("
 							SELECT `meta_value`
 							FROM `users_meta`
 							WHERE `user_id`=:uid
@@ -5104,24 +5122,14 @@ if($fn_ajax !== null)
 							'uid' => $fn_user_id,
 						));
 						
-						if($fn_q_userPersNames && isJson($fn_q_userPersNames))
+						if($fn_q_userFcturacion && isJson($fn_q_userFcturacion))
 						{
-							$fn_json_data_loc = json_decode($fn_q_userPersNames, JSON_UNESCAPED_UNICODE);
-							$fn_q['user_personal_data'] = $fn_json_data_loc;
+							$fn_json_data_loc = json_decode($fn_q_userFcturacion, JSON_UNESCAPED_UNICODE);
+							$fn_q['user_facturacion_data'] = $fn_json_data_loc;
 						}
 					}
 					
-					$fn_shipping_comp_name = $db->FetchValue("
-						SELECT `title`
-						FROM `shipping_types`
-						WHERE `id`=:id
-						LIMIT 1;
-					", array(
-						'id' => $fn_q['cart_checkout']['cart_shipping_type'],
-					));
-					
-					$fn_q['cart_checkout']['cart_shipping_name'] = $fn_shipping_comp_name;
-					if($fn_order_id) $fn_q['cart_checkout']['checkout_id'] = $fn_order_id;
+					if($fn_order_id) $fn_q['checkout']['checkout_id'] = $fn_order_id;
 				}
 				
 				exit(json_encode(array(
