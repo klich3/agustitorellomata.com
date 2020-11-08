@@ -192,7 +192,6 @@ $(function()
 		REQ:false,
 		COOKIES:false,
 		EDAD:false,
-		EDAD_OPEN:false,
 		GMAP:false,
 		GMAPSTYLE:[{featureType:"all",stylers:[{saturation:-100},{gamma:0.50}]},{featureType:"water",elementType:"all",stylers:[{hue:"#d8d8d8"},{visibility: "simplified"}]},{featureType:"landscape",elementType:"all",stylers:[{hue:"#0077ff"},{visibility:"simplified"},{invert_lightness:"true"}]} ],
 		GMAP_JSON:{},
@@ -230,11 +229,11 @@ $(function()
 			switch(_G.TYPE)
 		    {
 				case "home":
-					if(!_G.EDAD) window.loadJS(
+					window.loadJS(
 						{
 							items:[
 								fn_base_script+'js/jquery.fancybox.min.js',
-								fn_base_script+'js/jquery.fancybox.min.js'
+								fn_base_script+'js/iphone-inline-video.min.js'
 							],
 							callback: fn_home_edad()		
 						});
@@ -302,9 +301,7 @@ $(function()
 	
 	fn_home_edad = function()
 	{
-		if(_G.EDAD_OPEN) return;
-		
-		_G.EDAD_OPEN = true;
+		if(_G.EDAD) return;
 		
 		clearTimeout($.data(this, 'timertoshowEdad'));
 		$.data(this, 'timertoshowEdad', setTimeout(function()
@@ -754,28 +751,15 @@ $(function()
 			var data = $.parseJSON(ele_c[0].data);
 			
 			var items = {};
-			var dom_v_sources = "";
 				
 			if(data && data.data.length !== 0) for(var i in data.data)
 			{
-				if(/mp4/gim.test(data.data[i].img))
-				{
-					items.mp4 = data.data[i].img;
-					dom_v_sources += '<source src="'+items.mp4+'" type="video/mp4">';
-				}
+				if(/mp4/gim.test(data.data[i].img)) items.mp4 = data.data[i].img;
 				
 				//if(/webmsd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
-				if(/webmhd/gim.test(data.data[i].img))
-				{
-					items.webm = data.data[i].img;
-					dom_v_sources += '<source src="'+items.webm+'" type="video/webm">';
-				}
+				if(/webmhd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
 				
-				if(/ogv|ogg/gim.test(data.data[i].img))
-				{
-					items.ogv = data.data[i].img;
-					dom_v_sources += '<source src="'+items.ogv+'" type="video/ogv">';
-				}
+				if(/ogv|ogg/gim.test(data.data[i].img)) items.ogv = data.data[i].img;
 			}
 			
 			data.data = items;
@@ -786,13 +770,34 @@ $(function()
 			};
 			
 			var dom_v = $('[data-slider-id="'+_G.VIDEOFS[i].id+'"] video');
-			//var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
+			var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
 			
+			dom_v.attr('src', fn_base_script + fn_src);
+			//dom_v.on('oncanplay, loadedmetadata', e_play_video);
 			
-			dom_v.append(dom_v_sources);
-			dom_v.attr('muted', true);
-			dom_v.on('oncanplay, loadedmetadata', e_play_video);
+			init_videoinline(dom_v);
 		});
+	}
+	
+	//https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+	init_videoinline = function(dom){
+		if(typeof enableInlineVideo == 'function')
+		{
+			var video = $(dom).get(0);
+			enableInlineVideo(video, {
+				iPad: true
+			});
+			
+			setTimeout(function () { video.play();
+			 }, 1000); // example
+			
+		clearTimeout($.data(this, 'data-init_video'));
+		}else{
+			clearTimeout($.data(this, 'data-init_video'));
+			$.data(this, 'data-init_video', setTimeout(function(){
+				init_videoinline(dom);
+			}, 350));
+		}
 	}
 	
 	e_play_video = function(e)
