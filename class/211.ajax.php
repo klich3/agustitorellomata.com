@@ -905,8 +905,6 @@ if($fn_ajax !== null)
 									$fn_wsd_debug = ($CONFIG['status']['debug']) ? 'local' : '';
 									$fn_not_path = ($CONFIG['site']['redsys_notification_type'] == 'post') ? "{$CONFIG['site']['base']}response/response.php" : $fb_base_uri."class/redsys_soap/InotificacionSIS{$fn_wsd_debug}.wsdl";
 									
-									$fn_not_path = "https://agustitorellomata.com/";
-									
 									$redsys->setNotification($fn_not_path); //Url de notificacion
 									$redsys->setUrlOk("{$CONFIG['site']['base']}{$st_lang}/pago-completado");
 									$redsys->setUrlKo("{$CONFIG['site']['base']}{$st_lang}/pago-error");
