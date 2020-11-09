@@ -40,148 +40,38 @@ $(function()
 	'</div>');
 	
 	//cart
-	$.template('cart', '<div class="cart-container">\
-			<div class="w-1-1">\
-			<a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a>\
-			</div>\
-			<div class="w-1-1 pt-2"></div>\
-			<div class="container">\
-				{{if data.status == 400}}\
-					{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}}\
-				{{else}}'+
-					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}}\
-						<div class="txt@c">${data.lang.cart_empty}</div>\
-					{{else}}'+
+	$.template('cart', '<div class="cart-container"><div class="w-1-1"><a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a></div><div class="w-1-1 pt-2"></div><div class="container">'+
+				'{{if data.status == 400}}'+
+					'{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}}'+
+				'{{else}}'+
+					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}}<div class="txt@c">${data.lang.cart_empty}</div>{{else}}'+
 
 						//items
-						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}}\
-							{{tmpl({data:v, lang:data.lang}) "cart_item"}}\
-						{{/each}}{{/if}}'+
+						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}}{{tmpl({data:v, lang:data.lang}) "cart_item"}}{{/each}}{{/if}}'+
 						
 						//total
-						'{{if data.data && data.data.checkout}}<div class="w-1-1"></div>\
-						<div class="g gc">\
-							<div class="w-1-2"></div>\
-							<div class="w-1-2">\
-								<div class="g gc">\
-									<div class="w-1-2">\
-										<strong class="label txt@u">${data.lang.lang_iva}(${data.data.checkout.cart_iva_percent}%)</strong>\
-									</div>\
-									<div class="w-1-2 txt@r">\
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_iva}&euro;</strong>\
-									</div>\
-									<div class="w-1-2">\
-										<strong class="label txt@u">SUBTOTAL</strong>\
-									</div>\
-									<div class="w-1-2 txt@r">\
-										<strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}&euro;</strong>\
-									</div>\
-								</div>\
-							</div>\
-						</div>\
-						<div class="w-1-1 pb-5"></div>{{/if}}'+
+						'{{if data.data && data.data.checkout}}<div class="w-1-1"></div><div class="g gc"><div class="w-1-2"></div><div class="w-1-2"><div class="g gc"><div class="w-1-2"><strong class="label txt@u">${data.lang.lang_iva}(${data.data.checkout.cart_iva_percent}%)</strong></div><div class="w-1-2 txt@r"><strong class="label txt@u txt-org">${data.data.checkout.cart_iva}&euro;</strong></div><div class="w-1-2"><strong class="label txt@u">SUBTOTAL</strong></div><div class="w-1-2 txt@r"><strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}&euro;</strong></div></div></div></div><div class="w-1-1 pb-5"></div>'+
+					'{{/if}}'+
 						
 						//botones final					
 						'{{if data.data && data.data.cart}}{{tmpl() "cart_botones_final"}}{{/if}}'+
 						
-					'{{/if}}'+
-				'{{/if}}\
-				{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}}\
-			</div>\
-		</div>\
-	');
+					'{{/if}}{{/if}}'+
+				'{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}}'+
+		'</div></div>');
 	
-	$.template('cart_item', '<div class="item" data-cid="${data.cat_id}" data-pid="${data.p_id}"><div class="g gc">\
-		<div class="w-1-2">\
-			<img src="${data.thumb}" class="e" />\
-		</div>\
-		<div class="w-1-2">\
-			<div class="w-1-1 txt@u txt-org">\
-				{{if data.title}}<div class="w-1-1"><strong class="label">{{html data.title}}</strong></div>{{/if}}\
-				{{if data.subtitle}}<div class="w-1-1">{{html data.subtitle}}</div>{{/if}}\
-			</div>\
-			<div class="w-1-1 sep"></div>\
-			{{if data.pax_multimplier > "1"}}\
-			<div class="w-1-1"><strong>${lang.lang_box} ${data.pax_multimplier} ${lang.lang_bot}</strong></div>\
-			<div class="w-1-1 txt-org"><strong>${data.price_caja}&euro;</strong></div>\
-			{{if data.price_unit != "0"}}<div class="w-1-1"><strong>${data.price_unit}&euro; ${lang.lang_ud}</strong></div>{{/if}}\
-			<div class="w-1-1 sep"></div>'+
+	$.template('cart_item', '<div class="item" data-cid="${data.cat_id}" data-pid="${data.p_id}"><div class="g gc"><div class="w-1-2"><img src="${data.thumb}" class="e" /></div><div class="w-1-2"><div class="w-1-1 txt@u txt-org">{{if data.title}}<div class="w-1-1"><strong class="label">{{html data.title}}</strong></div>{{/if}}{{if data.subtitle}}<div class="w-1-1">{{html data.subtitle}}</div>{{/if}}</div><div class="w-1-1 sep"></div>{{if data.pax_multimplier >= "1"}}<div class="w-1-1"><strong>${lang.lang_box} ${data.pax_multimplier} ${lang.lang_bot}</strong></div><div class="w-1-1 txt-org"><strong>${data.price_caja}&euro;</strong></div>{{if data.price_unit != "0"}}<div class="w-1-1"><strong>${data.price_unit}&euro; ${lang.lang_ud}</strong></div>{{/if}}<div class="w-1-1 sep"></div>'+
 //cajas			
-'{{if data.by_box && data.by_box == "1"}}<div class="w-1-1">\
-	<div class="g gc" data-group="control">\
-	  <div class="w-1-1 pb-2">\
-		<strong>${lang.cart_cant_cajas}</strong>\
-	  </div>\
-	  <div class="w-6-10">\
-		<div class="w-1-1">\
-		  <input type="number" name="multimplier" min="1" max="${data.stock_count / data.multimplier}" value="${data.multimplier}" data-multimplier class="w-1-1 txt@c"/>\
-		</div>\
-	  </div>\
-	  <div class="w-4-10">\
-		<a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side">\
-		  <img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" />\
-		</a>\
-	  </div>\
-	  <div class="w-1-1 pt-4"></div>\
-	  <div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c">\
-		<a href="javascript:void(0);"  data-action="cartDownItem-side">\
-		  <img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" />\
-		</a>\
-		<a href="javascript:void(0);" data-action="cartUpItem-side">\
-		  <img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" />\
-		</a>\
-	  </div>\
-	  <div class="w-4-10"></div>\
-	  <div class="w-1-1 txt-org txt@r pt-9">\
-		<strong>${data.price_multimplier}&euro;</strong>\
-	  </div>\
-  </div>\
-</div>{{/if}}'+			
-			
-			'{{if data.by_box && data.by_box == "1" && data.by_pax && data.by_pax == "1"}}<div class="w-1-1 sep"></div>{{/if}}\
-			{{/if}}'+
+'{{if data.by_box && data.by_box == "1"}}<div class="w-1-1"><div class="g gc" data-group="control"><div class="w-1-1 pb-2"><strong>${lang.cart_cant_cajas}</strong></div><div class="w-6-10"><div class="w-1-1"><input type="number" name="multimplier" min="1" max="${data.stock_count / data.multimplier}" value="${data.multimplier}" data-multimplier class="w-1-1 txt@c"/></div></div><div class="w-4-10"><a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side"><img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" /></a></div><div class="w-1-1 pt-4"></div><div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c"><a href="javascript:void(0);"  data-action="cartDownItem-side">\<img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" /></a><a href="javascript:void(0);" data-action="cartUpItem-side"><img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" /></a></div><div class="w-4-10"></div><div class="w-1-1 txt-org txt@r pt-9"><strong>${data.price_multimplier}&euro;</strong></div></div></div>{{/if}}{{if data.by_box && data.by_box == "1" && data.by_pax && data.by_pax == "1"}}<div class="w-1-1 sep"></div>{{/if}}{{/if}}'+
 		
 //botones botellas
-'{{if data.by_pax && data.by_pax == "1"}}<div class="w-1-1">\
-	<div class="g gc" data-group="control">\
-	  <div class="w-1-1 pb-2">\
-		<strong>${lang.cart_cant_bot}</strong>\
-	  </div>\
-	  <div class="w-6-10">\
-		<div class="w-1-1">\
-			<input type="number" name="pax" min="1" max="${data.stock_count}" value="${data.pax}" data-pax class="w-1-1 txt@c">\
-		</div>\
-	  </div>\
-	  <div class="w-4-10">\
-		<a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side">\
-		  <img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" />\
-		</a>\
-	  </div>\
-	  <div class="w-1-1 pt-4"></div>\
-	  <div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c">\
-		<a href="javascript:void(0);"  data-action="cartDownItem-side">\
-		  <img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" />\
-		</a>\
-		<a href="javascript:void(0);" data-action="cartUpItem-side">\
-		  <img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" />\
-		</a>\
-	  </div>\
-	  <div class="w-4-10"></div>\
-	  <div class="w-1-1 txt-org txt@r pt-9">\
-		<strong>${data.price_unit_total}&euro;</strong>\
-	  </div>\
-  </div>\
-</div>{{/if}}'+	
-		
-		'</div> \
-		<div class="w-1-1 pt-1"></div><div class="w-1-1 sep"></div><div class="w-1-1 pt-1"></div> \
-	</div></div>');
+'{{if data.by_pax && data.by_pax == "1"}}<div class="w-1-1"><div class="g gc" data-group="control"><div class="w-1-1 pb-2"><strong>${lang.cart_cant_bot}</strong></div><div class="w-6-10"><div class="w-1-1"><input type="number" name="pax" min="1" max="${data.stock_count}" value="${data.pax}" data-pax class="w-1-1 txt@c"></div></div><div class="w-4-10"><a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side"><img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" /></a></div><div class="w-1-1 pt-4"></div><div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c"><a href="javascript:void(0);"  data-action="cartDownItem-side"><img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" /></a><a href="javascript:void(0);" data-action="cartUpItem-side"><img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" /></a></div><div class="w-4-10"></div><div class="w-1-1 txt-org txt@r pt-9"><strong>${data.price_unit_total}&euro;</strong></div></div></div>{{/if}}</div><div class="w-1-1 pt-1"></div><div class="w-1-1 sep"></div><div class="w-1-1 pt-1"></div></div></div>');
 	
-	$.template('cart_botones_final', '<div class="w-1-1 pb-4"> \
-		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'atm-club-shop" class="w-1-1 secundary button" data-action="closeCart">${data.lang.cart_seguircomprando_but}</a></div> \
-		<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">${data.lang.cart_vercarrito_but}</a></div> \
-		<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">${data.lang.cart_checkout_but}</a></div> \
-	</div>');
+	$.template('cart_botones_final', '<div class="w-1-1 pb-4">'+
+		'<div class="w-1-1 pb-2"><a href="'+fn_base_script+'atm-club-shop" class="w-1-1 secundary button" data-action="closeCart">${data.lang.cart_seguircomprando_but}</a></div>'+
+		'<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">${data.lang.cart_vercarrito_but}</a></div>'+
+		'<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">${data.lang.cart_checkout_but}</a></div>'+
+	'</div>');
 	
 	//_G vars
 	var _G = {

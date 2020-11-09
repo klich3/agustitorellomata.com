@@ -118,8 +118,8 @@ if($fn_q_cat_list)
 				//interios del grupos
 				$fn_xtemplate_parse['assign'][] = array(
 					'title' => html_entity_decode(decodeLangData($vi->lang_data)),
-					'image' => ($fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
-					'alt' => $fn_file['alt'],
+					'image' => (isset($fn_file['img']) && $fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
+					'alt' => (isset($fn_file['alt']) && $fn_file['alt']) ? $fn_file['alt'] : "",
 					'id' => $vi->id,
 					'cat_id' => $vi->cat_id,
 					'sm' => (count($cv['cat_items']) == 3) ? "sm" : ""

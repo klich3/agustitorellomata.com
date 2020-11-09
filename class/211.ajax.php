@@ -4252,17 +4252,17 @@ if($fn_ajax !== null)
 				
 				//stock table
 				$fn_stock = $db->ExecuteSQL("
-					INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`, `item_base`, `pax_multimplier`)
-					VALUES (:pid, :szid, :cid, :pr, :pv, :sm, :sb, :sc, :fp, :sy, :sx, '1', :mult);
+					INSERT INTO `product_stock` (`prid`, `size_id`, `color_id`, `precio_coste`, `precio_venta`, `stock_min`, `stock_base`, `stock_count`, `peso`, `size_y`, `size_x`, `item_base`, `pax_multimplier`, `precio_tachado`)
+					VALUES (:pid, :szid, :cid, :pr, :pv, :sm, :sb, :sc, :fp, :sy, :sx, '1', :mult, 0);
 				", array(
 					'pid' => $fn_insert_id,
-					'szid' => (isset($fn_p['stock']['f_size_id'])) ? $fn_p['stock']['f_size_id'] : null,
-					'cid' => (isset($fn_p['stock']['f_color_id'])) ? $fn_p['stock']['f_color_id'] : null,
+					'szid' => (isset($fn_p['stock']['f_size_id'])) ? $fn_p['stock']['f_size_id'] : 8,
+					'cid' => (isset($fn_p['stock']['f_color_id'])) ? $fn_p['stock']['f_color_id'] : 12,
 					'pr' => ($fn_f_precio_coste) ? $fn_f_precio_coste : 0,
 					'pv' => ($fn_f_precio_venta) ? $fn_f_precio_venta : 0,
-					'sm' => ($fn_f_stock_min) ? $fn_f_stock_min : 0,
-					'sb' => ($fn_f_stock_base) ? $fn_f_stock_base : 0,
-					'sc' => ($fn_f_stock_count) ? $fn_f_stock_count : 0,
+					'sm' => ($fn_f_stock_min) ? $fn_f_stock_min : 4,
+					'sb' => ($fn_f_stock_base) ? $fn_f_stock_base : 99999,
+					'sc' => ($fn_f_stock_count) ? $fn_f_stock_count : 99999,
 					'fp' => ($fn_f_peso) ? $fn_f_peso : 0,
 					'sy' => ($fn_f_size_y) ? $fn_f_size_y : 0,
 					'sx' => ($fn_f_size_x) ? $fn_f_size_x : 0,
@@ -4333,6 +4333,7 @@ if($fn_ajax !== null)
 						'id' => $fn_p['id'], 
 					));
 					
+					/*
 					//remove ofertas
 					$db->ExecuteSQL("
 						DELETE FROM `oferta_rel`
@@ -4340,6 +4341,7 @@ if($fn_ajax !== null)
 					", array(
 						'id' => $fn_p['id'],
 					));
+					*/
 					
 					//remove metas
 					$db->ExecuteSQL("
