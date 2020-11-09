@@ -74,7 +74,7 @@ if($fn_q_cat_list)
 					"id" => $vi->id
 				));
 				
-				if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier > 1 && $fn_stock->precio_venta != 0)
+				if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier >= 1 && $fn_stock->precio_venta != 0)
 				{
 					$fn_stock->precio_caja = round($fn_stock->pax_multimplier * $fn_stock->precio_venta, 2);
 					
