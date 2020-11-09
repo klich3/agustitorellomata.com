@@ -55,7 +55,7 @@ if(getCartCount() == '0')
 		//procesamos carrito
 		foreach($fn_process_cart['cart'] as $ck => $cv)
 		{
-			if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1 && isset($cv['by_box']) && $cv['by_box'] == "1")
+			if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] >= 1 && isset($cv['by_box']) && $cv['by_box'] == "1")
 			{
 				$fn_xtemplate_parse['assign'][] = $cv;
 				$fn_xtemplate_parse['parse'][] = 'checkout.cart.cart.cart_row.by_box';

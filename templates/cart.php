@@ -35,7 +35,7 @@ if($too_login->isLogged() == 400)
 				if(!isset($cv['multimplier'])) $cv['multimplier'] = 0;
 				
 				
-				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] > 1 && isset($cv['by_box']) && $cv['by_box'] == "1")
+				if(isset($cv['pax_multimplier']) && $cv['pax_multimplier'] >= 1 && isset($cv['by_box']) && $cv['by_box'] == "1")
 				{
 					$fn_xtemplate_parse['assign'][] = $cv;
 					$fn_xtemplate_parse['parse'][] = 'cart.cart.row.by_box';
