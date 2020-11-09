@@ -253,7 +253,7 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
 			'isIframe' => (isset($fn_g['iframe'])) ? true : false
 		));
 		exit;
-	}else if(preg_match('/datos|dades-/', $fn_url['url']))
+	}else if(preg_match('/datos|dades-per/', $fn_url['url']))
 	{
 		$fn_sep = explode('/', $fn_url['url']);
 		
