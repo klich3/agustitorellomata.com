@@ -3,7 +3,7 @@
 global $CONFIG, $fn_page_args, $db, $st_lang;
 
 $fn_q_cat_list = $db->FetchAll("
-	SELECT p.*,  c.`lang_data` AS 'cat_title', g.`objects` AS 'file'
+	SELECT p.*,  c.`lang_data` AS 'cat_title', g.`objects` AS 'file', c.`hash` as 'cat_hash' 
 	FROM `category` c
 	LEFT JOIN `product` p ON(p.`cat_id`=c.`id`)
 	LEFT JOIN `gallery` g ON(p.`gallery_id`=g.`id`)
@@ -22,10 +22,11 @@ if($fn_q_cat_list)
 {
 	$i = 1;
 	
-	foreach($fn_q_cat_list as $ck => $cv)
+	foreach($fn_q_cat_list as $clk => $clv)
 	{
-		$fn_catid[$cv->cat_id]['cat_title'] = decodeLangData($cv->cat_title);
-		$fn_catid[$cv->cat_id]['cat_items'][] = $cv;
+		$fn_catid[$clv->cat_id]['cat_title'] = decodeLangData($clv->cat_title);
+		$fn_catid[$clv->cat_id]['cat_items'][] = $clv;
+		$fn_catid[$clv->cat_id]['cat_hash'] = $clv->cat_hash;
 	}
 	
 	foreach($fn_catid as $ck => $cv)
@@ -122,7 +123,8 @@ if($fn_q_cat_list)
 					'alt' => (isset($fn_file['alt']) && $fn_file['alt']) ? $fn_file['alt'] : "",
 					'id' => $vi->id,
 					'cat_id' => $vi->cat_id,
-					'sm' => (count($cv['cat_items']) == 3) ? "sm" : ""
+					'sm' => (count($cv['cat_items']) == 3) ? "sm" : "",
+					'hash' => $vi->hash,
 				); 
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row";
 			}
@@ -142,6 +144,7 @@ if($fn_q_cat_list)
 		//grupos
 		$fn_xtemplate_parse['assign'][] = array(
 			'cat_title' => $cv['cat_title'],
+			'cat_hash' => $cv['cat_hash']
 		);
 		$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group";
 		
