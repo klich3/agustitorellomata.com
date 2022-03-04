@@ -30,7 +30,7 @@ targetNamespace="https://sis.SERMEPA.es/sis/InotificacionSIS.wsdl" xmlns:xs="htt
 </binding>
 <service name="InotificacionSISService">
   <port name="InotificacionSIS" binding="tns:InotificacionSISBinding">
-    <soap:address location="http://too.192.168.100.16.xip.io:8888/glunt.com/class/redsys_soap/InotificacionSIS.php"/>
+    <soap:address location="class/redsys_soap/InotificacionSIS.php"/>
   </port>
 </service>
 </definitions>

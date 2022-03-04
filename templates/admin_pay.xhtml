@@ -9,9 +9,21 @@
 	<div class="uk-grid uk-grid-small">
 		<div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
 			<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin">
-				<div class="uk-panel-header"><strong>Pasarela virtual (RedSys | Avalon)</strong></div>
+				<div class="uk-panel-header"><strong>Pasarela virtual (RedSys | Avalon)</strong>
+				</div>
 				<div class="uk-panel-body uk-padding-remove">
 					
+					<div class="uk-form-row uk-margin-top">
+						<strong>Acceder al panel de Banco</strong>
+						<div class="uk-grid">
+							<div class="uk-button-group">
+								<a href="https://sis-t.redsys.es:25443/canales/bbva/" class="uk-button">Prubas</a>
+								<a href="https://canales.redsys.es/admincanales-web/index.jsp#/login" class="uk-button">Entorno real</a>
+								<a href="https://www.bbva.es/content/dam/public-web/bbvaes/documents/legal/psd2/TPV%20VIRTUAL_Manual%20Redirecci%C3%B3n_3DS%202.2.pdf" class="uk-button">Manual</a>
+							</div>
+						</div>
+					</div>
+						
 					<div class="uk-form-row uk-margin-top">
 			        	<label for="redsys_active">Activado</label>
 			        	<select name="redsys_active" class="uk-width-1-1">
@@ -74,65 +86,6 @@
 			        	<label for="redsys_sha256_real">Hash de seguridad SHA256</label>
 						<input type="text" name="redsys_sha256_real" value="{redsys_sha256_real}" class="uk-width-1-1" />
 			        </div>
-				</div>
-			</div>		
-		</div>
-		
-		<div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
-			<div class="uk-panel uk-panel-box uk-panel-box-primary uk-margin">
-				<div class="uk-panel-header"><strong>PayPal</strong></div>
-				<div class="uk-panel-body uk-padding-remove">
-					
-					<div class="uk-form-row uk-margin-top">
-			        	<label for="paypal_active">Activado</label>
-			        	<select name="paypal_active" class="uk-width-1-1">
-				        	<option value="0" {selected_paypal_active_0}>No</option>
-				        	<option value="1" {selected_paypal_active_1}>Si</option>
-			        	</select>
-			        </div>
-					
-					<div class="uk-form-row">
-			        	<label for="paypal_mode">Tipo</label>
-			        	<select name="paypal_mode" class="uk-width-1-1">
-				        	<option value="0" {selected_paypal_mode_0}>Prueba (Sandbox)</option>
-				        	<option value="1" {selected_paypal_mode_1}>Real</option>
-			        	</select>
-			        </div>
-					
-					<hr/>
-					
-					<strong>Prueba (Sandbox)</strong>
-					
-					<div class="uk-form-row uk-margin-top">
-			        	<label for="paypal_apiuser_sandbox">Api User</label>
-						<input type="text" name="paypal_apiuser_sandbox" value="{paypal_apiuser_sandbox}" class="uk-width-1-1" />
-			        </div>
-					<div class="uk-form-row">
-			        	<label for="paypal_apipass_sandbox">Api Pass</label>
-						<input type="text" name="paypal_apipass_sandbox" value="{paypal_apipass_sandbox}" class="uk-width-1-1" />
-			        </div>
-					<div class="uk-form-row">
-			        	<label for="paypal_apisign_sandbox">Api Sign</label>
-						<input type="text" name="paypal_apisign_sandbox" value="{paypal_apisign_sandbox}" class="uk-width-1-1" />
-			        </div>
-			        
-			        <hr/>
-			        
-			        <strong>Real</strong>
-			        
-					<div class="uk-form-row uk-margin-top">
-			        	<label for="paypal_apiuser_live">Api User</label>
-						<input type="text" name="paypal_apiuser_live" value="{paypal_apiuser_live}" class="uk-width-1-1" />
-			        </div>
-					<div class="uk-form-row">
-			        	<label for="paypal_apipass_live">Api Pass</label>
-						<input type="text" name="paypal_apipass_live" value="{paypal_apipass_live}" class="uk-width-1-1" />
-			        </div>
-					<div class="uk-form-row">
-			        	<label for="paypal_apisign_live">Api Sign</label>
-						<input type="text" name="paypal_apisign_live" value="{paypal_apisign_live}" class="uk-width-1-1" />
-			        </div>
-					
 				</div>
 			</div>		
 		</div>

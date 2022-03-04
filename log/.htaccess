@@ -1,0 +1,6 @@
+Options All -Indexes FollowSymLinks
+AddType text/plain .xhtml
+IndexIgnore *.xhtml
+
+order allow,deny
+deny from all

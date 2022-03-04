@@ -2,21 +2,11 @@
 
 date_default_timezone_set('Europe/Madrid');
 ini_set("always_populate_raw_post_data" , "-1");
-
 header("X-Author: Anthony Sychev https://dm211.com | https://twooneone.xyz ");
+
 
 //cookies & session security config
 ini_set("session.cookie_lifetime", "3600");
-//ini_set("session.cookie_httponly", 1); // Prevents javascript XSS attacks aimed to steal the session ID
-//ini_set("session.cookie_secure", 1); // Uses a secure connection (HTTPS) if possible
-//ini_set("session.use_only_cookies", 1); // Session ID cannot be passed through URLs
-
-//x-xss config
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: SAMEORIGIN");
-//header("X-XSS-Protection: 1;mode=block");
-header("X-Content-Security-Policy: allow 'self'; frame-ancestors 'none'");
-//header("Strict-Transport-Security: max-age=31536000; preload"); //HSTS Header
 
 global $CONFIG, $db, $fn_url, $fn_hash, $st_lang, $lang_items, $too_login, $cl_m;
 
@@ -220,7 +210,7 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
    	", array(
 	   	'hash' => $fn_parse_hash_name
    	));
-   	
+	   
    	/*
    	$fn_search_pages = searchBy($fn_parse_hash_name);
    	$fn_search_cat = searchBy($fn_url['url'], 'category', true);
@@ -244,15 +234,103 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
 		
 		$fn_url['url'] = 'admin';
 		
-	}else if(preg_match('/contac/', $fn_url['url']))
+	}else if(preg_match('/dreces|addres|direc/', $fn_url['url']))
 	{
-		page('contacto', array(
-			'lang' => $st_lang,
-			//'stage_title' => $fn_lang_title,
-			//'stage_type' => 'page',
-		));
-		return;
+		$fn_sep = explode('/', $fn_url['url']);
 		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = "mis_direcciones";
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'mis-direcciones',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
+	}else if(preg_match('/datos|dades-per/', $fn_url['url']))
+	{
+		$fn_sep = explode('/', $fn_url['url']);
+		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = "tus_datos";
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'tus-datos',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
+	}else if(preg_match('/cuenta|compte|account/', $fn_url['url']))
+	{
+		$fn_sep = explode('/', $fn_url['url']);
+		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = "mi_cuenta";
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'mi-cuenta',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
+	}else if(preg_match('/pedidos|orders|comand/', $fn_url['url']))
+	{
+		$fn_sep = explode('/', $fn_url['url']);
+		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = (preg_match("/\//", $fn_url['url'])) ? 'mis_pedidos_details' : 'mis_pedidos';
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'mis-pedidos',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'pedido_id' => (preg_match("/\//", $fn_url['url'])) ? $fn_sep[1] : false,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
+	}else if(preg_match('/devolu|return/', $fn_url['url']))
+	{
+		$fn_sep = explode('/', $fn_url['url']);
+		
+		//check db send page details
+		$fn_lang_title = str_replace(array('_', '-'), ' ', $fn_template_filename);
+		$fn_stage_title = (isset($fn_q_db['obj_title'])) ? $fn_q_db['obj_title'] : $fn_lang_title;
+		
+		$fn_tmpl_page_template = 'mis_devoluciones';
+		
+		page($fn_tmpl_page_template, array(
+			'lang' => $st_lang,
+			'hash' => 'mis-devoluciones',
+			'stage_title' => $fn_stage_title,
+			'stage_type' => 1,
+			'stage_tmpl' => $fn_tmpl_page_template,
+			'pedido_id' => (preg_match("/\//", $fn_url['url'])) ? $fn_sep[1] : false,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
+		));
+		exit;
 	}else if(file_exists($CONFIG['site']['templatepath'].$fn_template_filename.'.xhtml'))
 	{
 		$fn_t = getLangItem("lang_page_title_{$fn_template_filename}");
@@ -281,6 +359,7 @@ if($fn_url !== null && isset($fn_url['url']) && !empty($fn_url))
 			'stage_title' => $fn_stage_title,
 			'stage_type' => ($fn_tmpl_page && isset($fn_tmpl_page['type'])) ? $fn_tmpl_page['type'] : 1, //1 - pagina normal
 			'stage_tmpl' => $fn_tmpl_page_template,
+			'isIframe' => (isset($fn_g['iframe'])) ? true : false
 		));
 		exit;
 	}else{

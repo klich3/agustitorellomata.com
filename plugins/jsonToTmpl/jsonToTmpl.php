@@ -56,17 +56,7 @@ class WIDGET_jsonToTmpl {
 	 */
 	public function wPage($fn_args)
 	{
-		/*
-		var_dump($fn_args);
-		
-		array(5) { ["header_type"]=> string(6) "select" ["url"]=> string(4) "home" ["stage_id"]=> string(4) "home" ["plugins_templates"]=> array(3) { ["header_slider"]=> string(35) "plugins/header_slider/header_slider" ["jsonToTmpl"]=> string(29) "plugins/jsonToTmpl/jsonToTmpl" ["productos_destacados_footer"]=> string(63) "plugins/productos_destacados_footer/productos_destacados_footer" } ["st_lang"]=> string(2) "es" }
-		*/
-		
 		if(empty($fn_args['url'])) return;
-		
-		//hash de paginas
-		//$fn_arg_url = (preg_match('/(pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
-		$fn_hash = (isset($fn_args['stage_id']) && $fn_args['stage_id'] !== 'pages_details') ? $fn_args['stage_id'] : $fn_args['hash'];
 		
 		//excepcion
 		if(isset($fn_args['stage_tmpl']) && isset($fn_args['stage_id']) && $fn_args['stage_tmpl'] == $fn_args['stage_id']) $fn_hash = $fn_args['hash'];
@@ -75,14 +65,35 @@ class WIDGET_jsonToTmpl {
 		if(preg_match('/(admin)/', $fn_args['url'])) $fn_args['lang'] = 'es';
 		if(!isset($fn_args['lang'])) $fn_args['lang'] = $this->CONFIG['site']['defaultLang'];
 		
-		$fn_json = self::parseByPageContent($fn_args, $fn_hash);
-				
-		if(!$fn_json) return;
+		if(!isset($fn_args['hash']) && isset($fn_args['stage_id'])) $fn_args['hash'] = $fn_args['stage_id'];
+		
+		$fn_json = self::parseByPageContent($fn_args);
+		
+		if(!$fn_json)
+		{
+			$fn_args['hash'] = preg_replace("/\_/", "-", $fn_args['hash']);
+			
+			$fn_json = self::parseByPageContent($fn_args);
+			if(!$fn_json) return;
+		}
 		
 		$fn_json = base64_decode($fn_json);
 		$fn_json = html_entity_decode($fn_json, ENT_QUOTES | ENT_HTML5);
 		
 		if(!isJson($fn_json)) return;
+		
+		/*
+			replaces only on admin side
+		*/
+		if(class_exists('tooLogin') && $this->too_login->isLogged() == 200)
+		{
+			$fn_userData = $this->too_login->getUserData();
+			
+			foreach($fn_userData as $k => $v)
+			{
+				$fn_json = preg_replace("/%".$k."%/", $v, $fn_json);
+			}
+		}
 		
 		$fn_data = object_to_array(json_decode($fn_json));
 		$fn_hbox_count = 0;
@@ -131,35 +142,24 @@ class WIDGET_jsonToTmpl {
 				$fn_for_data['grid_collapse'] = '';
 			}
 			
-			if(isset($gv['control']))
+			//margin & padding
+			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
 			{
-				if($gv['control'] > 0)
+				$fn_for_data['mt'] = 'w-1-1';
+				//$fn_for_data['nb'] = '&nbsp;';
+			}
+			
+			//box height
+			if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
+			{
+				//separador entre cuadros
+				if($fn_hbox_count > 0)
 				{
-					$fn_page_metas = self::getPageMetas($fn_args['hash']);
-					
-					//button como llegar
-					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
-					{	
-						self::$fn_xtemplate_parse['assign'][] = $fn_page_metas;
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_geo_show_button";
-					}
-					
-					if($fn_page_metas && isset($fn_page_metas['actividades_reservas_show_button']) && $fn_page_metas['actividades_reservas_show_button'])
-					{	
-						self::$fn_xtemplate_parse['assign'][] = array();
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_reservas_show_button";
-					}
-					
-					self::$fn_xtemplate_parse['assign'][] = array();
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
+					self::$fn_xtemplate_parse['assign'][] = '';
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
 				}
 				
-				//saltamos resto de elementos no mover esta parte
-				
-				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
-				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
-				
-				continue;
+				$fn_hbox_count++;
 			}
 			
 			if(preg_match('/slider/', $gv['type']))
@@ -215,7 +215,6 @@ class WIDGET_jsonToTmpl {
 			{
 				//slider-0-10
 				//slider-<controls 0/1>-<id gallery>
-				
 				preg_match('/^videofs-(.*?)\-(.*?)\s/', $gv['type'], $fn_opts_match);
 				
 				if(sizeof($fn_opts_match) !== 0)
@@ -249,24 +248,35 @@ class WIDGET_jsonToTmpl {
 				continue;
 			}
 			
-			//margin & padding
-			if(preg_match('/(mt-|pt-)/', $fn_for_data['type']))
+			if(isset($gv['control']))
 			{
-				$fn_for_data['mt'] = 'w-1-1';
-				//$fn_for_data['nb'] = '&nbsp;';
-			}
-			
-			//box height
-			if(isset($fn_for_data['boxheight']) && $fn_for_data['boxheight'])
-			{
-				//separador entre cuadros
-				if($fn_hbox_count > 0)
+				if($gv['control'] > 0)
 				{
-					self::$fn_xtemplate_parse['assign'][] = '';
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row_boxh_sep";
+					$fn_page_metas = self::getPageMetas($fn_args);
+					
+					//button como llegar
+					if($fn_page_metas && isset($fn_page_metas['actividades_geo_show_button']) && $fn_page_metas['actividades_geo_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = $fn_page_metas;
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_geo_show_button";
+					}
+					
+					if($fn_page_metas && isset($fn_page_metas['actividades_reservas_show_button']) && $fn_page_metas['actividades_reservas_show_button'])
+					{	
+						self::$fn_xtemplate_parse['assign'][] = array();
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}.actividades_reservas_show_button";
+					}
+					
+					self::$fn_xtemplate_parse['assign'][] = array();
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row.element_control_{$gv['control']}";
 				}
 				
-				$fn_hbox_count++;
+				//saltamos resto de elementos no mover esta parte
+				
+				self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.grid.row";
+				
+				continue;
 			}
 			
 			self::$fn_xtemplate_parse['assign'][] = $fn_for_data;
@@ -350,15 +360,17 @@ class WIDGET_jsonToTmpl {
 	 * @param string $fn_page_hash
 	 * @return void
 	 */
-	private function getPageMetas($fn_page_hash)
+	private function getPageMetas($fn_args)
 	{
 		$fn_q = $this->db->FetchAll("
 			SELECT m.*
 			FROM `pages_meta` m
 			LEFT JOIN `pages` p ON(m.`p_id`=p.`id`)
 			WHERE p.`obj_hash`=:h
+			AND p.`lang`=:l
 		", array(
-			"h" => $fn_page_hash
+			"h" => $fn_args['hash'],
+			"l" => $fn_args['st_lang']
 		));
 		
 		$fn_result = false;
@@ -379,41 +391,66 @@ class WIDGET_jsonToTmpl {
 	 * @param mixed $fn_hash
 	 * @return void
 	 */
-	private function parseByPageContent($fn_args, $fn_hash)
+	private function parseByPageContent($fn_args)
 	{
-		//idioma por defecto
-		$fn_def_lang = $this->db->FetchArray("
-			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` AS 'pageContent'
-			FROM `pages` p
-			LEFT JOIN `pages_meta` m ON(m.`p_id`=p.`id`)
-			WHERE p.`obj_hash`=:hash
-			AND p.`lang`=:l
+		$fn_get_normal = $this->db->FetchArray("
+			SELECT *
+			FROM `pages`
+			WHERE `obj_hash`=:h
+			AND `lang`=:l
+		", array(
+			"h" => $fn_args['hash'],
+			"l" => $fn_args['lang']
+		));
+		
+		if($fn_get_normal)
+		{
+			//normal page with lang
+			$fn_q_metas = self::getPageMetas($fn_args);
+			
+			return $fn_q_metas['page_content'];
+		}else{
+			//no lang look for rel
+			//redirect to correct one
+			
+			if(preg_match('/(admin)/', $fn_args['url'])) return false;
+			
+			$fn_trans = $this->db->FetchValue("
+				SELECT ph.`obj_hash`
+				FROM `pages` p
+				LEFT JOIN `pages_lang_rel` r ON(r.`page_id`=p.`id`)
+				LEFT JOIN `pages` ph ON(ph.`id`=r.`page_translate_id`)
+				WHERE p.`obj_hash`=:h
+				AND r.`lang_type`=:l
+				LIMIT 1;
+			", array(
+				"h" => $fn_args['hash'],
+				"l" => $fn_args['st_lang'],
+			));
+			
+			$fn_args['hash'] = $fn_trans;
+			
+			$fn_q_metas = self::getPageMetas($fn_args);
+			
+			return ($fn_q_metas) ? $fn_q_metas['page_content'] : false;
+		}
+	}
+	
+	private function loadRelContent($fn_rel_id)
+	{
+		$fn_q = $this->db->FetchArray("
+			SELECT p.`id`, p.`active`, p.`lang`, m.`meta_value` as 'pageContent'
+			FROM `pages_lang_rel` r
+			LEFT JOIN `pages` p ON(p.`id`=r.`page_translate_id`)
+			LEFT JOIN `pages_meta` m ON(m.`p_id`=r.`page_translate_id`)
+			WHERE r.`page_id`=:id
 			AND m.`meta_key`='page_content'
-			AND p.`active`='1'
 			LIMIT 1;
 		", array(
-			'hash' => $fn_hash,
-			'l' => $this->CONFIG['site']['defaultLang'],
+			'id' => $fn_rel_id
 		));
 		
-		if(!$fn_def_lang) return false;
-		
-		$fn_translate = $this->db->FetchValue("
-			SELECT m.`meta_value` AS 'pageContent'
-			FROM `pages_lang_rel` pr
-			LEFT JOIN `pages_meta` m ON(m.`p_id`=pr.`page_translate_id`)
-			WHERE m.`meta_key`='page_content'
-			AND pr.`lang_type`=:lang
-			AND pr.`page_id`=:pid
-		", array(
-			'lang' => $fn_args['lang'],
-			'pid' => $fn_def_lang['id'],
-		));
-
-		$fn_translate_unbase = base64_decode($fn_translate);
-		$fn_json = (isset($fn_translate) && $fn_translate_unbase !== 'false' && $fn_args['lang'] !== $this->CONFIG['site']['defaultLang']) ? $fn_translate : $fn_def_lang['pageContent'];
-		
-		return $fn_json;
+		return ($fn_q) ? $fn_q : false;
 	}
 	
 	/**

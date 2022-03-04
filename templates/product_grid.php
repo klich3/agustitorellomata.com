@@ -2,7 +2,6 @@
 	
 global $CONFIG, $fn_page_args, $db, $st_lang;
 
-
 $fn_q_cat_list = $db->FetchAll("
 	SELECT p.*,  c.`lang_data` AS 'cat_title', g.`objects` AS 'file'
 	FROM `category` c
@@ -63,22 +62,68 @@ if($fn_q_cat_list)
 					$fn_xtemplate_parse['assign'][] = array(
 						'url' => (isset($fn_meta_array['page_is_link']) && preg_match('/(http|www)/', $fn_meta_array['page_is_link'])) ? $fn_meta_array['page_is_link'] : $CONFIG['site']['base_script'].$fn_meta_array['page_is_link'],
 					);
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.a_init";
-					$fn_xtemplate_parse['assign'][] = array();
-					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.a_final";
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.ficha_link";
 				}
+				
+				$fn_stock = $db->FetchObject("
+					SELECT *
+					FROM `product_stock`
+					WHERE `id`=:id
+					LIMIT 1;
+				", array(
+					"id" => $vi->id
+				));
+				
+				if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier > 1)
+				{
+					$fn_stock->precio_caja = round($fn_stock->pax_multimplier * $fn_stock->precio_venta, 2);
+					
+					$fn_xtemplate_parse['assign'][] = $fn_stock;
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.multiplier";
+				}
+				
+				if($fn_stock && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+				{
+					$fn_xtemplate_parse['assign'][] = $fn_stock;
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_price";
+					
+					$fn_xtemplate_parse['assign'][] = array(
+						'id' => $vi->id,
+						'cat_id' => $vi->cat_id,
+					);
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.venta_but";
+				}
+				
+				if($fn_stock && isset($fn_stock->pax_multimplier) && $fn_stock->pax_multimplier > 1 && isset($fn_stock->precio_venta) && $fn_stock->precio_venta > 0)
+				{
+					$fn_xtemplate_parse['assign'][] = "";
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.title_sep";
+				}
+				
+				//subtitle
+				if(isset($vi->subtitle_lang_data))
+				{
+					$fn_xtemplate_parse['assign'][] = array(
+						'subtitle' => html_entity_decode(decodeLangData($vi->subtitle_lang_data))
+					);
+					$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row.subtitle";
+				}
+				
 				
 				//interios del grupos
 				$fn_xtemplate_parse['assign'][] = array(
 					'title' => html_entity_decode(decodeLangData($vi->lang_data)),
 					'image' => ($fn_file['img']) ? $fn_file['img'] : "{$CONFIG['site']['base_script']}images/nofoto.png",
 					'alt' => $fn_file['alt'],
-				);
+					'id' => $vi->id,
+					'cat_id' => $vi->cat_id,
+					'sm' => (count($cv['cat_items']) == 3) ? "sm" : ""
+				); 
 				$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod.row";
 			}
 			
 			//pructos
-			$fn_xtemplate_parse['assign'][] = array();
+			$fn_xtemplate_parse['assign'][] = "";
 			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.group.prod";
 		}
 		

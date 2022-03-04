@@ -1,0 +1,81 @@
+<!-- BEGIN: mis_devoluciones -->
+<div class="w-1-1 pt-4 pb-6">
+	<div class="w-1-1">
+		<h1 class="txt@c"><span class="txt@u">{lang_page_title_mi_cuenta}</span></h1>
+	</div>
+</div>
+
+<div class="w-1-1">
+	<div class="c cc cp-4@s">
+		<div class="g">
+			<div class="ws-1-1 wm-2-10 wl-2-10 wxl-2-10 admin-menu sep">
+				{FILE {adminMenuTmpl}}
+			</div>
+			
+			<div class="w-1-1 pt-10 pb-2 hl"></div>
+			
+			<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
+				<div class="pl-2 pl-n@s">
+					<div class="g">
+					<!--////-->
+						<!-- BEGIN: no_pedidos -->
+						<div class="w-1-1 txt@c">
+							<div class="w-1-1">
+								{msg_no_hay_pedidos}
+							</div>
+							
+							<div class="w-1-1 mt-2">
+								<a href="{base}{user_lang}/atm-club-shop" class="button" data-event="mi-devoluciones/tienda">{but_ir_a_la_tienda}</a>
+							</div>
+						</div>
+						<!-- END: no_pedidos -->
+						
+							<div class="w-7-10">
+						<!-- BEGIN: pedidos -->
+								<form>
+									<fieldset>
+										<label for="f_subject">{form_motivo}</label>
+										<input type="text" name="f_subject" class="w-1-1" />
+									</fieldset>
+									
+									<fieldset>
+										<label for="f_or_id">{form_order_id}</label>
+										<select name="f_or_id" class="w-1-1">
+											<option value="">{lang_select}</option>
+											<!-- BEGIN: sel_row -->
+											<option value="{order_id}" {sel}>{order_id}</option>
+											<!-- END: sel_row -->
+										</select>
+									</fieldset>
+									
+									<fieldset>
+										<label for="f_message">{form_message}</label>
+										<textarea name="f_message" rows="10" class="w-1-1"></textarea>
+									</fieldset>
+									
+									<fieldset>
+										<a href="javascript:void(0);" rel="nofollow" class="button" data-action="reclamacionSend" data-event="mi-devoluciones/submit"><span class="h pr-4" data-preloader><img src="{base}images/preloader-gray-small.gif" /></span> {form_but_send}</a>
+									</fieldset>
+									
+									<fieldset class="w-1-1">
+										<div data-message class="h">
+											<img src="{base_script}images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{contact_form_confirm}</spam>
+										</div>
+									</fieldset>
+								</form>
+							</div>
+							
+							<div class="w-1-1">&nbsp;</div>
+						<!-- END: pedidos -->
+							</div>
+						</div>
+					<!--////-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="w-1-1 pb-10"></div>
+<!-- END: mis_devoluciones -->

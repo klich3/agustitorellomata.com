@@ -60,6 +60,8 @@ switch($g_action)
 		//edit normal content
 		$fn_meta_title = (!empty($fn_q_prod['lang_data']) && isJson($fn_q_prod['lang_data'])) ? object_to_array(json_decode($fn_q_prod['lang_data'])) : '';
 		
+		$fn_meta_subtitle = (!empty($fn_q_prod['subtitle_lang_data']) && isJson($fn_q_prod['subtitle_lang_data'])) ? object_to_array(json_decode($fn_q_prod['subtitle_lang_data'])) : '';
+		
 		//lang tabs and content inside
 		foreach($fn_lang as $lk => $lv)
 		{
@@ -72,7 +74,8 @@ switch($g_action)
 			
 			$fn_for_data = array(
 				'lang' => $lv,
-				'lang_title' => (isset($fn_meta_title[$lv])) ? $fn_meta_title[$lv] : '',
+				'lang_title' => (isset($fn_meta_title[$lv])) ? html_entity_decode($fn_meta_title[$lv]) : '',
+				'lang_subtitle' => (isset($fn_meta_subtitle[$lv])) ? html_entity_decode($fn_meta_subtitle[$lv]) : '',
 				'lang_content' => $fn_lang_content,
 				'lang_envio_extra' => $fn_lang_envio_extre,
 			);
@@ -84,40 +87,6 @@ switch($g_action)
 			$fn_xtemplate_parse['assign'][] = $fn_for_tabs;
 			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.tab_lang";
 		}
-		
-		//select size
-		$fn_q_size = $db->FetchAll("
-			SELECT *
-			FROM `product_size`;
-		");
-		
-		if($fn_q_size) foreach($fn_q_size as $ssk => $ssv)
-		{
-			$fn_for_data = object_to_array($ssv);
-			$fn_for_data['lang_title'] = langTitleJsonToStringJointer($ssv->lang_data);
-			$fn_for_data['selected_item'] = ($ssv->id == $fn_q_prod['size_id']) ? 'selected' : '';
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.size_sel";
-		}
-		//select size
-		
-		//select color
-		$fn_q_color = $db->FetchAll("
-			SELECT * 
-			FROM `product_color`;
-		");
-		
-		if($fn_q_color) foreach($fn_q_color as $sck => $scv)
-		{
-			$fn_for_data = object_to_array($scv); 
-			$fn_for_data['lang_title'] = langTitleJsonToStringJointer($scv->lang_data);
-			$fn_for_data['selected_item'] = ($scv->id == $fn_q_prod['color_id']) ? 'selected' : '';
-			
-			$fn_xtemplate_parse['assign'][] = $fn_for_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.editProducto.color_sel";
-		}
-		//select color
 		
 		//categoria
 		if($fn_q_prod['cat_id'] !== 0)
@@ -142,7 +111,7 @@ switch($g_action)
 		{
 			if(preg_match('/(link|customimage|keywords|description|resumen|image|freatured|gallery)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value)) ? html_entity_decode($mv->m_value, ENT_QUOTES) : '';
 			
-			if(preg_match('/(noodp|noydir|nofollow|noarchive|check|show_button_addcart)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value) && $mv->m_value == 1) ? 'selected' : '';
+			if(preg_match('/(noodp|noydir|nofollow|noarchive|check|show_button_addcart|by_pax|by_box)/', $mv->m_key)) $fn_q_prod[$mv->m_key] = (!empty($mv->m_value) && $mv->m_value == 1) ? 'selected' : '';
 		}
 		//metas
 		
@@ -169,7 +138,7 @@ switch($g_action)
 			$fn_for_data = object_to_array($pv);
 			
 			//title
-			$fn_for_data['item_title'] = langTitleJsonToStringJointer($pv->lang_data);
+			$fn_for_data['item_title'] = html_entity_decode(langTitleJsonToStringJointer($pv->lang_data));
 			
 			//thumb
 			if($pv->gallery_id == NULL || $pv->gallery_id == 0)
@@ -202,7 +171,7 @@ switch($g_action)
 			
 			if(sizeof($fn_cat_lang_data) !== 0) foreach($fn_lang as $cak)
 			{
-				$fn_cat_title_out[] = (isset($fn_cat_lang_data[$cak])) ? $fn_cat_lang_data[$cak] : '';
+				$fn_cat_title_out[] = (isset($fn_cat_lang_data[$cak])) ? html_entity_decode($fn_cat_lang_data[$cak]) : '';
 			}
 			
 			//title
@@ -224,7 +193,7 @@ switch($g_action)
 			{
 				$fn_foritem_data = object_to_array($iv);
 				
-				$fn_foritem_data['item_title'] = langTitleJsonToStringJointer($iv->lang_data);
+				$fn_foritem_data['item_title'] = html_entity_decode(langTitleJsonToStringJointer($iv->lang_data));
 				
 				//thumb
 				if($iv->gallery_id == NULL || $iv->gallery_id == 0)
@@ -243,38 +212,6 @@ switch($g_action)
 		}
 		
 		// MODAL ------------------------------------------------
-		
-		//size & color
-		$fn_q_c = $db->FetchAll("
-			SELECT *
-			FROM `product_color`;
-		");
-		
-		if($fn_q_c) foreach($fn_q_c as $ck => $cv)
-		{
-			$fn_f_data = object_to_array($cv);
-			$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($cv->lang_data);
-						
-			$fn_xtemplate_parse['assign'][] = $fn_f_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list.producto_color_item";
-		}
-		
-		unset($fn_f_data);
-		unset($fn_f_lang_title);
-		
-		$fn_q_s = $db->FetchAll("
-			SELECT *
-			FROM `product_size`;
-		");
-		
-		if($fn_q_s) foreach($fn_q_s as $sk => $sv)
-		{
-			$fn_f_data = object_to_array($sv);
-			$fn_f_data['lang_parse'] = langTitleJsonToStringJointer($sv->lang_data);
-			
-			$fn_xtemplate_parse['assign'][] = $fn_f_data;
-			$fn_xtemplate_parse['parse'][] = "{$fn_page_args['stage_id']}.list.producto_size_item";
-		}
 		
 		//lang modal
 		if($fn_lang) foreach($fn_lang as $l)
