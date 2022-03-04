@@ -8,6 +8,10 @@ ___   _   _
  ) ) / | / | 
 /_/_ |_| |_| 
 
-Designed By: 
+Designed by: 
+
+Albert Ventosa Rodríguez
+
+Directed and management of this project by: 
 
 Albert Ventosa Rodríguez
