@@ -9,20 +9,7 @@ $(function()
 		   
 		   //slider action
 		   '{{if v.type=="action"}}<a href="${v.url}" class="item" data-bgfrom-img="${v.img}" data-id="${i}">&nbsp;</a>{{/if}}'+
-		   
-			//slider video
-			/*'{{if v.type=="video"}}<div class="item video" data-bgfrom-img="${v.file}" data-id="${i}">'+
-				'<a href="javascript:void(0);" data-slider-action="stopvideo" class="video-close h"><svg width="35" height="35" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-videoclose"></use></svg></a>'+
-				'<div class="iframe-conteiner h"></div>'+
-				'<a href="javascript:void(0);" data-slider-action="loadvideo" data-video-iframe="${v.url}" data-event="home/video/${v.id}">'+
-					'<div class="video-icon"><svg width="92" height="92" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-videoplay"></use></svg></div>'+
-				'</a>'+
-			'</div>{{/if}}'+
-			*/
-		   
-			//slider media
-			//'{{if v.type=="media"}}<div class="item" data-bgfrom-img><div class="media-conteiner hidden"></div><a href="javascript:void(0);" data-media-file="${v.file}" data-event="home/slider/${v.file}"><div class="video-icon"></div><img src="${v.image}" alt="${v.alt}"/></a></div></div></div>{{/if}}'+
-			
+		   			
 		'{{/each}}{{/if}}'+
 		
 		'</div>'+ //slider-content
@@ -42,40 +29,49 @@ $(function()
 		'{{/each}}{{/if}}</ul></div>'+
 	'</div></div></div>{{/if}}');
 	
-	
-	//lista de productos del grid
-	$.template('productItemTMPL', '{{if status=="200" && data.length!=="0"}}{{each(i, v) data}}<li><div class="img-cnt" data-bgfrom-img="${v.image}"><a href="javascript:void(0);" rel="nofollow" data-type="getProductDetails" data-pid="${v.id}"><span class="h">{{if lang}}${lang.lang_details}{{else}}+{{/if}}</span></a></div></li>{{/each}}{{/if}}');
-	
 	//preloader del grid productos
 	$.template('preloaderTMPL', '<img src="'+fn_base_script+'images/preloader-big.gif" alt="preloader spinning animation" />');
 	
-	//modal detalles del producto
-	$.template('prodDetailsTMPL', '<div class="w-1-1 mt-3"></div><div class="g"><div class="pt-2 ws-1-1 wm-2-3 wl-2-3 wxl-2-3">'+
-		//slider
-		'{{if data.slider}} <div class="slider-area h" data-slider-id="slider_product"><noscript id="sliderData">{{parsejson data.slider}}</noscript></div>{{/if}}'+
+	//cookies
+	$.template('smallCookie', '<div class="cookies-policy">'+
+		'Aceptas nuestra <a href="'+fn_base_script+'politica-de-privacidad" target="_self">Política de Privacidad</a> y <a href="'+fn_base_script+'politica-de-cookies" target="_self">Política de Cookies</a>?<br/>Utilizamos ‘cookies’ propias y de terceros para mejorar nuestros servicios, así como para obtener datos estadísticos de navegación de los usuarios.'+
+		'<div class="w-1-1 pt-2"></div>'+
+		'<a href="javascript:void(0);" data-cookies="accept">Aceptar</a>'+
+	'</div>');
+	
+	//cart
+	$.template('cart', '<div class="cart-container"><div class="w-1-1"><a href="javascript:void(0);" data-action="closeCart"><img src="'+fn_base_script+'images/icon-close.svg" width="27px" height="27px" alt="close button"/></a></div><div class="w-1-1 pt-2"></div><div class="container">'+
+				'{{if data.status == 400}}'+
+					'{{if data.message}}<div class="w-1-1 txt@c">${data.message}</div>{{/if}}'+
+				'{{else}}'+
+					'{{if data.data && data.data.checkout && data.data.checkout.cart_count == 0}}<div class="txt@c">${data.lang.cart_empty}</div>{{else}}'+
+
+						//items
+						'{{if data.data && data.data.cart}}{{each(i, v) data.data.cart}}{{tmpl({data:v, lang:data.lang}) "cart_item"}}{{/each}}{{/if}}'+
+						
+						//total
+						'{{if data.data && data.data.checkout}}<div class="w-1-1"></div><div class="g gc"><div class="w-1-2"></div><div class="w-1-2"><div class="g gc"><div class="w-1-2"><strong class="label txt@u">${data.lang.lang_iva}(${data.data.checkout.cart_iva_percent}%)</strong></div><div class="w-1-2 txt@r"><strong class="label txt@u txt-org">${data.data.checkout.cart_iva}&euro;</strong></div><div class="w-1-2"><strong class="label txt@u">SUBTOTAL</strong></div><div class="w-1-2 txt@r"><strong class="label txt@u txt-org">${data.data.checkout.cart_subtotal}&euro;</strong></div></div></div></div><div class="w-1-1 pb-5"></div>'+
+					'{{/if}}'+
+						
+						//botones final					
+						'{{if data.data && data.data.cart}}{{tmpl() "cart_botones_final"}}{{/if}}'+
+						
+					'{{/if}}{{/if}}'+
+				'{{if data == "preload"}}<div class="w-1-1 tc txt@c">{{tmpl() "preloaderTMPL"}}</div>{{/if}}'+
+		'</div></div>');
+	
+	$.template('cart_item', '<div class="item" data-cid="${data.cat_id}" data-pid="${data.p_id}"><div class="g gc"><div class="w-1-2"><img src="${data.thumb}" class="e" /></div><div class="w-1-2"><div class="w-1-1 txt@u txt-org">{{if data.title}}<div class="w-1-1"><strong class="label">{{html data.title}}</strong></div>{{/if}}{{if data.subtitle}}<div class="w-1-1">{{html data.subtitle}}</div>{{/if}}</div><div class="w-1-1 sep"></div>{{if data.pax_multimplier >= "1"}}<div class="w-1-1"><strong>${lang.lang_box} ${data.pax_multimplier} ${lang.lang_bot}</strong></div><div class="w-1-1 txt-org"><strong>${data.price_caja}&euro;</strong></div>{{if data.price_unit != "0"}}<div class="w-1-1"><strong>${data.price_unit}&euro; ${lang.lang_ud}</strong></div>{{/if}}<div class="w-1-1 sep"></div>'+
+//cajas			
+'{{if data.by_box && data.by_box == "1"}}<div class="w-1-1"><div class="g gc" data-group="control"><div class="w-1-1 pb-2"><strong>${lang.cart_cant_cajas}</strong></div><div class="w-6-10"><div class="w-1-1"><input type="number" name="multimplier" min="1" max="${data.stock_count / data.multimplier}" value="${data.multimplier}" data-multimplier class="w-1-1 txt@c"/></div></div><div class="w-4-10"><a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side"><img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" /></a></div><div class="w-1-1 pt-4"></div><div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c"><a href="javascript:void(0);"  data-action="cartDownItem-side">\<img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" /></a><a href="javascript:void(0);" data-action="cartUpItem-side"><img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" /></a></div><div class="w-4-10"></div><div class="w-1-1 txt-org txt@r pt-9"><strong>${data.price_multimplier}&euro;</strong></div></div></div>{{/if}}{{if data.by_box && data.by_box == "1" && data.by_pax && data.by_pax == "1"}}<div class="w-1-1 sep"></div>{{/if}}{{/if}}'+
 		
-		'</div><div class="pt-2 ws-1-1 wm-1-3 wl-1-3 wxl-1-3">'+
-		
-		//data content
-		'<div class="w-1-1 pt-3 hl">&nbsp;</div>'+
-		'{{if data.lang_data}}<div class="w-1-1 txt@c pt-3 pb-3 border@t@b title">${data.lang_data}</div>{{/if}}'+
-		'{{if data.lang_content}}<div class="w-1-1 pt-3 pb-3 border@b desc">{{html data.lang_content}}</div>{{/if}}'+
-		'<div class="w-1-1 pt-3 pb-3 border@b">'+
-			'<div class="g">'+
-				'<div class="w-1-2 price">125 €</div>'+
-				'<div class="w-1-2">'+
-					'<ul class="ln g gc gw-1-3 txt@c w-1-1">'+
-						'<li><a href="javascript:void(0);" rel="nofollow" class="arrow l"><svg width="40" height="40" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-l"></use></svg></a></li>'+
-						'<li class="qty">1</li>'+
-						'<li><a href="javascript:void(0);" rel="nofollow" class="arrow r"><svg width="40" height="40" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" ><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#arrow-r"></use></svg></a></li>'+
-					'</ul>'+
-				'</div>'+
-			'</div>'+
-		'</div>'+
-		'<div class="w-1-1 font@lr pt-3 pb-2"><a href="" class="button">añadir al cesta</a></div>'+
-		'<div class="w-1-1 font@lr pt-2 pb-3"><a href="" class="button">comprar ahora</a></div>'+
-		
-	'</div></div>');
+//botones botellas
+'{{if data.by_pax && data.by_pax == "1"}}<div class="w-1-1"><div class="g gc" data-group="control"><div class="w-1-1 pb-2"><strong>${lang.cart_cant_bot}</strong></div><div class="w-6-10"><div class="w-1-1"><input type="number" name="pax" min="1" max="${data.stock_count}" value="${data.pax}" data-pax class="w-1-1 txt@c"></div></div><div class="w-4-10"><a href="javascript:void(0);" class="fr w-1-1 txt@c" data-action="cartDelItem-side"><img src="'+fn_base_script+'images/icon-trash.svg" width="22px" height="27px" /></a></div><div class="w-1-1 pt-4"></div><div class="w-6-10 flx@fd-r@jc-sb@ai-c@ac-c"><a href="javascript:void(0);"  data-action="cartDownItem-side"><img src="'+fn_base_script+'images/icon-minus.svg" width="25px" height="25px" /></a><a href="javascript:void(0);" data-action="cartUpItem-side"><img src="'+fn_base_script+'images/icon-plus.svg" width="25px" height="25px" /></a></div><div class="w-4-10"></div><div class="w-1-1 txt-org txt@r pt-9"><strong>${data.price_unit_total}&euro;</strong></div></div></div>{{/if}}</div><div class="w-1-1 pt-1"></div><div class="w-1-1 sep"></div><div class="w-1-1 pt-1"></div></div></div>');
+	
+	$.template('cart_botones_final', '<div class="w-1-1 pb-4">'+
+		'<div class="w-1-1 pb-2"><a href="'+fn_base_script+'atm-club-shop" class="w-1-1 secundary button" data-action="closeCart">${data.lang.cart_seguircomprando_but}</a></div>'+
+		'<div class="w-1-1 pb-2"><a href="'+fn_base_script+'cart" class="w-1-1 secundary button">${data.lang.cart_vercarrito_but}</a></div>'+
+		'<div class="w-1-1"><a href="'+fn_base_script+'checkout" class="w-1-1 button">${data.lang.cart_checkout_but}</a></div>'+
+	'</div>');
 	
 	//_G vars
 	var _G = {
@@ -85,6 +81,7 @@ $(function()
 		USERLANG: userLang,
 		REQ:false,
 		COOKIES:false,
+		EDAD:false,
 		GMAP:false,
 		GMAPSTYLE:[{featureType:"all",stylers:[{saturation:-100},{gamma:0.50}]},{featureType:"water",elementType:"all",stylers:[{hue:"#d8d8d8"},{visibility: "simplified"}]},{featureType:"landscape",elementType:"all",stylers:[{hue:"#0077ff"},{visibility:"simplified"},{invert_lightness:"true"}]} ],
 		GMAP_JSON:{},
@@ -96,6 +93,9 @@ $(function()
 	var init = function()
 	{
 		trace('init running up jquery.ver['+$().jquery+']');			
+		
+		_G.COOKIES = readCookie('showPrivacy');
+		_G.EDAD = readCookie('showEdad');
 		
 		//miramos el hash y cargamos los scripts correspondientes
 		$('html[data-hash]').each(function(e)
@@ -118,19 +118,31 @@ $(function()
 			
 			switch(_G.TYPE)
 		    {
-			    /*
-			    case "product_grid":
+				case "home":
+					window.loadJS(
+						{
+							items:[
+								fn_base_script+'js/jquery.fancybox.min.js',
+								fn_base_script+'js/iphone-inline-video.min.js'
+							],
+							callback: fn_home_edad()		
+						});
+				break;
+				
+			    case "checkout":
+					$('html[data-hash="checkout"] :input').on("change", e_checkoutValidator_handler);
 			    break;
-				*/
-		    }
+		    	
+				case "cart":
+					$('[data-multiplier] input').on("change", e_updateCart);
+				break;
+			}
 		});
 		
 		fn_init_fn();
 		
-		/*
-		_G.COOKIES = readCookie('showPrivacy');
 		
-		if(_G.COOKIES !== 'false')
+		if(!_G.COOKIES)
 		{
 			if(debug) console.log("[>] COOKIES");
 			
@@ -141,7 +153,6 @@ $(function()
 				$(document).on('click', '[data-cookies="accept"]', e_cond_accept);
 			}, 5000));
 		}
-		*/
 		
 		//scroll to 
 		$(document).on('click', '[href^="#"]', e_scrolltoid);
@@ -149,12 +160,315 @@ $(function()
 		//mobile click
 		$(document).on('click', '[menu-handler]', fn_menu_handler);
 		
-		//$(document).on('click', '[data-action]', e_action_submit_handler);
+		$(document).on('click', '[data-action]', e_action_handler);
 		$(document).on('click', '[data-event]', e_analytics_event);
 		
 		$(document).on('click', '[data-submenu="1"]', fn_tab_handler);
 		
+		$(document).on('click', '.cart-close-outside', e_closeCartOutDom);
+		$(document).on('click', '[data-show-pass]', e_showPass);
+		$(document).on('click', '[data-edad]', fn_home_edad_buttons_handler);
+				
 		$(window).on('resize', e_resize).trigger('resize');
+		
+		//load script
+		if($('[data-fancybox]').length !== 0) window.loadJS(
+		{
+			items:[
+				fn_base_script+'js/jquery.fancybox.min.js'
+			],
+			callback: fn_init_fancybox()		
+		});
+	}
+	
+	fn_home_edad_buttons_handler = function()
+	{
+		var ele = $(this).attr('data-edad');
+		
+		if(ele == "si") createCookie('showEdad', 'true', 2);
+		$.fancybox.close(true);
+	}
+	
+	fn_home_edad = function()
+	{
+		if(_G.EDAD) return;
+		
+		clearTimeout($.data(this, 'timertoshowEdad'));
+		$.data(this, 'timertoshowEdad', setTimeout(function()
+		{
+			$.fancybox.open({
+				src  : '#modal_edad',
+				type : 'inline',
+				toolbar  : false,
+				smallBtn : true,
+				infobar : false,
+				arrows : false,
+				closeExisting : true,
+				buttons:[],
+			});
+		}, 5000));
+	}
+	
+	e_showPass = function(e)
+	{
+		var ele = $(e.currentTarget).parents('span').find(':input');
+		
+		if(ele.attr('type') == "password")
+		{
+			ele.attr('type', 'text');
+		}else{
+			ele.attr('type', 'password');
+		}
+	}
+	
+	e_closeCartOutDom = function(e){
+		e.stopPropagation();
+		e.preventDefault();
+		e_action_handler(null, "closeCart")
+		return;
+	}
+	
+	e_updateCart = function(e) 
+	{
+		e_action_handler(e, 'upCart');
+		return;
+	}
+	
+	//validador de checkout
+	e_checkoutValidator_handler = function()
+	{
+		var ele = $(this),
+			form = ele.parents("form"),
+			doms = form.find(":input[required]"),
+			emptyFields = 0;
+		
+		if(doms) for(var e in doms)
+		{
+			if(!$.isNumeric(e)) continue;
+			if($(doms[e]).val() == "") emptyFields++;
+		}
+		
+		if(!$('[name="p_pay_type"]').is(":checked")) emptyFields++;
+		
+		if(!emptyFields)
+		{
+			var dom_p = $('input[name="p_agree_privacy"]').is(":checked") ? true : false,
+				dom_y = $('input[name="p_agree_payment"]').is(":checked") ? true : false;
+			
+			if(dom_p && dom_y && emptyFields == 0)
+			{
+				$('[data-action="checkoutPayment"]').attr('disabled', false);
+			}else{
+				$('[data-action="checkoutPayment"]').attr('disabled', true);
+			}
+		}
+	}
+	
+	e_action_handler = function(e, fn) {
+		var ele = $(this),
+		dom_type = (fn) ? fn : ele.attr('data-action'),
+		dom_data_ser = (ele.parents('form').length !== 0) ? ele.parents('form').serialize() : null;
+		
+		//cart buttons
+		if(/cartUpItem|cartUpItem-side/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			if(itm.val() == undefined || itm.val() == "")
+			{
+				itm.val(1);
+			}else{
+				itm.val(parseFloat(itm.val()) + 1);
+			}
+			
+			e_action_handler(e, 'upCart');
+			return;
+		}
+		
+		if(/cartDownItem|cartDownItem-side/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			itm.val(parseFloat((itm.val() == 0) ? 0 : itm.val() - 1));
+			e_action_handler(e, 'upCart');
+			return;
+		}
+		
+		if(/cartDelItem|carDelItem-side/gim.test(dom_type))
+		{
+			var itm = ele.parents('[data-group="control"]').find(':input');
+			itm.val(0);
+			
+			var itms = ele.parents('.item').find('[data-group="control"]'),
+				isDel = false;
+			
+			if(itms)
+			{
+				var totalItms = itms.length;
+				var countItms = 0;
+				
+				for(var i in itms)
+				{
+					if(!$.isNumeric(i)) continue;
+					
+					if($(":input", itms[i]).val() == 0) countItms++;
+				}
+				
+				if(totalItms == countItms)
+				{
+					ele.parents('.item').remove();
+					e_action_handler(e, 'delCart');
+				}else{
+					e_action_handler(e, 'upCart');
+				}
+			}
+			
+			return;
+		}
+		
+		if(/(rec|Pass|client|clientUpInvoiceDir|clientUpShippingDir)/gim.test(dom_type)) ele.parents('form').find("input").removeClass("error");
+		
+		if(/(newClient)/gim.test(dom_type))
+		{
+			var accept = ele.parents('form').find("input[name='accept']").is(":checked");
+			if(!accept)
+			{
+				ele.parents('form').find("input[name='accept']").addClass("error");
+				return;
+			}
+		}
+		
+		if(/closeCart/gim.test(dom_type))
+		{
+			$('html').removeClass('menu-open').removeClass('openCart');
+			$('[data-cart-container]').empty();
+			
+			//recargamos la pagina en checkout
+			if($('html').attr('data-hash') == 'checkout') location.reload();
+			
+			return;
+		}
+		
+		if(/(repeat|add|open)Cart/gim.test(dom_type))
+		{
+			//quitamos el mob menu
+			$('html').removeClass('menu-open').addClass('openCart');
+			$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:"preload"}));
+		}
+		
+		if(/repeatCart/gim.test(dom_type)) dom_data_ser = ele.attr('data-id');
+		
+		if(/addCart/gim.test(dom_type))
+		{
+			var dom_data_ser = JSON.stringify({
+				"p_id": ele.data('id'),
+				"cat_id": ele.data('cat')
+			});
+		}
+		
+		//update cart items
+		if(/(del|up)Cart/gim.test(dom_type))
+		{
+			var dom_data_ser = JSON.stringify({
+				"p_id": $(e.currentTarget).parents('.item').data('pid'),
+				"cat_id": $(e.currentTarget).parents('.item').data('cid'),
+				"pax": $(e.currentTarget).parents('.item').find('[data-pax]').val(),
+				"multimplier" : $(e.currentTarget).parents('.item').find('[data-multimplier]').val(),
+			});
+		}
+		
+		if(/checkoutPayment/gim.test(dom_type))
+		{
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			e.stopPropagation();
+			
+			ele.attr("disabled", true);
+			
+			ele.parents('[data-cc-container]').find('[data-message]').show().html('<img src="'+fn_base_script+'images/preloader-gray-small.gif"/>');
+		}
+				
+		fn_call_ajax(dom_type, 
+		{
+			data:dom_data_ser
+		}, null, function(d)
+		{
+			if(debug) console.log(dom_type, d);
+			
+			if(/cart(Del|Down|Up)Item-side/gim.test(dom_type))
+			{
+				$('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+				return;
+			}
+				
+			if(/(add|open|repeat)Cart/gim.test(dom_type) || (/(up|del)Cart/gim.test(dom_type) && $('html').hasClass('openCart'))) $('.cart-wrap [data-cart-container]').html($.tmpl('cart', {data:d}));
+			
+			
+			if(d.status == 200)
+			{
+				//update header cart counter
+				if(/(up|add|open|repeat|del)Cart/gim.test(dom_type))
+				{
+					if(!d.data.cart || !d.data.cart.length)
+					{
+						$('.cart-not').addClass('h');
+						e_action_handler(null, "closeCart");
+					}else{
+						$('.cart-not').text(d.data.cart.length).removeClass('h');
+					}
+				}
+				
+				//reload add cart / del
+				if(/(up|del)Cart/gim.test(dom_type) && !$('html').hasClass('openCart')) window.location.reload();
+					
+				if(dom_type == 'newClient') window.location.href = "/atm-club-bienvenido";
+				if(dom_type == 'recPass') window.location.href = "/recuperacion-de-contrasena-enviado";
+				if(dom_type == 'recUpPass') window.location.href = "/login";
+				if(/(reclamacionSend|clientUpInvoiceDir|clientUpShippingDir|clientPersonalData|clientUpPass)/gim.test(dom_type)) ele.parents('form').find('[data-message]').show();
+				
+				if(dom_type == "checkoutPayment") ele.parents('[data-cc-container]').find('[data-message]').show();
+				
+				//clean form
+				if(/(reclamacionSend)/gim.test(dom_type))
+				{
+					ele.parents('form').find('select').val(0);
+					ele.parents('form').find(':input').val("");
+				}
+				
+				if(/checkoutPayment/gim.test(dom_type))
+				{
+					ele.attr("disabled", false);
+					
+					//si hay algun fallo redireccionamos a la pagina de tienda o home
+					if(d.data && d.data.redirect) window.location.href = d.data.redirect;
+					
+					if(d.data && d.data.pay_html)
+					{
+						var dom_container = $('<div/>', {
+							'class':'h',
+							'id':'paymentform'
+						});
+						
+						$('body').append(dom_container).find('#paymentform').html(d.data.pay_html);
+						$('#paymentform form').submit();
+					}
+				}
+				
+			}else{
+				if(dom_type == 'recPass') ele.parents('form').find("input").addClass("error");
+				
+				if(/checkoutPayment/gim.test(dom_type))
+				{
+					ele.attr("disabled", false);
+					$('[data-message]').html(d.message);
+				}
+			}
+			
+			if(/checkoutPayment/gim.test(dom_type)) ele.find('span').addClass('h');
+			
+			if(d.dom && d.dom.length !== 0) for(var i in d.dom)
+			{
+				$('[name="'+d.dom[i]+'"]').addClass("error");
+			}
+		});
 	}
 	
 	//tab open close
@@ -196,7 +510,6 @@ $(function()
 		
 		if($('noscript[id*="slider"]').length !== 0) fn_initSlider_handler();
 		if($('noscript[id*="videofs"]').length !== 0) fn_videofs_handler();
-		if($('noscript[id*="gmap"]').length !== 0) fn_gmap_handler();
 		
 		if($('[data-some-h]').length !== 0) some_h();
 		if($('[data-source]').length !== 0) fn_content_from_source();
@@ -273,8 +586,10 @@ $(function()
 	//init fancybox
 	fn_init_fancybox = function()
 	{
-		if(typeof $.fn.fancybox == 'function')
+		if(typeof $.fancybox == 'function')
 		{
+			clearTimeout($.data(this, 'data-fancybox'));
+			
 			var dom_gid = $.parseJSON($('body[data-popup]').attr('data-popup'));
 		
 			if(dom_gid) fn_call_ajax('homeGalleryContent', dom_gid, null, function(d)
@@ -293,12 +608,21 @@ $(function()
 					}
 				});
 			});
-			
-   			clearTimeout($.data(this, 'data-fancybox'));
 		}else{
 			clearTimeout($.data(this, 'data-fancybox'));
-		    $.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
+			$.data(this, 'data-fancybox', setTimeout('fn_init_fancybox()', 350));
 		}
+	}
+	
+	//cookies conditions
+	e_cond_accept = function()
+	{
+		createCookie('showPrivacy', 'true', 2);
+		
+		$('.cookies-policy', document).fadeOut(1200, function()
+		{
+			$(this).remove();
+		});
 	}
 	
 	//process videofs
@@ -321,8 +645,10 @@ $(function()
 			if(data && data.data.length !== 0) for(var i in data.data)
 			{
 				if(/mp4/gim.test(data.data[i].img)) items.mp4 = data.data[i].img;
+				
 				//if(/webmsd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
 				if(/webmhd/gim.test(data.data[i].img)) items.webm = data.data[i].img;
+				
 				if(/ogv|ogg/gim.test(data.data[i].img)) items.ogv = data.data[i].img;
 			}
 			
@@ -336,23 +662,57 @@ $(function()
 			var dom_v = $('[data-slider-id="'+_G.VIDEOFS[i].id+'"] video');
 			var fn_src = (!!document.createElement('video').canPlayType('video/mp4; codecs=avc1.42E01E,mp4a.40.2')) ? items.mp4 : items.webm;
 			
-			dom_v.attr('src', fn_src);
+			dom_v.attr('src', fn_base_script + fn_src);
+			//dom_v.on('oncanplay, loadedmetadata', e_play_video);
 			
-			$(dom_v).on('loadedmetadata', function(e)
-			{
-				//f_resizeVideo(e.target);
-				
-				$(e.target).animate(
-				{
-					opacity:1
-				}, 2000, 'easeOutExpo');
-			});
-			
-			$(dom_v).on('oncanplay', function(e)
-			{
-				$(e.target)[0].play();
-			});
+			init_videoinline(dom_v);
 		});
+	}
+	
+	//https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+	init_videoinline = function(dom){
+		if(typeof enableInlineVideo == 'function')
+		{
+			var video = $(dom).get(0);
+			enableInlineVideo(video, {
+				iPad: true
+			});
+			
+			setTimeout(function () { video.play();
+			 }, 1000); // example
+			
+		clearTimeout($.data(this, 'data-init_video'));
+		}else{
+			clearTimeout($.data(this, 'data-init_video'));
+			$.data(this, 'data-init_video', setTimeout(function(){
+				init_videoinline(dom);
+			}, 350));
+		}
+	}
+	
+	e_play_video = function(e)
+	{
+		var dom = $(e.currentTarget).get(0);
+		var status;
+		
+		try{
+			status = dom.play();
+			dom.attr('muted', false);
+		}catch(error)
+		{
+			status == undefined;
+		}
+		
+		if(status !== undefined)
+		{
+			clearTimeout($.data(this, 'data-playVideo'));
+			$.data(this, 'data-playVideo', setTimeout(function()
+			{
+				e_play_video(e);
+			}, 350));
+		}else{
+			clearTimeout($.data(this, 'data-playVideo'));
+		}
 	}
 	
 	//process slider
@@ -495,98 +855,6 @@ $(function()
 		ele.find('.dual-slider .iosSlider .thumb:eq(' + (c.currentSlideNumber - 1) + ')').addClass("selected");
 	}
 	
-	//process gmap
-	fn_gmap_handler = function()
-	{
-		if(!fn_gmapkey) return;
-		
-		trace("[R:681]");
-		
-		$('noscript[id*="gmap"]').each(function()
-		{
-			var dom_j = $('noscript#gmap').contents();
-			
-			if(dom_j.length == 0 && dom_j[0].data == undefined) return;
-			
-			_G.GMAP_JSON = $.parseJSON(dom_j[0].data);
-			
-			//cargamos el api de google maps
-			window.loadJS(
-			{
-				items:[
-					'//maps.googleapis.com/maps/api/js?v=3&key='+fn_gmapkey+'&callback=fn_gmapInit'
-				],
-				callback:function()
-				{
-					_G.GMAP = true;
-				}
-			});
-		});
-	}
-	
-	//google maps
-	fn_gmapInit = function(fn_action)
-	{
-		var ele = $('#'+_G.GMAP_JSON.renderDomId);
-		
-		if(!_G.FIRSTRUN) return;
-		if(fn_action == 'resize') ele.empty();
-		
-		trace("[R:713]");
-		
-		var args = {
-			center: new google.maps.LatLng(41.385064, 2.173403), //barcelona
-			zoom: 16,
-			disableDefaultUI: false,
-			draggable: true,
-			scaleControl: false,
-			scrollwheel: true,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-		
-		if(_G.GMAPSTYLE !== undefined && _G.GMAPSTYLE.length !== 0) args.styles = _G.GMAPSTYLE;
-		
-		//gmap
-		var map = new google.maps.Map(document.getElementById(_G.GMAP_JSON.renderDomId), args);
-		
-		var infowindow = new google.maps.InfoWindow();
-		var bounds = new google.maps.LatLngBounds();
-		
-		/*
-			for (var k in j) {
-				var d = j[k][0].split(", ");
-				var f = new google.maps.LatLng(d[0], d[1]);
-				b.extend(f);
-				l = new google.maps.Marker({
-					position: f,
-					map: c,
-					animation: (g == "resize") ? google.maps.Animation.NONE : google.maps.Animation.DROP
-				});
-				google.maps.event.addListener(l, "click", (function(m, p) {
-					return function() {
-						h.setContent('<a href="' + j[p][2] + '" style="color:#000"><strong>' + j[p][1] + "</strong></a>");
-						h.open(c, m)
-					}
-				})(l, k))
-			}
-		*/
-		var p = (_G.GMAP_JSON.gps.indexOf(', ') !== -1) ? _G.GMAP_JSON.gps.split(", ") : _G.GMAP_JSON.gps.split(",");
-		var fn_point = new google.maps.LatLng(p[0], p[1]);
-		
-		bounds.extend(fn_point);
-		
-		var marker = new google.maps.Marker(
-		{
-			position: fn_point, 
-			map: map,
-			icon: fn_base_script+'images/map-pin.png',
-			animation: (fn_action == 'resize') ? google.maps.Animation.NONE : google.maps.Animation.DROP
-		});
-		
-		map.setCenter(bounds.getCenter());
-		//map.fitBounds(bounds);
-	}
-	
 	//preload images
 	fn_page_preload_images = function()
 	{
@@ -727,7 +995,6 @@ $(function()
 		_G.FIRSTRUN = true;
 	}
 	
-	/*
 	//cookies read write
 	createCookie = function(name, value, days) 
 	{
@@ -755,7 +1022,6 @@ $(function()
 		
 		return null;
 	}
-	*/
 	
 	//ajax caller
 	fn_call_ajax = function(fn_hash, fn_data, fn_before, fn_success)

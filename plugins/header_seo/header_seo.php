@@ -74,7 +74,7 @@ class WIDGET_header_seo {
 			self::$fn_xtemplate_parse['assign'][] = array(
 				'value' => $sv,
 			);
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.{$sk}";	
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.{$sk}";	
 		}
 		
 		$fn_hash_to_title = ($fn_hash) ? ucfirst(str_replace(array('-', '_', '/'), ' ', $fn_hash)) : '';
@@ -89,7 +89,7 @@ class WIDGET_header_seo {
 			'sitetitlefull' => $this->CONFIG['site']['sitetitlefull'],
 			'og_image' => $fn_ob_image,
 		);
-		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.og_cart";
+		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.og_cart";
 		
 		//fb api
 		$fn_q_fbapi = $this->db->FetchValue("
@@ -104,7 +104,7 @@ class WIDGET_header_seo {
 			self::$fn_xtemplate_parse['assign'][] = array(
 				'fb_app' => $fn_q_fbapi,
 			);
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.fb_api";
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.fb_api";
 		}
 		//fb api
 		

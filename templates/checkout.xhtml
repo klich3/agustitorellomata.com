@@ -1,0 +1,411 @@
+<!-- BEGIN: checkout -->
+<div class="w-1-1" data-cc-container>
+  <div class="c cc cp-4@s">
+    <div class="w-1-1">{FILE {jsonToTmpl}}</div>
+  </div>
+
+  <div class="w-1-1 pt-6@s cp-2 cp-4@s">
+    <div class="g">
+      <!-- BEGIN: no_cart -->
+      <div class="w-1-1">
+        <div class="w-1-1 txt@c">{message}</div>
+
+        <div class="w-1-1 mt-2 txt@c">
+          <a
+            href="{base}{user_lang}/atm-club-shop"
+            class="button"
+            data-event="cart/tienda"
+            >{but_ir_a_la_tienda}</a
+          >
+        </div>
+      </div>
+      <!-- END: no_cart -->
+
+      <!-- BEGIN: cart -->
+      <div class="w-1-1">
+        <form>
+          <div class="g">
+            <!-- BEGIN: nologged -->
+            <div class="w-1-1 pb-1">
+              <p>{msg_no_logged}</p>
+
+              <div class="w-1-1 pt-1">&nbsp;</div>
+
+              <a
+                href="{base}{user_lang}/login"
+                class="button txt@u"
+                data-event="checkout/login"
+                >{menu_but_login}</a
+              >
+              <!-- BEGIN: hide -->
+              <a
+                href="{base}{user_lang}/login"
+                class="button txt@u"
+                data-event="checkout/registro"
+                >{menu_but_register}</a
+              >
+              <!-- END: hide -->
+            </div>
+
+            <div class="mt-2 w-1-1">&nbsp;</div>
+            <!-- END: nologged -->
+
+            <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10 side pr-2 pl-2@s">
+              <div class="txt@u brd-b mb-3">
+                <strong class="label">{checkout_title_adress_book}</strong>
+              </div>
+
+              <div class="box w-1-1 mb-4">
+                <div class="pt-4 pb-4">{checkout_message_account}</div>
+              </div>
+
+              <div class="txt@u brd-b pt-4">
+                <strong class="label">{lang_title_dir_shipping}</strong>
+              </div>
+
+              <div class="box w-1-1 mb-4">
+                <div class="pt-4 pb-4">{checkout_message_shipping}</div>
+              </div>
+
+              <div class="box w-1-1 mb-4">
+                <div class="pt-4 pb-4">{lang_campos_obligatorios}</div>
+                <div class="w-1-1 mt-4">
+                  <label for="u_name" class="pb-2"
+                    ><strong>{form_name}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="u_name"
+                    value="{u_name}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+
+                <div class="w-1-1 mt-4">
+                  <label for="u_surname" class="pb-2"
+                    ><strong>{form_surname}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="u_surname"
+                    value="{u_surname}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="u_cif" class="pb-2"
+                    ><strong>{form_cif}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="u_cif"
+                    value="{u_cif}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="dir_country" class="pb-2"
+                    ><strong>{lang_label_country}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="dir_country"
+                    value="{dir_country}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="dir_city" class="pb-2"
+                    ><strong>{lang_label_city}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="dir_city"
+                    value="{dir_city}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="dir_primary" class="pb-2"
+                    ><strong>{lang_label_dir}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="dir_primary"
+                    value="{dir_primary}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="dir_post" class="pb-2"
+                    ><strong>{lang_label_post}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="dir_post"
+                    value="{dir_post}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="u_tel" class="pb-2"
+                    ><strong>{form_tel}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="u_tel"
+                    value="{u_tel}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 mt-4">
+                  <label for="u_email" class="pb-2"
+                    ><strong>{label_email}</strong>
+                    <span class="txt-red">*</span>:</label
+                  >
+                  <input
+                    type="text"
+                    name="u_email"
+                    value="{u_email}"
+                    class="w-1-1"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="w-1-1 pt-4 hl">&nbsp;</div>
+
+            <div class="ws-1-1 wm-3-10 wl-3-10 wxl-3-10 side pl-2 pr-2">
+              <div class="txt@u brd-b mb-4">
+                <strong class="label">{checkout_pago_title}</strong>
+              </div>
+
+              <div class="w-1-1 pt-3 pb-4">
+                <div class="w-1-1 mt-4">
+                  <!-- BEGIN: no_payment_actived -->
+                  {no_payment_actived_message}
+                  <!-- END: no_payment_actived -->
+
+                  <ul class="ln g gw-1-1">
+                    <!-- BEGIN: pay_rd -->
+                    <li>
+                      <input
+                        type="radio"
+                        name="p_pay_type"
+                        value="rd"
+                        required
+                      />
+                      <span class="ml-2 txt@tb">{creditcard}</span>
+                    </li>
+                    <!-- END: pay_rd -->
+                  </ul>
+                </div>
+              </div>
+
+              <div class="txt@u brd-b pt-10 mb-3">
+                <strong class="label">{lang_entrega}</strong>
+              </div>
+
+              <div class="w-1-1 pt-4">{lang_entrega2472}</div>
+
+              <div class="txt@u brd-b pt-10 mb-3">
+                <strong class="label">{lang_envio}</strong>
+              </div>
+
+              <div class="w-1-1 pt-4">{lang_free}</div>
+            </div>
+
+            <div class="w-1-1 pt-4 hl">&nbsp;</div>
+
+            <div class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10 pl-2">
+              <div class="txt@u brd-b mb-4">
+                <strong class="label">{checkout_pedido_title}</strong>
+              </div>
+
+              <!-- BEGIN: no_cart -->
+              <p>{msg_cart_no_hay_compras}</p>
+              <div class="w-1-1 pt-3">&nbsp;</div>
+              <a
+                href="{base}{user_lang}/tienda"
+                class="button"
+                data-event="checkout/tienda"
+                >{but_ir_a_la_tienda}</a
+              >
+              <!-- END: no_cart -->
+
+              <!-- BEGIN: cart -->
+              <div class="brd-b">
+                <div class="g gc">
+                  <div class="w-1-3 txt@u">
+                    <strong>{lang_cart_producto_title}</strong>
+                  </div>
+                  <div class="w-1-3 txt@u@c">
+                    <strong>{lang_cart_cantidad_title}</strong>
+                  </div>
+                  <div class="w-1-3 txt@u@r">
+                    <strong>{lang_cart_price}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="w-1-1 mt-1">&nbsp;</div>
+
+              <!-- BEGIN: cart_row -->
+              <div class="g gc">
+                <div class="w-1-3">
+                  <div>
+                    <div class="title txt@u"><strong>{title}</strong></div>
+                    <div class="subtitle">{subtitle}</div>
+                  </div>
+                  <img
+                    src="{base}images/blank.gif"
+                    data-image="{thumb}"
+                    data-preloadimages
+                    class="e"
+                    title="product {title} image preview"
+                  />
+                </div>
+                <div class="w-2-3 txt@c">
+                  <div class="g">
+                    <!-- BEGIN: by_box -->
+                    <div class="w-1-2 txt@c">
+                      <strong>{cart_cant_cajas}</strong>
+                      <div class="w-1-1 txt@c pb-10">{multimplier}</div>
+                    </div>
+                    <div class="w-1-2 txt@u@r price">
+                      <span class="txt-org">{price_multimplier}&euro;</span>
+                    </div>
+                    <!-- END: by_box -->
+                    <!-- BEGIN: by_pax -->
+                    <div class="w-1-2 txt@c">
+                      <strong>{cart_cant_bot}</strong>
+                      <div class="w-1-1 txt@c">{pax}</div>
+                    </div>
+                    <div class="w-1-2 txt@u@r price">
+                      <span class="txt-org">{price_unit_total}&euro;</span>
+                    </div>
+                    <!-- END: by_pax -->
+                  </div>
+                </div>
+              </div>
+              <div class="w-1-1 sep"></div>
+              <!-- END: cart_row -->
+
+              <div class="w-1-1 mt-2 sub-divider">&nbsp;</div>
+
+              <div class="w-1-1">
+                <div class="g">
+                  <div class="w-4-10"></div>
+                  <div class="w-6-10 mt-1">
+                    <div class="g gc">
+                      <div class="w-1-2 txt@u label">subtotal</div>
+                      <div class="w-1-2 txt@u@r txt-org price">
+                        {checkout.cart_subtotal}&euro;
+                      </div>
+                      <div class="w-1-2 txt@u label">
+                        {lang_iva} ({cart_iva_percent}%)
+                      </div>
+                      <div class="w-1-2 txt@u@r txt-org price">
+                        {checkout.cart_iva}&euro;
+                      </div>
+
+                      <div class="w-1-2 txt@u label">{lang_envio}</div>
+                      <div class="w-1-2 txt@u@r txt-org price">
+                        {cart_shipping_included}
+                      </div>
+
+                      <div class="w-1-1 pb-3 pt-3">
+                        <div class="w-1-1 brd-b"></div>
+                      </div>
+
+                      <div class="w-1-2 txt@u label">total</div>
+                      <div class="w-1-2 txt@u@r txt-org price">
+                        {checkout.cart_total}&euro;
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="w-1-1 pt-5"></div>
+            </div>
+            
+            <!--////-->
+            <div class="ws-1-1 wm-2-3 wl-2-3 wxl-2-3">
+              <div class="w-1-1 pt-5 txt@r" data-message></div>
+            </div>
+            
+            <div class="ws-1-1 wm-1-3 wl-1-3 wxl-1-3">
+              <div class="g">
+                <!-- BEGIN: pay_button -->
+                <div class="w-1-1 mt-2">&nbsp;</div>
+
+                <div class="w-1-1 txt@r">
+                  <span class="txt@tb pr-2">{checkout_accept_privacy}</span>
+                  <input
+                    type="checkbox"
+                    name="p_agree_privacy"
+                    value="1"
+                    required
+                  />
+                </div>
+                <div class="w-1-1 txt@r">
+                  <span class="txt@tb pr-2">{checkout_accept_payment}</span>
+                  <input
+                    type="checkbox"
+                    name="p_agree_payment"
+                    value="1"
+                    required
+                  />
+                </div>
+
+                <div class="w-1-1 mt-4">&nbsp;</div>
+
+                <div class="w-1-1 hs">
+                  <button
+                    data-action="checkoutPayment"
+                    disabled
+                    class="ws-1-1 fr button small"
+                    data-event="checkout/pay"
+                    data-source="pay"
+                  >
+                    {checkout_finalizar_but}
+                  </button>
+                </div>
+                                  
+                <div class="w-1-1 hl">
+                  <div class="w-1-1 pt-5@s">&nbsp;</div>
+                  <div data-content-from="pay"></div>
+                </div>
+                
+                <!-- END: pay_button -->
+              </div>
+              
+            </div>
+            <!-- END: cart -->
+            <!--////-->
+          </div>
+        </form>
+      </div>
+      <!-- END: cart -->
+    </div>
+  </div>
+  <div class="w-1-1 pb-10@s"></div>
+</div>
+<!-- END: checkout -->

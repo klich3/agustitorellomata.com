@@ -5,14 +5,58 @@ $(function()
 	$.template('tableLangThead', '<th data-lang="${lang}" class="uk-text-center">${lang}</th>');
 	$.template('tableLangRow', '<td data-lang="${lang_k}"><textarea name="${key}[${lang_k}]" rows="2" class="uk-width-1-1">${lang_v}</textarea></td>');
 	
+	//ignore oprion
+	$.template('ignoreSelLangRow', '<option value="${code}">${code}</option>');
+	
+	//order
+	$.template('orderLangRow', '<li data-id="${code}" class="uk-nestable-item"> \
+		<div class="uk-nestable-panel"> \
+			<div class="uk-nestable-handle uk-float-left"> \
+				<i class="uk-nestable-handle uk-icon-bars uk-margin-small-right"></i> \
+			</div> \
+			<span class="noselect">${code}</i> \
+			</span> \
+		</div> \
+	</li>');
+	
+	
 	var admin_options = function() 
 	{
 		if (debug) console.log("[plugin] admin-options");
 		
 		$(document).on('click', '[data-submit]', e_submit_handler);
 		$(document).on('click', '[data-action]', e_action_handler);
+		$(document).on('change.uk.nestable', '[data-order-lang-container]', fn_order);
 		
 		$(document).on('change', '[data-translations] textarea', e_save_translation_handler);
+	}
+	
+	//order langs
+	fn_order = function()
+	{
+		var ele = $(this),
+		dom = $('[data-order-lang-container]').find('[data-id]'),
+		data_order = [];
+	
+		if(dom.length !== 0) for(var c in dom)
+		{
+			if(!$.isNumeric(c)) continue;
+			data_order.push($(dom[c]).attr('data-id'));
+		}
+		
+		fn_call_ajax("orLang", {
+			data: data_order
+		}, null, function(d)
+		{
+			//notify
+			UIkit.notify(
+			{
+				message : d.message,
+				status  : 'info',
+				timeout : 5000,
+				pos     : 'top-center'
+			});
+		});
 	}
 	
 	//to actions
@@ -22,12 +66,30 @@ $(function()
 			dom_type = ele.attr('data-action'),
 			dom_table = $('[data-translations] table'),
 			dom_thead = dom_table.find('thead'),
-			dom_tbody = dom_table.find('tbody');
+			dom_tbody = dom_table.find('tbody'),
+			dom_ser,
+			up_langs = [];
 			
 		switch(dom_type)
 		{
+			case "delLangIgnore":
+				ele.parents('[data-lang-item]').remove();
+				dom_sels = $('[data-lang_ignore-container]').find('input');
+			break;
+			
+			case "addLangIgnore":
+				var getDomLang = $('select[name="addlangignore"]').val();
+				
+				$.tmpl('addLangField', 
+				{
+					'lang':getDomLang
+				}).appendTo('[data-lang_ignore-container]');
+				
+				dom_sels = $('[data-lang_ignore-container]').find('input');
+			break;
+			
 			case "addLang":
-				var getDomLang = $('select[name^="addlang"]').val(),
+				var getDomLang = $('select[name="addlang"]').val(),
 					dom_list_langs = $('[data-lang-item] :input');
 				
 				//prevent add exist one
@@ -52,6 +114,19 @@ $(function()
 					}
 				}
 				
+				//ignorelist
+				$.tmpl('ignoreSelLangRow', 
+				{
+					'code':getDomLang
+				}).appendTo('select[name="addlangignore"]');
+				
+				//order list
+				$.tmpl('orderLangRow', 
+				{
+					'code':getDomLang
+				}).appendTo('[data-order-lang-container]');
+				
+				//----
 				$.tmpl('addLangField', 
 				{
 					'lang':getDomLang
@@ -63,7 +138,6 @@ $(function()
 				}).appendTo(dom_thead.find('tr'));
 				
 				//add rows of languages in table head
-				
 				var fn_items_tbody = dom_tbody.find('tr');
 				
 				if(fn_items_tbody.length !== 0) for(i in fn_items_tbody)
@@ -96,6 +170,8 @@ $(function()
 				
 				row_clone.appendTo('[data-translations] tbody');
 				
+				dom_sels = $('[data-lang-container]').find('input');
+				
 				//notify
 				UIkit.notify(
 				{
@@ -119,10 +195,40 @@ $(function()
 				dom_thead.find('[data-lang="'+dom_item_lang+'"]').remove();
 				dom_tbody.find('[data-lang="'+dom_item_lang+'"]').remove();
 				
+				//order
+				$('[data-order-lang-container] li[data-id="'+dom_item_lang+'"]').remove();
+				
+				//ignore
+				$('select[name="addlangignore"] option[value="'+dom_item_lang+'"]').remove();
+				
 				//remove translate
 				$('[data-translations] tbody').find('input[value=lang_country_'+dom_item_lang+']').parents('tr').remove();
+				
+				dom_sels = $('[data-lang-container]').find('input');
 			break;
 		}
+			
+		if(dom_sels.length) for(var i in dom_sels)
+		{
+			if(!$.isNumeric(i)) continue;
+			
+			up_langs.push($(dom_sels[i]).val());
+		}
+		
+		//call
+		fn_call_ajax(dom_type, {
+			data: up_langs	
+		}, null, function(d)
+		{
+			//notify
+			UIkit.notify(
+			{
+				message : d.message,
+				status  : 'info',
+				timeout : 5000,
+				pos     : 'top-center'
+			});
+		});
 	}
 	
 	//submit modals

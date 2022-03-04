@@ -18,22 +18,42 @@
 			
 			<!-- BEGIN: group -->
 			<div class="w-1-1 pt-4 pb-4">
-				<h2 class="title txt@u">{cat_title}</h2>
+				<h1 class="title txt@c"><span class="txt@u">{cat_title}</span></h1>
 			</div>
 			
 				<!-- BEGIN: prod -->
 				<div class="w-1-1">
-					<div class="g gc">
+					<div class="flx@fd-r@jc-se@ac-c@fw-w h-100">
 						<!-- BEGIN: row -->
-						<div class="ws-1-2 wm-1-5 wl-1-5 wxl-1-5 pb-3 sep">
-							<!-- BEGIN: a_init --><a href="{url}" target="_blank"><!-- END: a_init -->
+						<div class="ws-1-2 wm-1-4 wl-1-4 wxl-1-4 sep item {sm}">
+							<div class="cp-3 flx@fd-c@js-se@ac-fs h-100">
 								<div class="thumb">
 									<img class="e" src="{base_script}images/blank.gif" data-preloadimages data-image="{image}" alt="{alt}" />
 								</div>
+								
 								<div class="title w-1-1 txt@c@u pt-2">
 									<strong>{title}</strong>
 								</div>
-							<!-- BEGIN: a_final --></a><!-- END: a_final -->
+								
+								<!-- BEGIN: subtitle -->
+								<div class="subtitle w-1-1 txt@c@u">
+									{subtitle}
+								</div>
+								<!-- END: subtitle -->
+								
+								<!-- BEGIN: ficha_link -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div>
+									<a href="{url}" target="_blank" class="w-1-1">
+										<div class="flx@fd-r@jc-sb@ai-c@ac-c">
+											<strong class="ficha">{lang_ver_ficha}</strong> 
+											<img src="{base_script}images/icon-verficha.svg" width="28" height="31" alt="ficha icono" />
+										</div>
+									</a>
+								</div>
+								<!-- END: ficha_link -->
+							</div>
 						</div>
 						<!-- END: row -->
 					</div>
@@ -44,8 +64,6 @@
 				<div class="w-1-1 pt-4 pb-4"></div>
 				<!-- END: group_end_sep -->
 			<!-- END: group -->
-			
-			<div class="w-1-1 sep-v pt-4 pb-4"></div>
 		</div>
 		
 	</div>
