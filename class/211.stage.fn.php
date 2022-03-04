@@ -42,7 +42,7 @@ function get_header($fn_args)
 	
 	$b = new XTemplate ("{$CONFIG['site']['template']}{$tmpl_header}.xhtml");
 	
-	$fn_h_hash = (preg_match('/(product_grid|pages_details)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
+	$fn_h_hash = (preg_match('/(product_grid|pages_details|pedidos)/', $fn_args['url'])) ? $fn_args['hash'] : $fn_args['url'];
 	
 	$fn_dir_prop = (isset($CONFIG['site']['dir']) && isJson($CONFIG['site']['dir'])) ? object_to_array(json_decode($CONFIG['site']['dir'])) : '';
 	
@@ -69,11 +69,23 @@ function get_header($fn_args)
 		'header_popup_data' => (isset($CONFIG['site']['initial_page_header_popup_enabled']) && $CONFIG['site']['initial_page_header_popup_enabled'] == 1) ? json_encode(array('gid' => $CONFIG['site']['initial_page_header_popup_id'])) : 'false',
 		
 		'dir' => (isset($CONFIG['site']['dir'])) ? $fn_dir_prop[0] : $fn_dir_prop,
+		
+		'cart_hide' => (isset($_SESSION) && isset($_SESSION['cart']) && count($_SESSION['cart']) !== 0) ? "" : "h",
+		'cart_items' => (isset($_SESSION) && isset($_SESSION['cart']) && isset($_SESSION['checkout'])) ? $_SESSION['checkout']['cart_count'] : 0,
 	));
 	
 	//custom settings
-	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.header_lang_list_mob");
-	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.header_lang_list");
+	if($CONFIG['site']['showHeaderLangsMob']) $b->parse("{$tmpl_header}.not_home.header_lang_list_mob");
+	if($CONFIG['site']['showHeaderLangs']) $b->parse("{$tmpl_header}.not_home.header_lang_list");
+	
+	//header logged / not
+	if(class_exists('tooLogin') && $too_login->isLogged() == 200)
+	{
+		$b->parse("{$tmpl_header}.not_home.header_logged");
+	}else{
+		$b->parse("{$tmpl_header}.not_home.login_but_not_logged");
+		$b->parse("{$tmpl_header}.not_home.only_not_logged"); //but header login
+	}
 	
 	//widgets load template
 	if(isset($fn_args['plugins_templates']) && sizeof($fn_args['plugins_templates']) !== 0)
@@ -89,14 +101,13 @@ function get_header($fn_args)
 			if(isset($fn_header_parser) && $fn_header_parser['assign'] && $fn_header_parser['parse']) pageBParser($b, $fn_header_parser);
 		}
 	}
-	//widgets
-	
-	//logged header
+		
+	//logged header (admin side)
 	if($tmpl_header == 'admin_header')
 	{
 		if(class_exists('tooLogin'))
 		{
-			if($too_login->isLogged() == 200)
+			if($too_login->isLogged() == 200 && $too_login->isAuth(100, false) == 200)
 			{
 				//user data from session
 				$fn_user_data_array = object_to_array($_SESSION[$too_login->sessionName]);
@@ -130,7 +141,7 @@ function get_header($fn_args)
 		}
 	}
 	//end logged header
-		
+	if(!preg_match("/home/", $fn_args['url'])) $b->parse("{$tmpl_header}.not_home");
 	$b->parse($tmpl_header);
 	$b->out($tmpl_header);
 }
@@ -191,12 +202,13 @@ function get_footer($fn_args)
 		//normal "client" loggged
 		if(class_exists('tooLogin') && $too_login->isLogged() == 200)
 		{
-			$b->parse("{$tmpl_footer}.logged");
+			$b->parse("{$tmpl_footer}.not_home.logged");
 		}else{
-			$b->parse("{$tmpl_footer}.unlogged");
+			$b->parse("{$tmpl_footer}.not_home.unlogged");
 		}
 	}
 	
+	if(!preg_match("/home/", $fn_args['url'])) $b->parse("{$tmpl_footer}.not_home");
 	$b->parse($tmpl_footer);
 	$b->out($tmpl_footer);
 }
@@ -236,7 +248,7 @@ function page($fn_id, $fn_args = null)
 	{
 		foreach($fn_plugins_folders as $pk => $pv)
 		{
-			if(!preg_match('/admin/', $pv) && file_exists("{$CONFIG['site']['pluginspath']}{$pv}/{$pv}.xhtml")) $fn_plugin_template_files[$pv] = "{$CONFIG['site']['pluginspath']}{$pv}/{$pv}";
+			if(file_exists("{$CONFIG['site']['pluginspath']}{$pv}/{$pv}.xhtml")) $fn_plugin_template_files[$pv] = "{$CONFIG['site']['pluginspath']}{$pv}/{$pv}";
 		}
 	}
 	
@@ -262,8 +274,13 @@ function page($fn_id, $fn_args = null)
 	//first load php view controller
 	if(file_exists($CONFIG['site']['template'].$fn_id.'.php')) include("{$CONFIG['site']['template']}{$fn_id}.php");
 	
+	if(preg_match("/sitemap/", $fn_args['url'])) return;
+	
+	/*
+	if($fn_args)*/
+	
 	//construct stage view
-	get_header($fn_args);
+	if(!isset($fn_args['isIframe']) || !$fn_args['isIframe']) get_header($fn_args);
 
 	//get hash
 	$fn_hash = ($fn_args['url'] == '/') ? 'home' : $fn_args['url'];
@@ -274,7 +291,7 @@ function page($fn_id, $fn_args = null)
 	$b->assign(array(
 		'user_lang' => $st_lang,
 		'hash' => $fn_hash,
-		'current_hash' => $CONFIG['site']['current_hash'],
+		'current_hash' => (isset($CONFIG['site']['current_hash'])) ? $CONFIG['site']['current_hash'] : $fn_hash,
 		'user_name' => (isset($CONFIG['user'])) ? $CONFIG['user']['user_name']:'',
 		'dataNow' => date('Y-m-d'),
 	));
@@ -290,7 +307,7 @@ function page($fn_id, $fn_args = null)
 	if(isset($fn_plugin_template_files) && sizeof($fn_plugin_template_files) !== 0)
 	{
 		$fn_page_args['stage_id'] = $fn_id;
-		
+			
 		foreach($fn_plugin_template_files as $tpk => $tpv)
 		{
 			$fn_page_parser = false;
@@ -309,7 +326,7 @@ function page($fn_id, $fn_args = null)
 	$b->parse(strtolower($fn_id));
 	$b->out(strtolower($fn_id));
 	
-	get_footer($fn_args);
+	if(!isset($fn_args['isIframe']) || !$fn_args['isIframe']) get_footer($fn_args);
 }
 
 /**
@@ -337,7 +354,8 @@ function pageBParser($b = null, $fn_xtemplate_parse)
 		}else if(sizeof($fn_xtemplate_parse['parse']) == 0)
 		{
 			$fn_objToArry = object_to_array($fn_xtemplate_parse['assign'][0]);
-			$b->assign($fn_objToArry);
+			
+			$b->assign($fn_objToArry); //not_home
 			if(!empty($fn_xtemplate_parse['parse'])) $b->parse($fn_xtemplate_parse['parse'][0]);
 		}
 	}

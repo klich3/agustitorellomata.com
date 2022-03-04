@@ -1,0 +1,121 @@
+<!-- BEGIN: atm_club_shop -->
+{FILE {pagefreaturedImageTmpl}}
+
+<div class="w-1-1">
+	<div class="c cc cp-4@s">
+		{FILE {jsonToTmpl}}
+	</div>
+</div>
+
+<div class="w-1-1 mt-4 mb-4">
+	<div class="c cc">
+		
+		<div class="g gc product-grid">
+			<!-- BEGIN: no_items -->
+			<div class="w-1-1 txt@c">{no_post_content}</div>
+			<!-- END: no_items -->
+			
+			
+			<!-- BEGIN: group -->
+			<div class="w-1-1 pt-4 pb-4" id="{cat_hash}">
+				<h1 class="title txt@c"><span class="txt@u">{cat_title}</span></h1>
+			</div>
+			
+				<!-- BEGIN: prod -->
+				<div class="w-1-1">
+					<div class="flx@fd-r@jc-se@ac-c@fw-w h-100">
+						<!-- BEGIN: row -->
+						<div class="ws-1-2 wm-1-4 wl-1-4 wxl-1-4 sep item {sm}" id="{hash}">
+							<div class="cp-3 flx@fd-c@js-se@ac-fs h-100">
+								<div class="thumb">
+									<img class="e" src="{base_script}images/blank.gif" data-preloadimages data-image="{image}" alt="{alt}" />
+								</div>
+								
+								<div class="title w-1-1 txt@c@u pt-2">
+									<strong>{title}</strong>
+								</div>
+								
+								<!-- BEGIN: subtitle -->
+								<div class="subtitle w-1-1 txt@c@u">
+									{subtitle}
+								</div>
+								<!-- END: subtitle -->
+								
+								<!-- BEGIN: title_sep -->
+								<div class="sep-h w-1-1"></div>
+								<!-- END: title_sep -->
+								
+								<div>
+									<!-- BEGIN: multiplier -->
+									<div class="bot">{lang_box} {pax_multimplier} {lang_bot}</div>
+									<div class="bot-price">{precio_caja} €</div>
+									<!-- END: multiplier -->
+									<!-- BEGIN: venta_price -->
+									<div class="price">{precio_venta} € {lang_ud}</div>
+									<!-- END: venta_price -->
+								</div>
+								
+								<!-- BEGIN: ficha_link -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div>
+									<a href="{url}" target="_blank" class="w-1-1">
+										<div class="flx@fd-r@jc-sb@ai-c@ac-c">
+											<strong class="ficha">{lang_ver_ficha}</strong> 
+											<img src="{base_script}images/icon-verficha.svg" width="28" height="31" alt="ficha icono" />
+										</div>
+									</a>
+								</div>
+								<!-- END: ficha_link -->
+								
+								<!-- BEGIN: login_but -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div class="w-6-10 h" id="no_login">
+									<div class="g">
+										<div class="w-1-1 txt@u txt-org">
+											<strong>{lang_grid_addcart_no_login_title}</strong>
+										</div>
+										<div class="w-1-1 pt-3 pb-5">
+											{lang_grid_addcart_no_login_txt}
+										</div>
+										
+										<div class="w-1-1 pt-2"></div>
+										
+										<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 txt@c">
+											<a href="{base_script}{user_lang}/inscribirse" class="button">{but_inscribirme}</a>
+										</div>
+										<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 txt@c">
+											<a href="{base_script}login" class="button">{but_soymiembro}</a>
+										</div>
+									</div>
+								</div>
+								
+								<div class="mt-a">
+									<a href="javascript:void(0);" class="w-1-1 button" data-src="#no_login" data-fancybox>{add_cart_but}</a>
+								</div>
+								<!-- END: login_but -->
+								
+								<!-- BEGIN: venta_but -->
+								<div class="sep-h w-1-1"></div>
+								
+								<div class="mt-a">
+									<a href="javascript:void(0);" class="w-1-1 button" data-action="addCart" data-id="{id}" data-cat="{cat_id}">{add_cart_but}</a>
+								</div>
+								<!-- END: venta_but -->
+							</div>
+						</div>
+						<!-- END: row -->
+					</div>
+				</div>
+				<!-- END: prod -->
+			
+				<!-- BEGIN: group_end_sep -->
+				<div class="w-1-1 pt-4 pb-4"></div>
+				<!-- END: group_end_sep -->
+			<!-- END: group -->
+		</div>
+		
+	</div>
+</div>
+<!-- END: atm_club_shop -->

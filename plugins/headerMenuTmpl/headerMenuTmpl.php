@@ -51,9 +51,11 @@ class WIDGET_headerMenuTmpl {
 			FROM `menus_types` t 
 			LEFT JOIN `menus` m ON(m.`m_type`=t.`id`)
 			WHERE t.`id`=:id
+			AND m.`lang`=:l
 			LIMIT 1;
 		", array(
-			'id' => '1',
+			"id" => '1',
+			"l" => $fn_args['st_lang']
 		));
 		
 		$fn_count_w = 0;
@@ -118,19 +120,24 @@ class WIDGET_headerMenuTmpl {
 							if($sv['url'] == "") $sv['url'] = 'javascript:void(0);';
 							
 							self::$fn_xtemplate_parse['assign'][] = $sv;
-							self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.submenu.row";
+							self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.headerMenuTmpl.row_item.submenu.row";
 							
 							//anti loop
 							if($sk > ($fn_total_sublevel-1) ) break;
+							$arrow_present = false;
 						}
 						
 						self::$fn_xtemplate_parse['assign'][] = array(
 							'class_parent' => 'parent',
 						);
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.submenu";
+						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.headerMenuTmpl.row_item.submenu";
 						
-						self::$fn_xtemplate_parse['assign'][] = '';
-						self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item.arrow";
+						if(!$arrow_present)
+						{
+							$arrow_present = true;
+							self::$fn_xtemplate_parse['assign'][] = '';
+							self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.headerMenuTmpl.row_item.arrow";
+						}
 					}
 					//level 0 -----------------------------------------------------------------
 					
@@ -165,7 +172,7 @@ class WIDGET_headerMenuTmpl {
 					$fn_count_w++;
 					
 					self::$fn_xtemplate_parse['assign'][] = $mv;
-					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl.row_item";
+					self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.headerMenuTmpl.row_item";
 					//anti loop
 					if($mk > ($fn_totla_mv-1) ) break;
 				}
@@ -173,7 +180,7 @@ class WIDGET_headerMenuTmpl {
 		}
 		
 		self::$fn_xtemplate_parse['assign'][] = array();
-		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.headerMenuTmpl";
+		self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.headerMenuTmpl";
 		
 		return self::$fn_xtemplate_parse;
 	}

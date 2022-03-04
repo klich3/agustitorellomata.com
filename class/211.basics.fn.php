@@ -500,89 +500,23 @@ function cartProcessAndCalc($fn_array)
 	$fn_iva = ($fn_q_iva) ? $fn_q_iva : $CONFIG['site']['default_iva_percentage'];
 	
 	//set variables
-	$fn_data_out = array();
-	$fn_data_out['cart_checkout'] = array(
-		'cart_count' => 0,
-		'cart_subtotal' => 0,
-		'cart_iva' => 0,
-		'cart_iva_percent' => $fn_iva,
-		'cart_peso' => 0,
+	$fn_data_out = array(
+		"checkout" => array(
+			'cart_count' => 0,
+			'cart_subtotal' => 0,
+			'cart_total' => 0,
+			'cart_iva' => 0,
+			'cart_iva_percent' => $fn_iva,
+			'cart_peso' => 0,
+			'cart_shipping_type' => 0,
+		),
 	);
-	$fn_data_out['cart_wiva_checkout'] = array(
-		'cart_subtotal' => 0,
-		'cart_iva' => 0,
-	);
 	
-	$fn_loc_type_shipping = (isset($fn_data_out['cart_checkout']) && isset($fn_data_out['cart_checkout']['cart_shipping_type'])) ? $fn_data_out['cart_checkout']['cart_shipping_type'] : 0;
-	
-	//user
-	$fn_nodir = true;
-	$fn_noshipping = true;
-	$fn_dir_data = array();
-	$fn_shipping_data = array();
-	$fn_oferta_product = 0;
-	
-	if($too_login->isLogged() == 200)
-	{
-		$fn_login_user_data = $too_login->getUserData();
-		
-		$fn_user_meta = $db->FetchValue("
-			SELECT `meta_value`
-			FROM `users_meta`
-			WHERE `user_id`=:uid
-			AND `meta_key`='user_dirs'
-			LIMIT 1;
-		", array(
-			'uid' => $fn_login_user_data->ID,
-		));
-		
-		//check default dir
-		if($fn_user_meta)
-		{
-			$fn_d = (!empty($fn_user_meta) && isJson($fn_user_meta)) ? object_to_array(json_decode($fn_user_meta)) : false;
-			
-			if($fn_d) foreach($fn_d as $mk => $mv)
-			{
-				if(isset($mv['dir_default']) && $mv['dir_default'] == 1)
-				{
-					$fn_nodir = false;
-					$fn_dir_data = $mv;
-					break;
-				}
-			}
-		}
-	}
-	//user
-	
-	//check shipping
-	$fn_q_shipping = $db->FetchAll("
-		SELECT *
-		FROM `shipping_companies`
-		WHERE `active`='1'
-	");
-	
-	if(count($fn_q_shipping) !== 0) $fn_noshipping = false;
-	//check shipping
-	
-	/*
-		//var_dump($fn_dir_data);
-		
-		array (size=9)
-		  'dir_name' => string 'espa&ntilde;a' (length=13)
-		  'dir_primary' => string '' (length=0)
-		  'dir_secundary' => string '' (length=0)
-		  'dir_city' => string '' (length=0)
-		  'dir_region' => string '' (length=0)
-		  'dir_post' => string '' (length=0)
-		  'dir_country' => string 'es' (length=2)
-		  'id' => string '0' (length=1)
-		  'dir_default' => int 1
-	*/
-	
+	//complete cart data
 	foreach($fn_array['cart'] as $k => $v)
 	{
 		$fn_q = $db->FetchArray("
-			SELECT p.`lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`
+			SELECT p.`id`, p.`cat_id`, p.`lang_data`, p.`subtitle_lang_data`, p.`gallery_id`, p.`hash`, s.`precio_venta`, s.`stock_count`, s.`peso`, s.`pax_multimplier` 
 			FROM `product` p
 			LEFT JOIN `product_stock` s ON(s.`prid`=p.`id`)
 			WHERE p.`id`=:id
@@ -591,206 +525,102 @@ function cartProcessAndCalc($fn_array)
 			'id' => $v['p_id']
 		));
 		
+		$fn_get_meta = $db->FetchAll("
+			SELECT * 
+			FROM `product_meta`
+			WHERE `p_id`=:pid
+		", array(
+			'pid' => $fn_q['id']
+		));
+		
+		$fn_metas = array();
+		
+		if($fn_get_meta) foreach($fn_get_meta as $kk => $vv)
+		{
+			$fn_metas[$vv->m_key] = $vv->m_value;
+		}
+		
 		$fn_prod_title = (isset($fn_q['lang_data']) && isJson($fn_q['lang_data'])) ? object_to_array(json_decode($fn_q['lang_data'])) : array();
+		$fn_prod_subtitle = (isset($fn_q['subtitle_lang_data']) && isJson($fn_q['subtitle_lang_data'])) ? object_to_array(json_decode($fn_q['subtitle_lang_data'])) : array();
+		
+		$fn_array['cart'][$k]['cat_id'] = $fn_q['cat_id'];
+		$fn_array['cart'][$k]['p_id'] = $fn_q['id'];
+		
+		$fn_array['cart'][$k]['by_box'] = (isset($fn_metas['by_box']) && $fn_metas['by_box'] == "1") ? 1 : 0;
+		$fn_array['cart'][$k]['by_pax'] = (isset($fn_metas['by_pax']) && $fn_metas['by_pax'] == "1") ? 1 : 0;
 		
 		$fn_array['cart'][$k]['hash'] = $fn_q['hash'];
-		$fn_array['cart'][$k]['title'] = $fn_prod_title[$st_lang];
+		$fn_array['cart'][$k]['title'] = html_entity_decode($fn_prod_title[$st_lang]);
+		$fn_array['cart'][$k]['subtitle'] = html_entity_decode($fn_prod_subtitle[$st_lang]);
 		$fn_array['cart'][$k]['stock_count'] = $fn_q['stock_count'];
 		$fn_array['cart'][$k]['thumb'] = getThumbFromGallery($fn_q['gallery_id']);
+		$fn_array['cart'][$k]['pax_multimplier'] = $fn_q['pax_multimplier'];
 		
-		//oferta solo un item
-		if(isset($fn_array['promote']) && $fn_array['promote']['id'] == $v['p_id'] && $fn_oferta_product == 0)
+		$fn_array['cart'][$k]['price_caja'] = round($fn_q['pax_multimplier'] * $fn_q['precio_venta'] , 2);
+		$fn_array['cart'][$k]['price_unit'] = $fn_q['precio_venta'];
+		$fn_array['cart'][$k]['price_unit_total'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : $fn_q['precio_venta'];
+		
+		$fn_array['cart'][$k]['price_total'] = $fn_array['cart'][$k]['price_unit_total'];
+		$fn_array['cart'][$k]['price_multimplier'] = 0;
+		
+		//cajas
+		if(isset($fn_array['cart'][$k]['multimplier']) && $fn_array['cart'][$k]['multimplier'] !== 0)
 		{
-			//off
-			if(isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0)
-			{
-				if($fn_array['promote']['used'] <= $fn_array['promote']['max'])
-				{
-					//oferta sobre 1 producto
-					$fn_loc_of = round(($fn_q['precio_venta'] * $fn_array['promote']['oferta_value'] / 100), 2);
-					$fn_loc_calc_total_price_per_pax = round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2);
-					
-					//restamos descuento de un solo producto del total
-					$fn_price_loc = round(($fn_loc_calc_total_price_per_pax - $fn_loc_of), 2);
-					
-					$fn_oferta_product++;
-				}else{
-					$fn_price_loc = round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2);
-				}
-			}else{
-				$fn_price_loc =  $fn_q['precio_venta'];
-			}
-		}else{
-			//sin oferta
-			$fn_array['cart'][$k]['price'] = (isset($fn_array['cart'][$k]['pax']) && $fn_array['cart'][$k]['pax'] !== 0) ? round(($fn_q['precio_venta'] * $fn_array['cart'][$k]['pax']), 2) : $fn_q['precio_venta'];
+			$fn_array['cart'][$k]['price_multimplier'] = round(($fn_array['cart'][$k]['multimplier'] * ($fn_q['pax_multimplier'] * $fn_q['precio_venta'])), 2);
+			
+			
+			$fn_array['cart'][$k]['price_total'] += $fn_array['cart'][$k]['price_multimplier'];
 		}
+		
+		//----------
 		
 		$fn_data_out['cart'][] = $fn_array['cart'][$k];
 		
 		//calculos
-		$fn_data_out['cart_checkout']['cart_subtotal'] += $fn_array['cart'][$k]['price'];
+		$fn_data_out['checkout']['cart_total'] += $fn_array['cart'][$k]['price_total'];
 		
 		//peso
-		if(isset($fn_q['peso'])) $fn_data_out['cart_checkout']['cart_peso'] += $fn_q['peso'];
+		if(isset($fn_q['peso'])) $fn_data_out['checkout']['cart_peso'] += $fn_q['peso'];
 	}
 	
-	//oferta global
-	if(isset($fn_array['promote']) && $fn_array['promote']['id'] == 0 && !isset($_SESSION['promote']['global_userd']))
-	{
-		if($fn_array['promote']['used'] <= $fn_array['promote']['max'] && $fn_array['promote']['p_id'] == 0)
-		{
-			//cart_checkout
-			$fn_sub_of = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_array['promote']['oferta_value'] / 100), 2);
-			//subtotal
-			$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] - $fn_sub_of), 2);
-			
-			//iva del sobtotal
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			
-			//dejamos una marca de que ya esta aplicada la oferta general
-			$_SESSION['promote']['global_userd'] = $fn_array['promote']['global_userd'] = 1;
-		}
-	}
+	$fn_data_out['checkout']['cart_count'] = getCartCount($_SESSION['cart']);
+	$fn_data_out['checkout']['cart_iva'] = round(($fn_data_out['checkout']['cart_total'] * $fn_data_out['checkout']['cart_iva_percent'] / 100), 2);
 	
-	//envio
-	//primero hay que mirar que compañia ha seleccionado el cliente
-	/*
-		var_dump($_SESSION);
-	
-		array (size=3)
-		  'lang' => string 'es' (length=2)
-		  'glunt_login_session' => 
-		    object(stdClass)[1]
-		      public 'ID' => string '1' (length=1)
-		      public 'user_name' => string '211' (length=3)
-		      public 'user_email' => string 'admin@211.com' (length=13)
-		      public 'user_status' => string '1' (length=1)
-		      public 'user_add_date' => string '2017-02-25 17:22:14' (length=19)
-		      public 'status_value' => string 'Activo' (length=6)
-		      public 'user_level' => string '100' (length=3)
-		      public 'time_stamp' => int 1488800019
-		  'cart' => 
-		    array (size=2)
-		      0 => 
-		        array (size=3)
-		          'cat_id' => string '1' (length=1)
-		          'p_id' => string '4' (length=1)
-		          'pax' => string '1' (length=1)
-		      1 => 
-		        array (size=3)
-		          'cat_id' => string '1' (length=1)
-		          'p_id' => string '7' (length=1)
-		          'pax' => string '1' (length=1)
-    */
-	
-	//cart without iva
-	//cart_iva en este punto es 0 se calcula por primera vez
-	$fn_data_out['cart_wiva_checkout'] = array(
-		'cart_subtotal' => round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2),
-		'cart_iva' => round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2),
-	);
-	
-	//tiene dir & hay compañias de envio
-	if((!$fn_nodir && !$fn_noshipping))
-	{
-		$fn_data_out['cart_checkout']['cart_total'] = 0;
-		$fn_data_out['cart_checkout']['cart_shipping_type'] = 0;
-		$fn_data_out['cart_checkout']['cart_shipping_cost'] = 0;
-		
-		//cliente no ha seleccionado envio calculamos con la primera opcion
-		$fn_get_tid = false;
-		
-		$fn_q_shipping = $db->FetchAll("
-		  SELECT *
-		  FROM `shipping_companies`
-		  WHERE `active`='1'
-		  LIMIT 1;
-		");
-		
-		if($fn_q_shipping)
-		{
-			$fn_q_tid = $db->FetchAll("
-				SELECT t.`id`
-				FROM `shipping_types` t
-				LEFT JOIN `shipping_types_rel` r ON(r.`t_id`=t.`id`)
-				WHERE r.`s_id`=:sid
-			", array(
-				'sid' => $fn_q_shipping[0]->id
-			));
-			
-			if($fn_q_tid) foreach($fn_q_tid as $tk => $tv)
-			{
-				$fn_tid = (!empty($fn_array['cart_checkout']['cart_shipping_type']) && $fn_array['cart_checkout']['cart_shipping_type'] !== 0) ? $fn_array['cart_checkout']['cart_shipping_type'] : $tv->id;
-				
-				$fn_peso = $fn_data_out['cart_checkout']['cart_peso'];
-				
-				//asignamos el tipo de envio si no esta asignado
-				$fn_data_out['cart_checkout']['cart_shipping_type'] = $fn_tid;
-				
-				//cliente habia seleccionado antes una opcion de envio
-				$fn_get_tarifa = $db->FetchArray("
-					SELECT t.*, c.`country_name`, c.`country_code`
-					FROM `shipping_tarifas` t
-					LEFT JOIN `apps_countries` c ON(c.`id`=t.`c_id`)
-					WHERE c.`country_code`=UPPER('{$fn_dir_data['dir_country']}')
-					AND t.`s_id`='{$fn_q_shipping[0]->id}'
-					AND t.`t_id`='{$fn_tid}'
-					AND t.`kg`>='{$fn_peso}'
-					LIMIT 1;
-				");
-				
-				if($fn_get_tarifa) $fn_shipping_data[] = $fn_get_tarifa;
-			}
-		}
-		
-		if(count($fn_shipping_data) !== 0)
-		{
-			$fn_data_out['cart_checkout']['cart_shipping_type'] = $fn_shipping_data[0]['t_id'];
-			
-			$fn_ship_iva = round(($fn_shipping_data[0]['precio'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_shipping_cost'] = round(($fn_shipping_data[0]['precio'] - $fn_ship_iva), 2);
-			
-			$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-			
-			$fn_cart_iva = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_cart_iva + $fn_ship_iva), 2);  //productos + envio
-			
-			$fn_calc_subtotal = round(($fn_data_out['cart_checkout']['cart_subtotal'] - $fn_cart_iva), 2); //solo productos sin iva
-			$fn_data_out['cart_checkout']['cart_subtotal'] = $fn_calc_subtotal;
-			
-			$fn_data_out['cart_checkout']['cart_total'] = round(($fn_calc_subtotal + $fn_data_out['cart_checkout']['cart_iva'] + $fn_data_out['cart_checkout']['cart_shipping_cost']), 2); //se suman envio + iva + subtotal
-		}else{
-			//no hay envio ni dir
-			$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-			$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-			$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
-		}
-	}else{
-		//no hay envio ni dir
-		$fn_data_out['cart_checkout']['cart_count'] = getCartCount($_SESSION['cart']);
-		$fn_data_out['cart_checkout']['cart_iva'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] * $fn_data_out['cart_checkout']['cart_iva_percent'] / 100), 2);
-		$fn_data_out['cart_checkout']['cart_subtotal'] = round(($fn_data_out['cart_checkout']['cart_subtotal'] + $fn_data_out['cart_checkout']['cart_iva']), 2);
-	}
-	//envio
+	//subtotal sin iva
+	$fn_data_out['checkout']['cart_subtotal'] = round(($fn_data_out['checkout']['cart_total'] - $fn_data_out['checkout']['cart_iva']), 2);
+
 	
 	if(isset($_SESSION['cart'])) $_SESSION['cart'] = $fn_array['cart'];
 	
-	$_SESSION['cart_wiva_checkout'] = $fn_data_out['cart_wiva_checkout'];
-	
 	//write all to session
-	$_SESSION['cart_checkout'] = $fn_data_out['cart_checkout'];
-	
-	//mantenemos shipping seleccionado
-	$_SESSION['cart_checkout']['cart_shipping_type'] = $fn_loc_type_shipping;
-	
-	$fn_data_out['lang'] = array(
-		'lang_iva' => $lang_items[$st_lang]['lang_iva'],
-		'lang_no_iva' => $lang_items[$st_lang]['lang_no_iva'],
-		'lang_envio' => $lang_items[$st_lang]['lang_envio'],
-		'cart_shipping_included' => $lang_items[$st_lang]['cart_shipping_included'],
-	);
+	$_SESSION['checkout'] = $fn_data_out['checkout'];
 	
 	return $fn_data_out;
+}
+
+/*
+	return names of fields
+*/
+function nameFormFields($fn_key)
+{
+	$fn_dir_fields = array(
+		"u_name" => "Nombre",
+		"user_name" => "Nombre",
+		"u_surname" => "Apellido",
+		"u_lastname" => "Apellido",
+		"u_idd" => "Id interna",
+		"u_tel" => "Telefono",
+		"u_cif" => "CIF/NIF",
+		"u_email" => "Email",
+		"user_email" => "Email",
+		"dir_country" => "País",
+		"dir_city" => "Ciudad",
+		"dir_primary" => "Dirección",
+		"dir_post" => "C.P.",
+		"dir_default" => "Dirección por defecto",
+	);
+	
+	return ($fn_key) ? $fn_dir_fields[$fn_key] : ""; 
 }
 
 /**
@@ -802,22 +632,46 @@ function cartProcessAndCalc($fn_array)
  * @param mixed $fn_order_html //html createCartCheckoutHtml()
  * @return void
  */
-function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
+function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html, $fn_cart_data = false)
 {
 	global $st_lang, $CONFIG, $lang_items;
 	
 	//html y content del mail
-	$fn_mail_html = $CONFIG['templates']['standartEmail'];
+	$fn_mail_html = $CONFIG['site']['standartEmail'];
 	
 	//------- mail cliente + resumen
 	
 	//mails
-	$fn_subject = "[{$lang_items[$st_lang]['mail_order_confirm']}] - {$CONFIG['site']['sitetitlefull']}";
+	$fn_s = getLangItem('mail_order_confirm');
+	$fn_subject = "{$fn_s} - {$CONFIG['site']['sitetitlefull']}";
 	
-	$fn_message = $lang_items[$st_lang]['mail_order_confirm_text'];
-	$fn_message .= createCartCheckoutHtml($fn_order_html);
+	$fn_message = getLangItem('mail_order_confirm_text');
 	
 	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
+	$fn_message = str_replace('%order_details%', $fn_order_html, $fn_message);
+	
+	$fn_shipping_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_order']))
+	{
+		$fn_shipping_html = "";
+		foreach($fn_cart_data['user_order'] as $kf => $vf)
+		{
+			$fn_shipping_html .= "<strong>".nameFormFields($kf)."</strong> ".$vf."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_envio_data%', $fn_shipping_html, $fn_message);
+	
+	//facturacion
+	$fn_facturacion_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_facturacion']))
+	{
+		$fn_facturacion_html = "";
+		foreach($fn_cart_data['user_facturacion'] as $kff => $vff)
+		{
+			$fn_facturacion_html .= "<strong>".nameFormFields($kff)."</strong> ".$vff."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_facturacion_data%', $fn_facturacion_html, $fn_message);
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -828,31 +682,19 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
 		'%site_logo%', 
 	), array(
 		$fn_message,
-		$lang_items[$st_lang]['regards'],
+		getLangItem('regards'),
 		$CONFIG['site']['sitetitlefull'],
 		$CONFIG['site']['sitecopyz'],
 		'',
-		'<img src="'.$CONFIG['site']['base'].'m/logo.png?e='.urlencode($fn_user_mail).'" alt="logotype" />',
+		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 	), $fn_mail_html);
 	
-	$fn_content = preparehtmlmailBase64($CONFIG['site']['mailinfo'], $fn_mail_html);
+	$fn_content = preparehtmlmailBase64($CONFIG['site']['mailvisitas'], $fn_mail_html);
 	
 	//------ mail admin aviso de compra
 	
 	//envio del mail
 	$fn_send_user = @mail($fn_user_mail, $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-	
-	/*
-	if($CONFIG['status']['debug'])
-	{
-		var_dump($fn_send_user);
-		var_dump($fn_user_mail);
-		var_dump($fn_subject);
-		var_dump($fn_mail_html);
-		var_dump($fn_content['multipart']);
-		var_dump($fn_content['headers']);
-	}
-	*/
 }
 
 /**
@@ -862,15 +704,43 @@ function sendInvioce($fn_user_mail, $fn_order_num, $fn_order_html)
  * @param mixed $fn_order_num
  * @return void
  */
-function sendAdminNotice($fn_order_num)
+function sendAdminNotice($fn_order_num, $fn_cart_html = false, $fn_cart_data = false)
 {
 	global $st_lang, $CONFIG, $lang_items;
 	
 	//html y content del mail
-	$fn_mail_html = $CONFIG['templates']['standartEmail'];
+	$fn_mail_html = $CONFIG['site']['standartEmail'];
 	
 	//email de aviso al administrador
 	$fn_subject = "[Nueva compra] - {$fn_order_num} - {$CONFIG['site']['sitetitlefull']}";
+	
+	$fn_message = '<p>Aviso de una nueva compra con siguiente referencia: <strong>%ref_number%</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p><br/><br/><br/><br/><br/><p><h2><strong style="color:#B99219">INFORMACIÓN DE COMPRA:</strong></h2></p>%order_details%<br/><br/><hr/><br/><br/><p><h2><strong style="color:#B99219">DATOS DEL CLIENTE:</strong></h2></p>%user_envio_data%<br/><br/><p><h2><strong style="color:#B99219">DATOS DE FACTURACIÓN:</strong></h2></p>%user_facturacion_data%<br/><br/>';
+	
+	$fn_message = str_replace('%ref_number%', $fn_order_num, $fn_message);
+	$fn_message = str_replace('%order_details%', $fn_cart_html, $fn_message);
+	
+	$fn_shipping_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_order']))
+	{
+		$fn_shipping_html = "";
+		foreach($fn_cart_data['user_order'] as $kf => $vf)
+		{
+			$fn_shipping_html .= "<strong>".nameFormFields($kf)."</strong> ".$vf."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_envio_data%', $fn_shipping_html, $fn_message);
+	
+	//facturacion
+	$fn_facturacion_html = "<p>No especificado</p>";
+	if(isset($fn_cart_data['user_facturacion']))
+	{
+		$fn_facturacion_html = "";
+		foreach($fn_cart_data['user_facturacion'] as $kff => $vff)
+		{
+			$fn_facturacion_html .= "<strong>".nameFormFields($kff)."</strong> ".$vff."<br/>";
+		}
+	}
+	$fn_message = str_replace('%user_facturacion_data%', $fn_facturacion_html, $fn_message);
 	
 	$fn_mail_html = str_replace(array(
 		'%message%',
@@ -880,29 +750,17 @@ function sendAdminNotice($fn_order_num)
 		'%site_dir%', 
 		'%site_logo%', 
 	), array(
-		'<p>Aviso de una nueva compra con siguiente referencia: <strong>'.$fn_order_num.'</strong></p><p>Lo puede ver accediendo al panel de control en el apartado (<strong>Pedidos</strong>).</p>',
-		$lang_items[$st_lang]['regards'],
+		$fn_message,
+		getLangItem('regards'),
 		$CONFIG['site']['sitetitlefull'],
 		$CONFIG['site']['sitecopyz'],
 		'',
-		'<img src="'.$CONFIG['site']['base'].'m/logo.png" alt="logotype" />',
+		'<img src="'.$CONFIG['site']['base'].'images/logo-mail.png" alt="logotype" />',
 	), $fn_mail_html);
 	
 	$fn_content = preparehtmlmailBase64($CONFIG['site']['botmail'], $fn_mail_html);
 	
-	$fn_send_admin = @mail($CONFIG['site']['mailinfo'], $fn_subject, $fn_content['multipart'], $fn_content['headers']);
-
-	/*
-	if($CONFIG['status']['debug'])
-	{
-		var_dump($fn_send_admin);
-		var_dump($CONFIG['site']['mailinfo']);
-		var_dump($fn_subject);
-		var_dump($fn_mail_html);
-		var_dump($fn_content['multipart']);
-		var_dump($fn_content['headers']);
-	}
-	*/
+	$fn_send_admin = @mail($CONFIG['site']['mailpedidos'], $fn_subject, $fn_content['multipart'], $fn_content['headers']);
 }
 
 /**
@@ -918,24 +776,38 @@ function createCartCheckoutHtml($fn_cart_array)
 	global $lang_items, $st_lang, $db;
 	
 	//gen order html
-	$fn_order_html = '<table width="100%" style="display:block; width:100%"><thead><tr style="width: 50%"><th>'.strtoupper($lang_items[$st_lang]['lang_cart_producto_title']).'</th><th style="width: 30%">'.strtoupper($lang_items[$st_lang]['lang_cart_cantidad_title']).'</th><th style="width: 20%">TOTAL</th></tr></thead><tbody>';
+	$fn_order_html = '<table width="100%" style="display:block; width:100%">
+		<thead>
+			<tr style="width: 50%">
+				<th style="text-align:left;">'.strtoupper(getLangItem('lang_cart_producto_title')).'</th>
+				<th style="width: 30%">'.strtoupper(getLangItem('lang_cart_cantidad_unidades_title')).'</th>
+				<th style="width: 30%">'.strtoupper(getLangItem('cart_cant_cajas')).'</th>
+				<th style="width: 20%">TOTAL</th>
+			</tr>
+		</thead><tbody>';
 	
 	if(count($fn_cart_array) !== 0) foreach($fn_cart_array['cart'] as $ck => $cv)
 	{
-		$fn_order_html .= '<tr><td style="text-transform: uppercase; style="width: 50%"">'.$cv['title'].'</td><td style="text-transform: uppercase; style="width: 30%"">'.$cv['pax'].'</td><td style="text-transform: uppercase; style="width: 20%"">'.$cv['price'].'</td></tr>';
-		
-		//oferta
-		if(isset($fn_cart_array['promote']) && $fn_cart_array['promote']['p_id'] == $cv['p_id']) $fn_order_html .= '<tr><td colspan="3" style="text-transform: uppercase;" >'.$lang_items[$st_lang]['cart_item_apply_promocode'].' ('.$fn_cart_array['promote']['oferta_value'].'%)</td><td>'.$lang_items[$st_lang]['lang_cart_promote_code'].' (<i>'.$fn_cart_array['promote']['code'].'</i>)</td></tr>';
+		$fn_order_html .= '<tr>
+			<td style="text-transform: uppercase;width: 50%;text-align:left;">'.$cv['title'].' '.$cv['subtitle'].'</td>
+			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['pax'].'</td>
+			<td style="text-transform: uppercase;width: 30%;text-align:center;">'.$cv['multimplier'].'</td>
+			<td style="text-transform: uppercase;width: 20%;text-align:right;">'.$cv['price_total'].'</td>
+		</tr>';
 	}
 	
-	$fn_calc_total = $fn_cart_array['cart_wiva_checkout']['cart_subtotal'];
-	$fn_calc_subtotal = round($fn_calc_total - $fn_cart_array['cart_wiva_checkout']['cart_iva'] , 2);
-	
-	$fn_oferta_general = '';
-	
-	if(isset($fn_cart_array['promote']) && $fn_cart_array['promote']['p_id'] == 0) $fn_oferta_general = '<strong>'.$lang_items[$st_lang]['cart_descuento'].':</strong> '.$fn_cart_array['promote']['oferta_value'].'% (<i>'.$fn_cart_array['promote']['code'].'</i>)<br/>';
-	
-	$fn_order_html .= '<tr><td></td><td></td><td></td></tr><tr><td>'.$fn_oferta_general.'<strong>'.$lang_items[$st_lang]['lang_iva'].' ('.$fn_cart_array['cart_checkout']['cart_iva_percent'].'%):</strong> '.$fn_cart_array['cart_wiva_checkout']['cart_iva'].'&euro;<br/><strong>Subtotal:</strong> '.$fn_calc_subtotal.'&euro;<br/><strong>'.$lang_items[$st_lang]['lang_envio'].':</strong> '.$lang_items[$st_lang]['cart_shipping_included'].'<br/><strong>Total:</strong> '.$fn_calc_total.'&euro;<br/></td><td></td><td></td></tr></tbody></table>';
+	$fn_order_html .= '<tr>
+			<td colspan="4" style="height:40px;"></td>
+		</tr>
+		<tr>
+			<td colspan="4" style="text-align: right">
+				<strong>'.getLangItem('lang_iva').' ('.$fn_cart_array['checkout']['cart_iva_percent'].'%):</strong> '.$fn_cart_array['checkout']['cart_iva'].'&euro;<br/>
+				<strong>Subtotal:</strong> '.$fn_cart_array['checkout']['cart_subtotal'].'&euro;<br/>
+				<strong>'.getLangItem('lang_envio').':</strong> '.getLangItem('cart_shipping_included').'<br/>
+				<strong>Total:</strong> '.$fn_cart_array['checkout']['cart_total'].'&euro;<br/>
+			</td>
+		</tr>
+		</tbody></table>';
 	
 	return $fn_order_html;
 }
@@ -953,10 +825,7 @@ function getCartCount()
 			
 	if(isset($_SESSION) && isset($_SESSION['cart']) && sizeof($_SESSION['cart']) !== 0)
 	{
-		foreach($_SESSION['cart'] as $kk => $kv)
-		{
-			if(isset($kv['pax'])) $fn_size_of_cart += $kv['pax'];
-		}
+		$fn_size_of_cart = count($_SESSION['cart']);
 	}else{
 		unset($_SESSION['cart']);
 		unset($_SESSION['cart_checkout']);
@@ -966,30 +835,9 @@ function getCartCount()
 }
 
 /**
- * shopium_assignCheckoutId function.
  * genera checkout_id si no existe 
  *
  *
- 
-	$_SESSION
-	
-	array (size=5)
-	  'lang' => string 'es' (length=2)
-	  'cart_wiva_checkout' => 
-	    array (size=2)
-	      'cart_subtotal' => float 100
-	      'cart_iva' => float 21
-	  'cart_checkout' => 
-	    array (size=8)
-	      'cart_count' => int 3
-	      'cart_subtotal' => float 79
-	      'cart_iva' => float 24.69
-	      'cart_iva_percent' => string '21' (length=2)
-	      'cart_peso' => float 0.3
-	      'cart_total' => float 117.56
-	      'cart_shipping_type' => string '9' (length=1)
-	      'cart_shipping_cost' => float 13.87
- 
  * @access public
  * @return void
  */
@@ -998,23 +846,6 @@ function assignCheckoutId()
 	//global $db, $CONFIG;
 	
 	$fn_checkout_id = date('ymd')."0".substr(time(), 6, 4);
-	
-	/*
-	if(!isset($_SESSION)) @session_start();
-	
-	if(isset($_SESSION) && isset($_SESSION['cart_checkout']) && isset($_SESSION['cart_checkout']['checkout_id']))
-	{
-		$db->Fetch("
-			UPDATE `orders`
-			SET `order_id`='{$fn_checkout_id}'
-			WHERE `order_id`='{$_SESSION['cart_checkout']['checkout_id']}'
-		");
-		
-		//aqui puede haber un problema
-		//deberia comprobar si existe si si update si no false y mostrar que hay un problema que lo intente otra vez
-	}
-	*/
-	
 	return $fn_checkout_id;
 }
 
@@ -1116,6 +947,40 @@ function decodeLangData($fn_json, $fn_show_current_lang = true)
 	$fn_title = (isset($fn_json) && isJson($fn_json)) ? object_to_array(json_decode($fn_json)) : '';
 	
 	return ($fn_show_current_lang) ? $fn_title[$st_lang] : $fn_title;
+}
+
+/**
+ * treeArray function.
+ * 
+ * @access public
+ * @param mixed $array
+ * @param mixed $fn_by_value
+ * @param string $fn_push_by_key (default: 'id')
+ * @return void
+ */
+function treeArray($array, $fn_by_value = 'parent_id', $fn_push_by_key = 'id')
+{
+	$array = object_to_array($array);
+	$tree = array();
+	
+	// Create an associative array with each key being the ID of the item
+	foreach($array as $k => &$v) $tree[$v[$fn_push_by_key]] = &$v;
+	
+	// Loop over the array and add each child to their parent
+	foreach($tree as $k => &$v)
+	{
+		if(!$v[$fn_by_value]) continue;
+		$tree[$v[$fn_by_value]]['parent'][] = &$v;
+	}
+	
+	// Loop over the array again and remove any items that don't have a parent of 0;
+	foreach($tree as $k => &$v) 
+	{
+		if(!$v[$fn_by_value]) continue;
+		unset($tree[$k]);
+	}
+	
+	return array_values($tree);
 }
 
 ?>

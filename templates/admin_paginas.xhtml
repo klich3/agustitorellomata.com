@@ -26,7 +26,7 @@
 	        <!-- BEGIN: row_page -->
 	        <tr data-id="{id}">
 	            <td><i class="{active_classes}" title="Visibilidad" data-uk-tooltip></i></td>
-	            <td>{obj_title}<br/> Url: (<i class="uk-text-small">{obj_hash}</i>)</td>
+	            <td>{obj_title} {is_system}<br/> Url: (<a href="{base}{obj_hash}" target="_blank"><i class="uk-text-small">{obj_hash}</i></a>)</td>
 		        <td class="uk-text-center">{lang}</td>    
 		        <td class="uk-text-center">{type}</td>    
 		        <td class="uk-text-center">{create_date}<br/>{update_date}</td>    
@@ -34,9 +34,7 @@
 		        <td>
 			        <div class="uk-button-group uk-float-right">
 						<a href="{current_hash}?action=editPage&id={id}" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a>
-						<!-- BEGIN: cloneActividades -->
 						<a href="javascript:void(0);" data-action="clonePage" class="uk-button uk-button-small" title="Duplicar" data-uk-tooltip><i class="uk-icon-copy"></i></a>
-						<!-- END: cloneActividades -->
 						<!-- BEGIN: delAllow -->
 						<a href="javascript:void(0);" data-action="delPage" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
 						<!-- END: delAllow -->
@@ -44,121 +42,9 @@
 		        </td>
 	        </tr>
 	        <!-- END: row_page -->
-	        
-	        <!-- BEGIN: row_blog -->
-			<tr data-id="{id}">
-				<td><i class="{active_classes}" title="Visibilidad" data-uk-tooltip></i></td>
-	            <td>{obj_title}<br/> Url: (<i class="uk-text-small">{obj_hash}</i>)</td>
-		        <td class="uk-text-center">{lang}</td>
-		        <td class="uk-text-center">{type}</td>
-		        <td class="uk-text-center">
-			        Comentarios <i class="uk-icon-comment"></i> (<span class="uk-text-success" title="Comentarios publicados" data-uk-tooltip>{comment_count_pub}</span> / <span title="Comentarios en total" data-uk-tooltip>{comment_count}</span>)
-		        </td>
-		        <td>
-			        <div class="uk-button-group uk-float-right">
-						<a href="{current_hash}?action=showComments&id={id}" class="uk-button uk-button-small uk-button-primary"><i class="uk-icon-comment-o"></i></a>
-						<a href="{current_hash}?action=editPage&id={id}" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a>
-						<!-- BEGIN: delAllow -->
-						<a href="javascript:void(0);" data-action="delPage" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
-						<!-- END: delAllow -->
-					</div>
-		        </td>
-			</tr>
-			<!-- END: row_blog -->
 	    </tbody>
 	</table>
 	<!-- END: list_page -->
-	
-	<!-- BEGIN: blog_comments -->
-	<div class="uk-width-1-1">
-		<div class="uk-width-1-1 uk-margin-bottom">
-			<a href="{current_hash}" class="uk-button uk-button-small"><i class="uk-icon-angle-left"></i> Volver</a>
-		</div>
-		
-		<form class="uk-form" data-id="{pid}">
-			<div class="uk-grid uk-grid-small">
-				<div class="uk-width-1-1">
-					
-					<ul class="uk-comment-list" data-comments>
-					    <!-- BEGIN: row -->
-					    <li data-id="{id}">
-						    <div class="uk-comment">
-							    <div class="uk-comment-header">
-							        <div class="uk-badge uk-badge-notification uk-text-small uk-float-right" data-badge-status>{active}</div>
-							        <h4 class="uk-comment-title">{author}</h4>
-							        <div class="uk-comment-meta">
-										<div class="uk-grid">
-										   <div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
-											    <ul class="uk-comment-meta uk-subnav uk-subnav-line">
-											        <li>{author_mail}</li>
-											        <li>{date_create}</li>
-											    </ul>
-										   </div>
-										   
-										   <div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
-											   <div class="uk-button-group uk-float-right">
-												   <a href="javascript:void(0);" data-blog-action="approbed" class="uk-button uk-button-small" title="Aprobar y asi mismo publicar" data-uk-tooltip><i class="uk-icon-check-circle-o
-"></i></a>
-												   <a href="javascript:void(0);" data-blog-action="desapprobed" class="uk-button uk-button-small" title="Quitar comentario" data-uk-tooltip><i class="uk-icon-times-circle-o"></i></a>
-												   <a href="javascript:void(0);" data-blog-action="reply" data-parent="{id}" class="uk-button uk-button-small uk-button-primary" title="Contestar" data-uk-tooltip><i class="uk-icon-commenting"></i></a>
-												   <a href="javascript:void(0);" data-blog-action="edit" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a>
-												   <a href="javascript:void(0);" data-blog-action="del" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
-											   </div>
-										   </div>
-										</div>
-								    </div>
-							    </div>
-							    <div class="uk-comment-body" data-comment>{comment}</div>
-							</div>
-							
-						    <!-- BEGIN: reply -->
-							<ul class="uk-comment-list">
-							    <!-- BEGIN: row -->
-							    <li data-id="{id}">
-								    <div class="uk-comment">
-									    <div class="uk-comment-header">
-									        <div class="uk-badge uk-badge-notification uk-text-small uk-float-right" data-badge-status>{active}</div>
-									        <h4 class="uk-comment-title">{author}</h4>
-									        <div class="uk-comment-meta">
-												<div class="uk-grid">
-												   <div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
-													    <ul class="uk-comment-meta uk-subnav uk-subnav-line">
-													        <li>{author_mail}</li>
-													        <li>{date_create}</li>
-													    </ul>
-												   </div>
-												   
-												   <div class="uk-width-small-1-1 uk-width-medium-1-2 uk-width-large-1-2 uk-width-xlarge-1-2">
-													   <div class="uk-button-group uk-float-right">
-														   <a href="javascript:void(0);" data-blog-action="approbed" class="uk-button uk-button-small" title="Aprobar y asi mismo publicar" data-uk-tooltip><i class="uk-icon-check-circle-o
-		"></i></a>
-														   <a href="javascript:void(0);" data-blog-action="desapprobed" class="uk-button uk-button-small" title="Quitar comentario" data-uk-tooltip><i class="uk-icon-times-circle-o"></i></a>
-														   <a href="javascript:void(0);" data-blog-action="reply" data-parent="{parent_id}" class="uk-button uk-button-small uk-button-primary" title="Contestar" data-uk-tooltip><i class="uk-icon-commenting"></i></a>
-														   <a href="javascript:void(0);" data-blog-action="edit" class="uk-button uk-button-small uk-button-success"><i class="uk-icon-pencil"></i></a>
-														   <a href="javascript:void(0);" data-blog-action="del" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a>
-													   </div>
-												   </div>
-												</div>
-										    </div>
-									    </div>
-									    <div class="uk-comment-body" data-comment>{comment}</div>
-									</div>
-									
-									
-							    </li>
-							    <!-- END: row -->
-							</ul>
-						    <!-- END: reply -->
-							
-					    </li>
-					    <!-- END: row -->
-					</ul>
-					
-				</div>
-			</div>
-		</form>
-	</div>
-	<!-- END: blog_comments -->
 	
 	<!-- BEGIN: editPage -->
 	<div class="uk-width-1-1">
@@ -305,6 +191,9 @@
 								<label for="active">Visibilidad de la página</label><br/><br/>
 								<input type="checkbox" name="active" value="1" {active_checked} /> Visible
 							</div>
+							<div class="uk-form-row">
+								<a href="javascript:void(0);" data-action="delPage" class="uk-button uk-button-small uk-button-danger uk-width-1-1"><i class="uk-icon-trash"></i> Eliminar esta página</a>
+							</div>
 							
 							<hr/>
 							
@@ -369,10 +258,6 @@
 								
 							<div class="uk-form-row">	
 								<div class="uk-grid">
-									<div class="uk-width-small-1-1 uk-width-2-3">
-										<input type="checkbox" name="a_vice" value="1" /> Interrelacionar traducción
-									</div>
-									
 									<div class="uk-width-small-1-1 uk-width-1-3">
 										<a href="javascript:void(0);" data-action="addRelPage" class="uk-button uk-button-small uk-button-primary uk-float-right">Relacionár</a>
 									</div>
