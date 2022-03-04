@@ -27,9 +27,9 @@ $CONFIG = array(
 		"host" => "localhost", //server
 		"port" => "", //server port
 		
-		"username" => ($isLocal) ? "root" : "myagustito", //user
-		"password" => ($isLocal) ? "root" : "wogPcj3K", //pass
-		"database" => ($isLocal) ? "agustitorellomata" : "torelloweb", //table
+		"username" => ($isLocal) ? "root" : "", //user
+		"password" => ($isLocal) ? "root" : "", //pass
+		"database" => ($isLocal) ? "agustitorellomata" : "", //table
 	),
 	
 	"site" => array(
