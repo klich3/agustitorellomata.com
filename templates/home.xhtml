@@ -1,9 +1,36 @@
 <!-- BEGIN: home -->
-{FILE {pagefreaturedImageTmpl}}
+<div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10 h" id="modal_edad">
+	<div class="g">
+		<div class="w-1-1">
+			<svg class="e" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo"></use></svg>
+		</div>
+		
+		<div class="w-1-1 pt-2 pb-2 txt@c">
+			<p>Accediendo a esta web certifico que soy mayor de edad (18 años) </p>
+		</div>
+		
+		<div class="w-1-1 pt-3">
+			<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 mc">
+				<div class="g">
+					<div class="w-1-2 txt@c">
+						<a href="javascript:void(0);" class="button" data-edad="si">Si</a>
+					</div>
+					<div class="w-1-2 txt@c">
+						<a href="javascript:void(0);" class="button" data-edad="no">No</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 <div class="w-1-1" data-cc-container>
 	<div class="c cc">
 		{FILE {jsonToTmpl}}
+		
+		<div class="home-saltar">
+			<a href="{base_script}{user_lang}/{initial_page}"><strong class="txt@u">{lang_home_saltar_but}</strong></a>
+		</div>
 	</div>
 </div>
 <!-- END: home -->

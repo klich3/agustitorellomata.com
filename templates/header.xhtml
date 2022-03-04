@@ -1,12 +1,20 @@
 <!-- BEGIN: header -->
 <!DOCTYPE html>
-<html class="no-js" lang="{user_lang}" xmlns="http://www.w3.org/1999/xhtml" prefix="og: http://ogp.me/ns# addthis: http://www.addthis.com/help/api-spec" data-hash="{header_stage_hash}" data-type="{stage_hash}">
+<html class="no-js" lang="{user_lang}" data-hash="{header_stage_hash}" data-type="{stage_hash}">
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-	<!-- BEGIN: only_home --><meta name="description" content="{description}">
+	<!-- BEGIN: only_home -->
+	<meta name="description" content="{description}">
 	<meta name="keywords" content="{keywords}">
-	<meta name="ROBOTS" content="INDEX, FOLLOW" /><!-- END: only_home -->
+	<meta name="ROBOTS" content="INDEX, FOLLOW" />
+	
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.mp4">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.hd.webm">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.ogv">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmhd.webm">
+	<link rel="preload" as="video" href="//agustitorellomata.com/content/home-video.webmsd.webm">
+	<!-- END: only_home -->
 	{FILE {header_seo}}
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -21,6 +29,8 @@
 	
 	<link rel="shortcut icon" type="image/x-icon" href="{base}images/favicon.ico" />
 	<link rel="apple-touch-icon" type="image/png" href="{base}images/favicon.png" />
+	
+	
 	
 	<script type="text/javascript">
 		var fn_base_script = '{base_script}',
@@ -44,7 +54,38 @@
 <body>
 {FILE "templates/_header_svg.xhtml"}
 
+<div class="cart-wrap">
+	<div class="cart-close-outside"></div>
+	<div class="cp-1" data-cart-container>
+	</div>
+</div>
+
 <div class="wrap">
+<!-- BEGIN: not_home -->
+	<!-- BEGIN: header_logged -->
+	<div class="header-logged">
+		<div class="flx@fd-r@jc-fe@ai-c@ac-c@s-jc-sb h-100 items">
+			<div>
+				<a href="{base_script}{user_lang}/mi-cuenta" class="myaccount">
+					<img src="{base_script}images/user-icon-b.svg" width="30px" height="30px" alt="mi-cuenta" class="pr-2" /> <span class="pt-1">{but_mi_cuenta}</span></a>
+			</div>
+			<div class="sep"></div>
+			<div class="cart">
+				<div>
+					<a href="javascript:void(0);" data-action="openCart"><img src="{base_script}images/cart.svg" width="25px" height="22px" alt="cart"/></a>
+				</div>
+				<div>
+					<div class="cart-not {cart_hide}">{cart_items}</div>
+				</div>
+			</div>
+			<div class="sep"></div>
+			<div>
+				<a href="{base_script}{user_lang}/logout">{but_logout}</a>
+			</div>
+		</div>
+	</div>
+	<!-- END: header_logged -->
+	
 	<header class="cp-1 cp-n@s">
 		<div class="hl">
 			<div class="pr-2">
@@ -66,11 +107,11 @@
 					</div>
 					<!-- END: header_lang_list_mob -->
 					
-					<!--//
+					<!-- BEGIN: only_not_logged -->
 					<div class="h-100">
-						<img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" />
+						<a href="{base_script}{user_lang}/login"><img src="{base}images/user-icon.svg" width="45px" height="45px" alt="user" /></a>
 					</div>
-					//-->
+					<!-- END: only_not_logged -->
 				</div>
 			</div>
 			
@@ -94,7 +135,7 @@
 				</div>
 				
 				<div class="w-6-10 txt@c">
-					<a href="{base_script}{user_lang}" rel="nofollow" data-event="header/logo" class="logo" data-source="logo">
+					<a href="{base_script}" rel="nofollow" data-event="header/logo" class="logo" data-source="logo">
 						<svg class="e" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo"></use></svg>
 					</a>
 				</div>
@@ -124,6 +165,13 @@
 						<nav class="pt-3">
 							<ul class="ln flx@fd-r@fw-n@jc-sb@ai-c@ac-c" data-source="menu">
 								{FILE {headerMenuTmpl}}
+								<!-- BEGIN: login_but_not_logged -->
+								<li>
+									<a href="{base_script}{user_lang}/mi-cuenta" class="login">
+										<img src="{base}images/user-icon.svg" width="25px" height="25px" alt="user" class="pr-2" /> {but_login}
+									</a>
+								</li>
+								<!-- END: login_but_not_logged -->
 							</ul>
 						</nav>
 					</div>
@@ -135,7 +183,7 @@
 	</header>
 	
 	<div class="w-1-1 hl" data-some-h="header"></div>
-	
+<!-- END: not_home -->	
 	<main class="pt-5@s">
 		{FILE {pagefreaturedImageTmpl}}
 <!-- END: header -->

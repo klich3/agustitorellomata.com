@@ -22,21 +22,20 @@ $(function()
 	//edit Modal Product
 	$.template('editModalProduct', '{{if product && stock.length !== 0 && sc}}<form class="uk-form"><div class="uk-form-row">Activo <input type="checkbox" name="f_active" value="1" {{if product.active == 1}}checked{{/if}} class="uk-width-1-1" /></div><div class="uk-form-row"><label for="f_menu_title">Título del producto (<span class="uk-text-small">solo menu</span>)</label><input type="text" name="f_menu_title" id="f_menu_title" value="${product.menu_title}" class="uk-width-1-1" data-hash-reference="f_hash" /></div><div class="uk-form-row"><label for="f_hash">Hash (Automático)</label><input type="text" name="f_hash" id="f_hash" value="${product.hash}" class="uk-width-1-1 uk-"/></div><hr/>{{each(i, v) product.lang_data}}<div class="uk-form-row"><label for="f_title_${i}">Título en (<span class="uk-text-bold uk-text-small">${i}</span>)</label><input type="text" name="f_title_${i}" id="f_title_${i}" value="${v}" class="uk-width-1-1" /></div>{{/each}}'+
 			
-		//stock + colores + tallas + dimensiones
-		'<hr><div class="uk-form-row"><div class="uk-grid"><div class="uk-width-1-2"><label for="stock[f_size_id]">Tamaño</label><select name="stock[f_size_id]" class="uk-width-1-1">{{each(si, sv) sc.size}}<option value="${sv.id}" {{if stock[0].size_id == sv.id}}selected{{/if}}>${sv.lang_parse}</option>{{/each}}</select></div><div class="uk-width-1-2"><label for="stock[f_color_id]">Color</label><select name="stock[f_color_id]" class="uk-width-1-1">{{each(ci, cv) sc.color}}<option value="${cv.id}" {{if stock[0].color_id == cv.id}}selected="true"{{/if}}>${cv.lang_parse}</option>{{/each}}</select></div><div class="uk-width-1-2"><label for="stock[f_precio_coste]">Precio coste</label><input type="number" name="stock[f_precio_coste]" value="${stock[0].precio_coste}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_precio_venta]">Precio final (<strong class="uk-text-small">venta</strong>)</label><input type="number" name="stock[f_precio_venta]" value="${stock[0].precio_venta}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_stock_min]">Stock minimo</label><input type="number" name="stock[f_stock_min]" value="${stock[0].stock_min}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_stock_base]">Stock base</label><input type="number" name="stock[f_stock_base]" value="${stock[0].stock_base}" class="uk-width-1-1" /></div><div class="uk-width-1-1"><label for="stock[f_stock_count]">Stock actual</label><input type="number" name="stock[f_stock_count]" value="${stock[0].stock_count}" class="uk-width-1-1" /></div></div></div><div class="uk-form-row"><input type="hidden" name="id" value="${product.id}" /><a href="javascript:void(0);" data-submit="upProduct" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar cambios</a></div>{{else}}<div class="uk-alert uk-alert-danger uk-width-1-1">Algo a ido mal no se han cargado datos basicos del producto, cierre esta ventana y vuelva a intentarlo de nuevo.</div>{{/if}}'+
+		//stock + dimensiones
+		'<hr><div class="uk-form-row"><div class="uk-grid"><div class="uk-width-1-2"><label for="stock[f_precio_coste]">Precio coste</label><input type="number" name="stock[f_precio_coste]" value="${stock[0].precio_coste}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_precio_venta]">Precio final (<strong class="uk-text-small">venta</strong>)</label><input type="number" name="stock[f_precio_venta]" value="${stock[0].precio_venta}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_stock_min]">Stock minimo</label><input type="number" name="stock[f_stock_min]" value="${stock[0].stock_min}" class="uk-width-1-1" /></div><div class="uk-width-1-2"><label for="stock[f_stock_base]">Stock base</label><input type="number" name="stock[f_stock_base]" value="${stock[0].stock_base}" class="uk-width-1-1" /></div><div class="uk-width-1-1"><label for="stock[f_stock_count]">Stock actual</label><input type="number" name="stock[f_stock_count]" value="${stock[0].stock_count}" class="uk-width-1-1" /></div></div></div><div class="uk-form-row"><input type="hidden" name="id" value="${product.id}" /><a href="javascript:void(0);" data-submit="upProduct" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar cambios</a></div>{{else}}<div class="uk-alert uk-alert-danger uk-width-1-1">Algo a ido mal no se han cargado datos basicos del producto, cierre esta ventana y vuelva a intentarlo de nuevo.</div>{{/if}}'+
 		
 		'</form>');
 	
-	//administracion color / size
-	$.template('admColoSizeListItem', '<li data-id="${id}" data-lang-json=\'${lang_data}\'><div class="uk-grid"><div class="uk-width-6-10">${lang_parse}</div><div class="uk-width-4-10"><div class="uk-button-group uk-float-right"><a href="javascript:void(0);" data-action="edit${type}Item" class="uk-button uk-button-small"><i class="uk-icon-pencil"></i></a><a href="javascript:void(0);" data-action="del${type}Item" class="uk-button uk-button-small uk-button-danger"><i class="uk-icon-trash"></i></a></div></div></div></li>');
-	
-	$.template('admColorSize', '<div class="uk-grid uk-grid-small uk-width-1-1 uk-margin"><div class="uk-width-1-2"><p>Lista de colores</p><ul class="uk-list uk-list-line uk-list-striped uk-width-1-1" data-admv-color>{{each(i, v) color}}'+
-		'{{tmpl({id:v.id, lang_parse:v.lang_parse, type:"Color", lang_data:v.lang_data}) "admColoSizeListItem"}}'+
-	'{{/each}}</ul></div><div class="uk-width-1-2"><p>Lista de tamaños (tallas)</p><ul class="uk-list uk-list-line uk-list-striped uk-width-1-1" data-admv-size>{{each(i, v) size}}'+
-		'{{tmpl({id:v.id, lang_parse:v.lang_parse, type:"Size", lang_data:v.lang_data}) "admColoSizeListItem"}}'+
-	'{{/each}}</ul></div></div><hr/>'+
-
-	'<form class="uk-form uk-width-1-1"><div class="uk-form-row"><span class="uk-text-bold">Crear un color o tamaño / talla</span></div><div class="uk-form-row"><select class="uk-width-1-1" name="f_ctAdmType"><option value="color">color</option><option value="size">tamaño / talla</option></select></div><div class="uk-form-row"><ul class="uk-grid uk-grid-width-1-${lang.length}">{{each(i, v) lang}}<li><input type="text" name="f_lang_data[${v}]" value="" placeholder="Idioma: (${v})" class="uk-width-1-1" /></li>{{/each}}</ul></div><div class="uk-form-row"><span class="uk-badge uk-badge-notification">Nota:</span> Es importante y recomendable borrar contenido (<i class="uk-icon-eraser"></i>) antes de crear nuevo item.</div><div class="uk-form-row"><input type="hidden" name="id" value="" /><div class="uk-button-group uk-float-right"><a href="javascript:void(0);" data-action="cleanForm" class="uk-button uk-button-success"><i class="uk-icon-eraser"></i></a><a href="javascript:void(0);" data-action="ctUpColorSize" class="uk-button uk-button-primary"><i class="uk-icon-save"></i></a></div></div></form>');
+		$.template('modalCatManager', '{{if status=="200"}}'+
+				'<div class="uk-width-1-1 uk-margin-bottom"><strong>Administración de categorías</strong></div><div class="uk-width-1-1"><div class="uk-panel uk-panel-box uk-padding-remove"><ul class="uk-nestable uk-placeholder uk-width-1-1" data-uk-nestable="{handleClass:\'uk-nestable-handle\', maxDepth:2, group:\'cat\'}" data-type="disabled" data-catlist-container>'+
+					//lista de categoria
+					'{{each(i, o) data}}<li data-id="${o.id}" class="uk-nestable-item"><div class="uk-nestable-panel"><div class="uk-nestable-handle uk-float-left"><i class="uk-nestable-handle uk-icon-bars uk-margin-small-right"></i></div><span class="noselect">${o.menu_name} - <i class="uk-text-small">${o.hash}</i></span></div>'+
+						//subcategoria parent
+						'{{if o.parent}}<ul class="uk-nestable-list">{{each(it, ot) o.parent}}<li data-id="${ot.id}" class="uk-nestable-item"><div class="uk-nestable-panel"><div class="uk-nestable-handle uk-float-left"><i class="uk-nestable-handle uk-icon-bars uk-margin-small-right"></i></div><span class="noselect">${ot.menu_name} - <i class="uk-text-small">${ot.hash}</i></span></div></li>{{/each}}</ul>{{/if}}'+
+					'</li>{{/each}}'+
+				'</ul></div></div><div class="uk-width-1-1 uk-margin"><a href="javascript:void(0);" data-action="upCatSortAdm" class="uk-button uk-button-primary uk-float-right"><i class="uk-hidden uk-icon-spin uk-icon-spinner"></i> Guardar</a></div><div class="uk-clearfix"></div>'+
+			'{{else}}<div class="uk-width-1-1">${message}</div>{{/if}}');
 	
 	var admin_productos = function() 
 	{
@@ -49,8 +48,23 @@ $(function()
 		$(document).on('click', '[data-action]', e_action_handler);
 		$(document).on('click', '[data-modal]', e_editModal_handler);
 		
+		$(document).on('keydown', fn_keys_handler);
+		
 		//stock variacion
 		$(document).on('click', '[data-stock="variaciones"]', e_variacion_handler);
+	}
+	
+	//key combination
+	fn_keys_handler = function(e)
+	{
+		var evtobj = window.event? event : e;
+		
+		//cmd + s = save
+		if(evtobj.keyCode == 83 && evtobj.ctrlKey)
+		{
+			e.preventDefault();
+			$('[data-submit="upProducto"]').trigger('click');
+		}
 	}
 	
 	//variacion de stock
@@ -93,8 +107,9 @@ $(function()
 			
 			switch(dom_type)
 			{
-				case "admVariedad":
-					fn_call_ajax("getColorSizes", null, function()
+				//administramos categoria parent dependencias
+				case "manageCategoria":
+					fn_call_ajax(dom_type, null, function()
 					{
 						$('[data-modal-container]').html($.tmpl('modalPreloader'));
 					}, function(d)
@@ -103,23 +118,18 @@ $(function()
 						
 						if(d.status == 200)
 						{ 
-							$('[data-modal-container]').html($.tmpl('admColorSize', d.data));
+							$('[data-modal-container]').html($.tmpl('modalCatManager', d));
 						}else{
 							//notify
 							UIkit.notify(
 							{
-							    message : d.message,
-							    status  : 'info',
-							    timeout : 5000,
-							    pos     : 'top-center'
+								message : d.message,
+								status  : 'info',
+								timeout : 5000,
+								pos     : 'top-center'
 							});
 						}
 					});
-				break;
-				
-				case 'variaciones':
-					$('[data-modal-container]').html($.tmpl('modalPreloader'));
-					return;
 				break;
 				
 				case "product":
@@ -260,37 +270,6 @@ $(function()
 			case "delItemCategoria":
 				dom_item_id = ele.parents('[data-cat-id]').attr('data-cat-id');
 			break;
-			
-			case "ctUpColorSize":
-				dom_item_id = ele.parents('[data-id]').attr('data-id');
-				dom_type_mods = ele.parents('form').find('[name="f_ctAdmType"]').val();
-				dom_form_ser = ele.parents('form').serialize();
-			break;
-			
-			case "editSizeItem":
-			case "editColorItem":
-			case "delSizeItem":
-			case "delColorItem":
-				if(ele.parents('[data-admv-color]').length !== 0) dom_type_mods = 'color';
-				if(ele.parents('[data-admv-size]').length !== 0) dom_type_mods = 'size';
-				dom_item_id = ele.parents('[data-id]').attr('data-id');
-			break;
-		}
-		
-		if(dom_action_type == 'editSizeItem' || dom_action_type == 'editColorItem')
-		{
-			dom_lang_data = $.parseJSON(ele.parents('[data-id]').attr('data-lang-json'));
-			
-			ele.parents('[data-modal-container]').find('input[name="id"]').val(dom_item_id);
-			ele.parents('[data-modal-container]').find('select[name="f_ctAdmType"] option[value="'+dom_type_mods+'"]').attr('selected', true);
-			
-			var fn_languages = $.parseJSON(st_languages);
-			if(fn_languages.length !== 0) for(var l in fn_languages)
-			{
-				if(!$.isNumeric(l)) continue;
-				ele.parents('[data-modal-container]').find('[name="f_lang_data['+fn_languages[l]+']"]').val(dom_lang_data[fn_languages[l]]);
-			}
-			return;
 		}
 		
 		//fn_call_ajax = function(fn_hash, fn_data, fn_before, fn_success)
@@ -319,36 +298,6 @@ $(function()
 						$('[data-producto-container]').trigger('change.uk.sortable');
 						
 						ele.parents('[data-cat-id]').remove();
-					break;
-					
-					case "delColorItem":
-					case "delSizeItem":
-						ele.parents('li').remove();
-					break;
-					
-					case "ctUpColorSize":
-						var fn_dom_by_type = (dom_type_mods == 'color') ? '[data-admv-color]' : '[data-admv-size]',
-							fn_tmpl_type = (dom_type_mods == 'color') ? 'Color' : 'Size';
-						
-						if(!d.data.create) $(fn_dom_by_type+' [data-id="'+d.data.id+'"]', '[data-modal-container]').remove();
-						
-						//creamos uno nuevo
-						$.tmpl('admColoSizeListItem', 
-						{
-							'id':d.data.id,
-							'lang_data':d.data.lang_data,
-							'lang_parse':d.data.lang_parse,
-							'type':fn_tmpl_type
-						}).appendTo(fn_dom_by_type);
-						
-							
-						//clean up
-						$(':input, textarea', ele.parents('form')).not('selected').val('');
-						
-						$('#editModal').on('hide.uk.modal', function()
-						{
-							location.reload();
-						});
 					break;
 				}
 			}

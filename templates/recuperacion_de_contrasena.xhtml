@@ -1,38 +1,38 @@
 <!-- BEGIN: recuperacion_de_contrasena -->
-{FILE {pagefreaturedImageTmpl}}
+<div class="w-1-1 pt-5 pb-2">
+	<div class="w-1-1">
+		<h1 class="txt@c"><span class="txt@u">{lang_page_title_recuperacion_de_pass}</span></h1>
+	</div>
+</div>
 
 <div class="w-1-1" data-cc-container>
 	<div class="c cc cp-4@s">
-		<div class="g">
-			
-			<div class="w-1-1 mt-4">&nbsp;</div>
-			
-			<div class="w-1-2">
-				<form data-type="user" autocomplete="off">
-					<div class="w-1-1 pb-2 border@b">
-						<svg class="mr-3" width="45" height="32" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-user-locked"></use></svg> <span class="header-title">{lang_recoverpass_title}</span>
-					</div>
+		<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 mc">
+			<div class="g">
+				<div class="w-1-1">
+					{FILE {jsonToTmpl}}
+				</div>
+				
+				<div class="w-1-1 pt-10 pb-2 hl"></div>
+				
+				<div class="w-1-1 pt-10">
 					
-					<div class="w-1-1 mt-6">
-						<span class="font@ctsi">{lang_recoverpass_inemail}</span>
-					</div>
+					<form data-type="user" autocomplete="off">
+						<fieldset>
+							<label for="email" class="pb-2">{label_email}:</label>
+							<input type="text" name="email" class="ws-1-1 wm-7-10 wl-7-10 wxl-7-10" />
+						</fieldset>
+						
+						<fieldset>
+							<a href="javascript:void(0);" class="ws-1-1 wm-5-10 wl-5-10 wxl-5-10 button" data-action="recPass">{recovery_pass_but}</a>
+						</fieldset>
+					</form>
 					
-					<div class="w-1-1 mt-3">
-						<input type="text" name="" class="w-6-10" />
-					</div>					
-					
-					<div class="w-1-1 pt-3"></div>
-					
-					<div class="w-1-1 mt-3">
-						<a href="javascript:void(0);" class="button" data-action="recPass">{lang_recoverpass_button}</a>
-					</div>
-					
-					<div class="mt-3 message h" data-message></div>		
-				</form>
+				</div>
 			</div>
-			
-			<div class="w-1-1 mb-10">&nbsp;</div>
 		</div>
 	</div>
 </div>
+
+<div class="w-1-1 pb-10"></div>
 <!-- END: recuperacion_de_contrasena -->

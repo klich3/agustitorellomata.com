@@ -57,20 +57,20 @@ class WIDGET_socialTmpl {
 					'val' => ($sv->options_key === 'mailinfo') ? "mailto:{$sv->options_value}" : $sv->options_value,
 					'desc' => $sv->description,
 				);
-				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl.{$sv->options_key}_header";
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.socialTmpl.{$sv->options_key}_header";
 				
 				$fn_i++;
 			}
 		
 			//only header cart icon
 			self::$fn_xtemplate_parse['assign'][] = array();
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl.header_cart_item";
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.socialTmpl.header_cart_item";
 			//only header cart icon
 		
 			self::$fn_xtemplate_parse['assign'][] = array(
 				'total' => (int)$fn_i,
 			);
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl";
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.socialTmpl";
 		}
 			
 		return self::$fn_xtemplate_parse;
@@ -111,7 +111,7 @@ class WIDGET_socialTmpl {
 					'val' => ($sv->options_key === 'mailinfo') ? "mailto:{$sv->options_value}" : $sv->options_value,
 					'desc' => $sv->description,
 				);
-				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl.{$sv->options_key}_footer";
+				self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.socialTmpl.{$sv->options_key}_footer";
 				
 				$fn_i++;
 			}
@@ -119,7 +119,7 @@ class WIDGET_socialTmpl {
 			self::$fn_xtemplate_parse['assign'][] = array(
 				'total' => (int)$fn_i,
 			);
-			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.socialTmpl";
+			self::$fn_xtemplate_parse['parse'][] = "{$fn_args['stage_id']}.not_home.socialTmpl";
 		}
 		
 		return self::$fn_xtemplate_parse;

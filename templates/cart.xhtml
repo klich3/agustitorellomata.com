@@ -1,0 +1,287 @@
+<!-- BEGIN: cart -->
+<div class="w-1-1" data-cc-container>
+  <div class="c cc cp-4@s">
+    <div class="w-1-1">{FILE {jsonToTmpl}}</div>
+  </div>
+
+  <div class="w-1-1 cp-4@s">
+    <div class="g">
+      <!-- BEGIN: no_cart -->
+      <div class="w-1-1">
+        <div class="w-1-1 txt@c">{message}</div>
+
+        <div class="w-1-1 mt-2 txt@c">
+          <a href="{base}{user_lang}/atm-club-shop" class="button"
+            >{but_ir_a_la_tienda}</a
+          >
+        </div>
+      </div>
+      <!-- END: no_cart -->
+
+      <!-- BEGIN: cart -->
+      <div class="w-1-1 cp-2 pb-3 hs">
+        <div class="g ">
+          <div class="ws-4-10 wm-2-10 wl-2-10 wxl-2-10">
+          </div>
+          
+          <div class="ws-6-10 wm-8-10 wl-8-10 wxl-8-10">
+            <div class="g">
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_producto_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_precio_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1">
+                  <strong class="txt@u label">{lang_cart_cantidad_title}</strong>
+                </div>
+      
+                <div class="w-1-4 brd-b pb-1 txt@r">
+                  <strong class="txt@u label">total</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <!-- BEGIN: row -->
+      <div class="w-1-1 cp-2">
+        <div
+          class="g item"
+          data-pid="{p_id}"
+          data-cid="{cat_id}"
+          data-price-u="{precio_venta}"
+          data-multiplier="{pax_multimplier}"
+        >
+          <div class="ws-4-10 wm-2-10 wl-2-10 wxl-2-10">
+            <div class="thumb">
+              <img
+                src="{base}images/blank.gif"
+                data-image="{thumb}"
+                data-preloadimages
+                class="e"
+                title="product {title} image preview"
+              />
+            </div>
+          </div>
+
+          <div class="ws-6-10 wm-8-10 wl-8-10 wxl-8-10">
+            <div class="g">
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
+                <div class="title txt@u">
+                  <strong>{title}</strong>
+                </div>
+                <div class="subtitle txt@u">
+                  {subtitle}
+                </div>
+              </div>
+
+              <div class="hl w-1-1 pt-4 pb-5">
+                <hr />
+              </div>
+
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
+                <div class="g">
+                  <div class="w-1-1">
+                    <div class="bot">
+                      <strong>{lang_box} {pax_multimplier} {lang_bot}</strong>
+                    </div>
+                    <div class="bot-price txt-org">
+                      <strong>{price_caja}&euro;</strong>
+                    </div>
+                    <div class="price">
+                      <strong>{price_unit}&euro; {lang_ud}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hl w-1-1 pt-4 pb-5">
+                <hr />
+              </div>
+
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4">
+                <div class="g">
+                  <div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
+                    <!-- BEGIN: by_box -->
+                    <div class="g gc" data-group="control">
+                      <div class="w-1-1 pb-2">
+                        <strong>{cart_cant_cajas}</strong>
+                      </div>
+                      <div class="w-8-10">
+                        <div class="w-1-1">
+                          <input
+                            type="number"
+                            name="multimplier"
+                            min="1"
+                            max="{stock_count}"
+                            value="{multimplier}"
+                            data-multimplier
+                            class="w-1-1 txt@c"
+                          />
+                        </div>
+                      </div>
+                      <div class="w-2-10">
+                        <a
+                          href="javascript:void(0);"
+                          class="fr"
+                          data-action="cartDelItem"
+                        >
+                          <img
+                            src="{base_script}images/icon-trash.svg"
+                            width="22px"
+                            height="27px"
+                          />
+                        </a>
+                      </div>
+                      <div class="w-1-1 pt-4"></div>
+                      <div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
+                        <a
+                          href="javascript:void(0);"
+                          data-action="cartDownItem"
+                        >
+                          <img
+                            src="{base_script}images/icon-minus.svg"
+                            width="25px"
+                            height="25px"
+                          />
+                        </a>
+                        <a href="javascript:void(0);" data-action="cartUpItem">
+                          <img
+                            src="{base_script}images/icon-plus.svg"
+                            width="25px"
+                            height="25px"
+                          />
+                        </a>
+                      </div>
+                      <div class="w-2-10"></div>
+
+                      <div class="w-1-1 txt-org txt@r pt-9">
+                        <strong>{price_multimplier}&euro;</strong>
+                      </div>
+                    </div>
+                    <!-- END: by_box -->
+                    <!-- BEGIN: by_box_sep -->
+                    <div class="w-1-1 sep pt-1 pb-1 mt-5@s pb-5@s"></div>
+                    <!-- END: by_box_sep -->
+                    <!-- BEGIN: by_pax -->
+                    <div class="g gc" data-group="control">
+                      <div class="w-1-1 pb-2">
+                        <strong>{cart_cant_bot}</strong>
+                      </div>
+                      <div class="w-8-10">
+                        <div class="w-1-1">
+                          <input
+                            type="number"
+                            name="pax"
+                            min="1"
+                            max="{stock_count}"
+                            value="{pax}"
+                            data-pax
+                            class="w-1-1 txt@c"
+                          />
+                        </div>
+                      </div>
+                      <div class="w-2-10">
+                        <a
+                          href="javascript:void(0);"
+                          class="fr"
+                          data-action="cartDelItem"
+                        >
+                          <img
+                            src="{base_script}images/icon-trash.svg"
+                            width="22px"
+                            height="27px"
+                          />
+                        </a>
+                      </div>
+                      <div class="w-1-1 pt-4"></div>
+                      <div class="w-8-10 flx@fd-r@jc-sb@ai-c@ac-c">
+                        <a
+                          href="javascript:void(0);"
+                          data-action="cartDownItem"
+                        >
+                          <img
+                            src="{base_script}images/icon-minus.svg"
+                            width="25px"
+                            height="25px"
+                          />
+                        </a>
+                        <a href="javascript:void(0);" data-action="cartUpItem">
+                          <img
+                            src="{base_script}images/icon-plus.svg"
+                            width="25px"
+                            height="25px"
+                          />
+                        </a>
+                      </div>
+                      <div class="w-2-10"></div>
+                      <div class="w-1-1 txt-org txt@r pt-9">
+                        <strong>{price_unit_total}&euro;</strong>
+                      </div>
+                    </div>
+                    <!-- END: by_pax -->
+                  </div>
+                </div>
+              </div>
+              <div class="ws-1-1 wm-1-4 wl-1-4 wxl-1-4 txt@r pt-10@s">
+                <strong class="w-1-1 price hl txt@u pr-8">{lang_cart_price}</strong>
+                <strong class="w-1-1 txt-org price">{price_total}&euro;</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pl-2">
+          <div class="w-1-1 sep mb-4"></div>
+        </div>
+      </div>
+      <!-- END: row -->
+
+      <div class="w-1-1 pt-4"></div>
+
+      <div class="w-1-1 cp-2">
+        <div class="g">
+          <div class="ws-4-10 wm-8-10 wl-8-10 wxl-8-10"></div>
+          <div class="ws-6-10 wm-2-10 wl-2-10 wxl-2-10">
+            <div class="g" data-subtotal-container>
+              <div class="w-1-2 txt@u">
+                <strong>{lang_iva} ({cart_iva_percent}%)</strong>
+              </div>
+              <div class="w-1-2 txt@r">
+                <strong class="txt@u txt-org">{cart_iva}&euro;</strong>
+              </div>
+
+              <div class="w-1-2 txt@u">
+                <strong>subtotal</strong>
+              </div>
+              <div class="w-1-2 txt@r">
+                <strong class="txt@u txt-org">{cart_subtotal}&euro;</strong>
+              </div>
+            </div>
+
+            <div class="w-1-1"></div>
+
+            <div class="w-1-1 hs">
+              <div class="w-1-1 pt-10">&nbsp;</div>
+              <a
+                href="{base}{user_lang}/checkout"
+                rel="nofollow"
+                class="ws-1-1 button small fr"
+                data-source="check"
+                >{cart_checkout_but}</a
+              >
+            </div>
+          </div>
+          <div class="w-1-1 hl">
+            <div class="w-1-1 pt-5@s">&nbsp;</div>
+            <div data-content-from="check"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="w-1-1 pb-10@s"></div>
+</div>
+<!-- END: cart -->

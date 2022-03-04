@@ -1,0 +1,112 @@
+<!-- BEGIN: tus_datos -->
+<div class="w-1-1 pt-4 pb-6">
+	<div class="w-1-1">
+		<h1 class="txt@c"><span class="txt@u">{lang_page_title_mi_cuenta}</span></h1>
+	</div>
+</div>
+
+<div class="w-1-1">
+	<div class="c cc cp-4@s">
+		<div class="g">
+			<div class="ws-1-1 wm-2-10 wl-2-10 wxl-2-10 admin-menu sep">
+				{FILE {adminMenuTmpl}}
+			</div>
+			
+			<div class="w-1-1 pt-10 pb-2 hl"></div>
+			
+			<div class="ws-1-1 wm-8-10 wl-8-10 wxl-8-10">
+				<div class="pl-2 pl-n@s">
+					<!--////-->
+					
+					<div class="w-1-1">
+						<h2 class="txt@u"><strong>{micuenta_datospers_title}</strong></h2>
+						<div class="w-1-1">{lang_campos_obligatorios}</div>
+					</div>
+					
+					<div class="pt-4">
+						<form>
+							<div class="g">
+								<div class="ws-1-1 w-1-2">
+									<label for="u_name" class="b pb-2">{form_name} <span class="txt-red">*</span></label>
+									<input type="text" name="u_name" value="{u_name}" class="w-1-1"/>
+								</div>
+								<div class="ws-1-1 w-1-2">
+									<label for="u_surname" class="b pb-2">{form_surname} <span class="txt-red">*</span></label>
+									<input type="text" name="u_surname" value="{u_surname}" class="w-1-1"/>
+								</div>
+								
+								<div class="w-1-1"></div>
+								
+								<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 pt-4">
+									<label for="user_name" class="b pb-2">{form_user_name}</label>
+									<input type="text" name="user_name" value="{user_name}" class="w-1-1"/>
+								</div>
+								
+								<div class="w-1-1"></div>
+								
+								<div class="ws-1-1 wm-1-2 wl-1-2 wxl-1-2 pt-4">
+									<label for="user_email" class="b pb-2">{label_email}:</label>
+									<input type="text" name="user_email" value="{user_email}" class="w-1-1"/>
+								</div>
+								
+								<div class="w-1-1 pt-5"></div>
+								
+								<div class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10">
+									<a href="javascript:void(0);" data-action="clientPersonalData" class="button"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {form_save_changes_but}</a>
+								</div>
+								
+								<div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10">
+									<div data-message class="h">
+										<img src="{base_script}images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					
+					<div class="w-1-1 pt-5">
+						<h2 class="txt@u"><strong>{micuenta_changepass_title}</strong></h2>
+					</div>
+					
+					<div class="pt-4">
+						<form>
+							<div class="g">
+								<div class="ws-1-1 w-1-2">
+									<label for="user_pass" class="b pb-2">{label_newpass}:</label>
+									<span class="rel">
+										<img src="{base_script}images/icon-eye.svg" data-show-pass />
+										<input type="password" name="pass" value="" class="w-1-1"/>
+									</span>
+								</div>
+								<div class="ws-1-1 w-1-2">
+									<label for="u_surname" class="b pb-2">{label_newpassrepeat}:</label>
+									<span class="rel">
+										<img src="{base_script}images/icon-eye.svg" data-show-pass />
+										<input type="password" name="pass_repeat" value="" class="w-1-1"/>
+									</span>
+								</div>
+								
+								<div class="w-1-1 pt-5"></div>
+								
+								<div class="ws-1-1 wm-4-10 wl-4-10 wxl-4-10">
+									<a href="javascript:void(0);" data-action="clientUpPass" class="button"><span class="h mr-1" data-preloader><img src="{base}images/preloader-gray-small.gif" alt="preloader image" /></span> {form_save_changes_but}</a>
+								</div>
+								
+								<div class="ws-1-1 wm-6-10 wl-6-10 wxl-6-10">
+									<div data-message class="h">
+										<img src="{base_script}images/success.svg" width="33px" height="33px" alt="ok" /> <span class="pl-3">{lang_changes_saved}</spam>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					
+					<!--////-->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="w-1-1 pb-10"></div>
+<!-- END: tus_datos -->
